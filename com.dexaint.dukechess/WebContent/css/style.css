@@ -1,0 +1,27 @@
+.grid
+{
+	background-image: url(../image/BG.png);
+	height:80px;
+	width:80px;
+}
+
+.effect.red
+{
+	background-color: red;
+	background-blend-mode: multiply;
+}
+
+.menu
+{
+	display: none;
+	position: absolute;
+	border: 1px solid black;
+	background-color: White;
+	padding: 5px;
+}
+
+.ibutton
+{
+	height:20px;
+	width:80px;
+}
