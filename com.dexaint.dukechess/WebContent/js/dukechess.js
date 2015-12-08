@@ -34,14 +34,14 @@ $(document).ready(function(){
     			break;
     		case "menu_click":
     			$.each(json,function(key,value){
-    				if ("connection"!=key & "type"!=key) {
+    				if (key.indexOf("grid")>=0) {
     					$(document.getElementById(key)).css("background-image","url(image/Duke_f_1.png)");
     				}
 				});
     			break;
     		case "grid_hover":
     			$.each(json,function(key,value){
-    				if ("connection"!=key & "type"!=key) {
+    				if (key.indexOf("grid")>=0) {
     					$(document.getElementById(key)).addClass("effect red");
     				}
 				});
