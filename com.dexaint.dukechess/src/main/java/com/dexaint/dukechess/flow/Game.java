@@ -24,6 +24,22 @@ public class Game {
 	}
 	private void FootmanSummon2() {
 		this.currentState = GameState.FootmanSummon2;
+		
+		Initialization();
+	}
+	
+	private void Initialization() {
+		this.currentState = GameState.INITIALIZATION;
+		// Do something
+		this.currentState= GameState.INITIALSUMMON1;
+	}
+	
+	public void NextStep(int userOp) {
+		switch (currentState) {
+		case INITIALSUMMON1:
+			// Do something
+			this.currentState = GameState.INITIALSUMMON2;
+		}
 	}
 }
 
@@ -31,5 +47,9 @@ enum GameState {
 	Initialization,
 	DukeInit,
 	FootmanSummon1,
-	FootmanSummon2
+	FootmanSummon2,
+	INITIALIZATION,
+	INITIALSUMMON1,
+	INITIALSUMMON2,
+
 }
