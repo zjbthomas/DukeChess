@@ -12,7 +12,7 @@ public class Game {
 		
 		this.field = new Field(maxRow, maxCol);
 	}
-	
+	/*
 	private void Initialization() {
 		this.currentState = GameState.Initialization;
 	}
@@ -27,7 +27,7 @@ public class Game {
 		
 		Initialization();
 	}
-	
+	*/
 	private void Initialization() {
 		this.currentState = GameState.INITIALIZATION;
 		// Do something
@@ -41,15 +41,23 @@ public class Game {
 			this.currentState = GameState.INITIALSUMMON2;
 		}
 	}
+
+
+public GameState getCurrentState()
+{
+	return currentState;
 }
 
 enum GameState {
+	/*
 	Initialization,
 	DukeInit,
 	FootmanSummon1,
 	FootmanSummon2,
+	*/
 	INITIALIZATION,
 	INITIALSUMMON1,
 	INITIALSUMMON2,
 
+}
 }

@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.dexaint.dukechess.action.ActionType;
 import com.dexaint.dukechess.app.App;
+import com.dexaint.dukechess.flow.Game.GameState;
 import com.dexaint.dukechess.web.PageBuilder;
 import com.dexaint.dukechess.web.ServletStreamInbound;
 
@@ -25,6 +26,25 @@ public class Controller implements App {
 		point2Player.put(second, (0 == randPlayer)?1:0);
 		
 		game = new Game(PageBuilder.getBuilder().getMaxRow(),PageBuilder.getBuilder().getMaxCol());
+		
+		
+		HashMap<Object, Object> out;
+		HashMap<Object, Object> out2;
+		out = new HashMap<>();
+		out.put("connection", "true");
+		out.put("message", "Set your Duke in one of the red");
+		//out.put("type", type);
+		out.put("grid_"+2,"dummy");
+		//Send Output
+		
+		out2 = new HashMap<>();
+		out2.put("connection", "true");
+		out2.put("message", "Set your Duke in one of the red.");
+		//out2.put("type", type);
+		out2.put("grid_"+3,"dummy");
+		
+		firstPoint.send(out);
+		firstPoint.send(out2);
 	}
 	
 	public void execute(ServletStreamInbound eventPoint, HashMap<Object, Object> inMsg) {
@@ -34,8 +54,76 @@ public class Controller implements App {
 		
 		HashMap<Object, Object> out;
 		
-		//game.NextStep(userOp);
+		HashMap<Object, Object> out2;
 		
+		//if (game.getCurrentState() == GameState.INITIALIZATION)
+		//{
+		switch(type)
+		{
+		/*case "screen_hover":
+			// Read Input
+			String grid_hover = (String) inMsg.get("grid");
+			int grid_hover_id = Integer.parseInt(grid_hover.substring("grid_".length()));
+			// Create Output
+			out = new HashMap<>();
+			out.put("connection", "true");
+			out.put("message", "Set your Duke in one of the red");
+			out.put("type", type);
+			out.put("grid_"+2,"dummy");
+			//Send Output
+			
+			out2 = new HashMap<>();
+			out2.put("connection", "true");
+			out2.put("message", "Set your Duke in one of the red.");
+			out2.put("type", type);
+			out2.put("grid_"+3,"dummy");
+			
+			eventPoint.send(out);
+			eventPoint.send(out2);
+			break;*/
+		case "grid_click":
+			// Read Input
+			String grid_click = (String) inMsg.get("grid");
+			this.lastId = Integer.parseInt(grid_click.substring("grid_".length()));
+			if(lastId == 2 || lastId == 3)
+			{
+			// Create Output
+			out = new HashMap<>();
+			out.put("connection", "true");
+			out.put("message", "Menu showed.");
+			out.put("type", type);
+			ActionType[] actions = new ActionType[]{ActionType.Summon};
+			out.put("actions",actions);
+			//Send Output
+			eventPoint.send(out);
+			}
+			break;
+		case "menu_click":
+			// Read Input
+			String button = (String) inMsg.get("value");
+			// Create Output:
+			out = new HashMap<>();
+			out.put("connection", "true");
+			out.put("message", "Menu clicked.");
+			out.put("type", type);
+			out.put("grid_"+this.lastId,"dummy");
+			// Send Output
+			eventPoint.send(out);
+			// Create Output
+			out = new HashMap<>();
+			out.put("connection", "true");
+			out.put("message", "New update.");
+			out.put("type", type);
+			out.put("grid_"+this.lastId,"dummy");
+			// Send Output
+			peerPoint.send(out);
+			break;
+		}
+		
+		
+		//game.NextStep(userOp);
+
+/*
 		switch (type) {
 		case "grid_click":
 			// Read Input
@@ -85,5 +173,6 @@ public class Controller implements App {
 			eventPoint.send(out);
 			break;
 		}
+*/
 	}
 }
