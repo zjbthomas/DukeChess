@@ -14,11 +14,22 @@ public class Game {
 	}
 	
 	private void Initialization() {
-		this.currentState = GameState.Initizlization;
-		
+		this.currentState = GameState.Initialization;
+	}
+	private void DukeInit() {
+		this.currentState = GameState.DukeInit;
+	}
+	private void FootmanSummon1() {
+		this.currentState = GameState.FootmanSummon1;
+	}
+	private void FootmanSummon2() {
+		this.currentState = GameState.FootmanSummon2;
 	}
 }
 
 enum GameState {
-	Initizlization
+	Initialization,
+	DukeInit,
+	FootmanSummon1,
+	FootmanSummon2
 }
