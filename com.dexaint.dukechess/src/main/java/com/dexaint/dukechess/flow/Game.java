@@ -11,14 +11,27 @@ public class Game {
 		this.playerList[1] = new Player(1,-1);
 		
 		this.field = new Field(maxRow, maxCol);
+		
+		Initialization();
 	}
 	
 	private void Initialization() {
-		this.currentState = GameState.Initizlization;
-		
+		this.currentState = GameState.INITIALIZATION;
+		// Do something
+		this.currentState= GameState.INITIALSUMMON1;
+	}
+	
+	public void NextStep(int userOp) {
+		switch (currentState) {
+		case INITIALSUMMON1:
+			// Do something
+			this.currentState = GameState.INITIALSUMMON2;
+		}
 	}
 }
 
 enum GameState {
-	Initizlization
+	INITIALIZATION,
+	INITIALSUMMON1,
+	INITIALSUMMON2,
 }

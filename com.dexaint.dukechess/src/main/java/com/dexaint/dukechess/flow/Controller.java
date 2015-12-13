@@ -34,6 +34,8 @@ public class Controller implements App {
 		
 		HashMap<Object, Object> out;
 		
+		//game.NextStep(userOp);
+		
 		switch (type) {
 		case "grid_click":
 			// Read Input
