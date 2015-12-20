@@ -74,6 +74,17 @@ public class ChessImpl implements Chess{
 		return ret;
 	}	
 	
+		public void performAction(Field field, ActionType action, int[] dest, ChessType type, Player p) {
+		switch (action) {
+		case Move:
+			
+		case Summon:
+			field.setChess(field.getChessFactory().createChess(type, p), dest[0]);;
+		case Command:
+			
+		}
+	}
+	
 	//public abstract HashMap<Destination, MovementType> getStyle(ActionType action);
 	
 	public Player getPlayer()
