@@ -27,6 +27,10 @@ public class Player {
 		}
 	}
 	
+	public void removeFromList(ChessType type) {
+		chessList.removeFirstOccurrence(type);
+	}
+	
 	public int getIndex() {
 		return index;
 	}
