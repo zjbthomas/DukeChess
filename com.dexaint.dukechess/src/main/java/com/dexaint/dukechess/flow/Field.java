@@ -1,4 +1,5 @@
-import com.dexaint.dukechess.chess.Chess;
+package com.dexaint.dukechess.flow;
+
 import com.dexaint.dukechess.chess.Chess;
 import com.dexaint.dukechess.chess.ChessFactory;
 import com.dexaint.dukechess.movement.MovementFactory;

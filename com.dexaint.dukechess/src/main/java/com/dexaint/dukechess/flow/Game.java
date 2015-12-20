@@ -1,6 +1,5 @@
 package com.dexaint.dukechess.flow;
 
-import com.dexaint.dukechess.chess.Chess;
 import com.dexaint.dukechess.chess.ChessType;
 
 public class Game {
@@ -19,9 +18,8 @@ public class Game {
 	public void Initialization()
 	{
 		currentState = GameState.INITIALIZATION;
-		Chess[] map = field.getFieldMap();
-		map[2] = field.getChessFactory().createChess(ChessType.Duke, this.playerList[0]);
-		map[33] = field.getChessFactory().createChess(ChessType.Duke, this.playerList[1]);
+		field.setChess(field.getChessFactory().createChess(ChessType.Duke, this.playerList[0]), 2);
+		field.setChess(field.getChessFactory().createChess(ChessType.Duke, this.playerList[1]), 33);
 		currentState = GameState.INITIALSUMMON1;
 		PerformState();
 	}

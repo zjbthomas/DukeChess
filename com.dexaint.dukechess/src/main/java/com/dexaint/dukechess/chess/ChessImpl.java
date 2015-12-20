@@ -74,7 +74,7 @@ public class ChessImpl implements Chess{
 		return ret;
 	}	
 	
-		public void performAction(Field field, ActionType action, int[] dest, ChessType type, Player p) {
+	public void performAction(Field field, ActionType action, int[] dest, ChessType type, Player p) {
 		switch (action) {
 		case Move:
 			

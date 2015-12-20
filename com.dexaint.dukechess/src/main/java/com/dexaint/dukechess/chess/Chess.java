@@ -12,5 +12,5 @@ public interface Chess {
 	ActionType[] getAvailableActions(Field field, int pos);
 	HashMap<Destination, MovementType> getStyle(ActionType action);
 	Player getPlayer();
-	void performAction();
+	void performAction(Field field, ActionType action, int[] dest, ChessType type, Player p);
 }

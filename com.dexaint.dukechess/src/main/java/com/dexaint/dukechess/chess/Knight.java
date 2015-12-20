@@ -1,4 +1,4 @@
-package com.dexaint.dukechess.chess;
+/*package com.dexaint.dukechess.chess;
 
 import java.util.HashMap;
 
@@ -49,3 +49,4 @@ public class Knight extends ChessImpl {
 		}
 	}
 }
+*/
