@@ -1,6 +1,7 @@
 package com.dexaint.dukechess.flow;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import com.dexaint.dukechess.action.ActionType;
@@ -31,10 +32,29 @@ public class Controller implements App {
 		ServletStreamInbound peerPoint = (eventPoint == this.firstPoint)?this.secondPoint:this.firstPoint;
 		
 		String type = (String) inMsg.get("type");
-		
 		HashMap<Object, Object> out;
-		
-		//game.NextStep(userOp);
+		HashMap<Integer, String> judge;
+		if(type != "Start") 
+		{
+			String getId = (String) inMsg.get("grid");
+			int userOp = Integer.parseInt(getId.substring("grid_".length()));
+			judge = game.performState(userOp);
+			if(judge == null)
+				return;
+		}
+		else
+		{
+			game.performState(0);
+			out = new HashMap<>();
+			out.put("connection", "true");
+			out.put("message", "Initialization done.");
+			out.put("type", "initialization");
+			out.put("grid_"+2,"dummy");
+			out.put("grid_"+33,"dummy");
+			eventPoint.send(out);
+			peerPoint.send(out);
+			return;
+		}
 		
 		switch (type) {
 		case "grid_click":
@@ -42,12 +62,13 @@ public class Controller implements App {
 			String grid_click = (String) inMsg.get("grid");
 			this.lastId = Integer.parseInt(grid_click.substring("grid_".length()));
 			// Create Output
-			out = new HashMap<>();
+			out = new HashMap<Object, Object>();
 			out.put("connection", "true");
 			out.put("message", "Menu showed.");
 			out.put("type", type);
 			ActionType[] actions = new ActionType[]{ActionType.Move, ActionType.Summon};
 			out.put("actions",actions);
+			out.put("grid_"+this.lastId,"dummy");
 			//Send Output
 			eventPoint.send(out);
 			break;

@@ -95,6 +95,10 @@ public class ServletStreamInbound extends StreamInbound {
 				this.send(out);
 				nowSession.send(out);
 				
+				HashMap<Object, Object> start = new HashMap<Object, Object>();
+				start.put("type", "Start");
+				newPeers.getApp().execute(this, start);
+				
 				return true;
 			}
 		}

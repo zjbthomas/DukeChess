@@ -23,6 +23,13 @@ $(document).ready(function(){
     	else {
     		$("#msgbar")[0].innerHTML = json.message;
     		switch (json.type){
+    		case "initialization":
+    			$.each(json,function(key,value){
+    				if (key.indexOf("grid")>=0) {
+    					$(document.getElementById(key)).css("background-image","url(image/Duke_f_1.png)");
+    				}
+				});
+    			break;
     		case "grid_click":
     			$(".menu").empty();
 				$.each(json.actions,function(i,value){
