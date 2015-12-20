@@ -4,7 +4,7 @@ import com.dexaint.dukechess.flow.Player;
 
 public class ChessFactory {
 	
-	public static Chess createChess(ChessType type, Player p) {
+	public Chess createChess(ChessType type, Player p) {
 		switch (type)
 		{
 		case Assassin:

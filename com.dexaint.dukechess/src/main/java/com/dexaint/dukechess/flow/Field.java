@@ -1,6 +1,4 @@
-package com.dexaint.dukechess.flow;
-
-
+rt com.dexaint.dukechess.chess.Chess;
 import com.dexaint.dukechess.chess.Chess;
 import com.dexaint.dukechess.chess.ChessFactory;
 import com.dexaint.dukechess.movement.MovementFactory;
@@ -12,6 +10,7 @@ public class Field {
 	public int getMaxCol(){return maxCol;}
 	private Chess[] fieldMap;
 	public Chess getChess(int pos) {return fieldMap[pos];}
+	public void setChess(Chess chess, int pos) {fieldMap[pos]=chess;}
 	
 	private ChessFactory chessFactory = new ChessFactory();
 	public ChessFactory getChessFactory() {return chessFactory;}

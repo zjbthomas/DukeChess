@@ -38,11 +38,22 @@ public abstract class ChessImpl implements Chess{
 		for (Entry<Destination, MovementType> kvp : getStyle(action).entrySet()) {
 			int[] dest = field.getMovementFactory().createMovement(kvp.getValue()).validateMovement(field, pos, kvp.getKey(), player);
 			ret= ArrayUtils.addAll(ret,dest);			
-		}
+		} 
 		return ret;
 	}	
 	
 	public abstract HashMap<Destination, MovementType> getStyle(ActionType action);
+
+	public void performAction(Field field, ActionType action, int[] dest, ChessType type, Player p) {
+		switch (action) {
+		case Move:
+			
+		case Summon:
+			field.setChess(field.getChessFactory().createChess(type, p), dest[0]);;
+		case Command:
+			
+		}
+	}
 	
 	public Player getPlayer()
 	{
