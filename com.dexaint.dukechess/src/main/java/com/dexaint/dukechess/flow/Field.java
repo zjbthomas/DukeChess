@@ -1,4 +1,4 @@
-rt com.dexaint.dukechess.chess.Chess;
+import com.dexaint.dukechess.chess.Chess;
 import com.dexaint.dukechess.chess.Chess;
 import com.dexaint.dukechess.chess.ChessFactory;
 import com.dexaint.dukechess.movement.MovementFactory;
