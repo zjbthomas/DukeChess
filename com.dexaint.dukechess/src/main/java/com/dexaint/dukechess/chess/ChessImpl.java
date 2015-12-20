@@ -16,20 +16,23 @@ import com.dexaint.dukechess.flow.Player;
 public class ChessImpl implements Chess{
 	public boolean starter = true;
 	private Player player;
+	@SuppressWarnings("unused")
 	private ChessType chessType;
 	private Element chessRoot;
 	private ActionType[] actions;
 	
 	@SuppressWarnings("unchecked")
-	protected ChessImpl(Player player, ChessType chessType, Document document) {
+	protected ChessImpl(Player player, ChessType chessType, List<Element> chessList) {
 		this.player = player;
 		this.chessType = chessType;
 
-		List<Element> nameList = document.getRootElement().elements("name");
-		for (Element name : nameList) {
-			if (name.getText().equals(chessType.toString())) {
-				this.chessRoot = name.getParent(); // Back to <chess/>
-				this.actions = (ActionType[]) this.chessRoot.element("actions").elements("action").toArray();
+		for (Element chess : chessList) {
+			if (chess.attribute("name").getText().equals(chessType.toString())) {
+				this.chessRoot = chess;
+				List<Element> actionList = this.chessRoot.element("actions").elements("action");
+				for (Element action : actionList) {
+					ArrayUtils.add(actions, ActionType.valueOf(action.getText()));
+				}
 				break;
 			}
 		}
@@ -40,14 +43,15 @@ public class ChessImpl implements Chess{
 		List<Element> styleList = this.chessRoot.element("styles").elements("style");
 		HashMap<Destination, MovementType> ret = new HashMap<Destination, MovementType>();
 		for (Element style : styleList) {
-			if (style.element("action").getText().equals(action.toString()) &&
-					(this.starter?"1":"0").equals(style.element("starter").getText())) {
-				List<Element> targetList = style.element("targets").elements("target");
-				for (Element target : targetList) {
-					ret.put(Destination.valueOf(target.element("destination").getText()),
-						MovementType.valueOf(target.element("movement").getText()));
+			if (style.element("action").getText().equals(action.toString())) {
+				if ((null == style.element("starter")) || (this.starter?"1":"0").equals(style.element("starter").getText())) {
+					List<Element> targetList = style.element("targets").elements("target");
+					for (Element target : targetList) {
+						ret.put(Destination.valueOf(target.element("destination").getText()),
+							MovementType.valueOf(target.element("movement").getText()));
+					}
+					return ret;
 				}
-				return ret;
 			}
 		}
 		return new HashMap<Destination, MovementType>();

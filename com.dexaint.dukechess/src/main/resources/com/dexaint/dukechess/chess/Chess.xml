@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chesses>
-	<chess>
-		<name>Assassin</name>
+	<chess name="Assassin">
 		<styles>
 			<!-- frontMoveStyle -->
 			<style>
@@ -44,11 +43,9 @@
 		</styles>
 		<actions>
 			<action>Move</action>
-			<action>Summon</action>
 		</actions>
 	</chess>
-	<chess>
-		<name>Bowman</name>
+	<chess name="Bowman">
 		<styles>
 			<!-- frontMoveStyle -->
 			<style>
@@ -72,12 +69,12 @@
 						<movement>Jump</movement>
 					</target>
 					<target>
-						<destination>L</destination>
-						<movement>Move</movement>
+						<destination>RR</destination>
+						<movement>Jump</movement>
 					</target>
 					<target>
-						<destination>L</destination>
-						<movement>Move</movement>
+						<destination>LL</destination>
+						<movement>Jump</movement>
 					</target>
 				</targets>
 			</style>
@@ -87,16 +84,237 @@
 				<starter>0</starter>
 				<targets>
 					<target>
-						<destination>UURR</destination>
-						<movement>JumpSlide</movement>
+						<destination>U</destination>
+						<movement>Move</movement>
 					</target>
 					<target>
-						<destination>UULL</destination>
-						<movement>JumpSlide</movement>
+						<destination>DR</destination>
+						<movement>Move</movement>
+					</target>
+					<target>
+						<destination>DL</destination>
+						<movement>Move</movement>
+					</target>
+					<target>
+						<destination>UU</destination>
+						<movement>Strike</movement>
+					</target>
+					<target>
+						<destination>UR</destination>
+						<movement>Strike</movement>
+					</target>
+					<target>
+						<destination>UL</destination>
+						<movement>Strike</movement>
+					</target>
+				</targets>
+			</style>
+		</styles>
+		<actions>
+			<action>Move</action>
+		</actions>
+	</chess>
+	<chess name="Champion">
+		<styles>
+			<!-- frontMoveStyle -->
+			<style>
+				<action>Move</action>
+				<starter>1</starter>
+				<targets>
+					<target>
+						<destination>U</destination>
+						<movement>Move</movement>
+					</target>
+					<target>
+						<destination>D</destination>
+						<movement>Move</movement>
+					</target>
+					<target>
+						<destination>R</destination>
+						<movement>Move</movement>
+					</target>
+					<target>
+						<destination>L</destination>
+						<movement>Move</movement>
+					</target>
+					<target>
+						<destination>UU</destination>
+						<movement>Jump</movement>
 					</target>
 					<target>
 						<destination>DD</destination>
-						<movement>JumpSlide</movement>
+						<movement>Jump</movement>
+					</target>
+					<target>
+						<destination>RR</destination>
+						<movement>Jump</movement>
+					</target>
+					<target>
+						<destination>LL</destination>
+						<movement>Jump</movement>
+					</target>
+				</targets>
+			</style>
+			<!-- backMoveStyle -->
+			<style>
+				<action>Move</action>
+				<starter>0</starter>
+				<targets>
+					<target>
+						<destination>U</destination>
+						<movement>Strike</movement>
+					</target>
+					<target>
+						<destination>D</destination>
+						<movement>Strike</movement>
+					</target>
+					<target>
+						<destination>R</destination>
+						<movement>Strike</movement>
+					</target>
+					<target>
+						<destination>L</destination>
+						<movement>Strike</movement>
+					</target>
+					<target>
+						<destination>UU</destination>
+						<movement>Jump</movement>
+					</target>
+					<target>
+						<destination>DD</destination>
+						<movement>Jump</movement>
+					</target>
+					<target>
+						<destination>RR</destination>
+						<movement>Jump</movement>
+					</target>
+					<target>
+						<destination>LL</destination>
+						<movement>Jump</movement>
+					</target>
+				</targets>
+			</style>
+		</styles>
+		<actions>
+			<action>Move</action>
+		</actions>
+	</chess>
+	<chess name="Dragoon">
+		<styles>
+			<!-- frontMoveStyle -->
+			<style>
+				<action>Move</action>
+				<starter>1</starter>
+				<targets>
+					<target>
+						<destination>R</destination>
+						<movement>Move</movement>
+					</target>
+					<target>
+						<destination>L</destination>
+						<movement>Move</movement>
+					</target>
+					<target>
+						<destination>UU</destination>
+						<movement>Strike</movement>
+					</target>
+					<target>
+						<destination>UURR</destination>
+						<movement>Strike</movement>
+					</target>
+					<target>
+						<destination>UULL</destination>
+						<movement>Strike</movement>
+					</target>
+				</targets>
+			</style>
+			<!-- backMoveStyle -->
+			<style>
+				<action>Move</action>
+				<starter>0</starter>
+				<targets>
+					<target>
+						<destination>U</destination>
+						<movement>Move</movement>
+					</target>
+					<target>
+						<destination>UU</destination>
+						<movement>Move</movement>
+					</target>
+					<target>
+						<destination>UUR</destination>
+						<movement>Jump</movement>
+					</target>
+					<target>
+						<destination>UUL</destination>
+						<movement>Jump</movement>
+					</target>
+					<target>
+						<destination>DR</destination>
+						<movement>Slide</movement>
+					</target>
+					<target>
+						<destination>DL</destination>
+						<movement>Slide</movement>
+					</target>
+				</targets>
+			</style>
+		</styles>
+		<actions>
+			<action>Move</action>
+		</actions>
+	</chess>
+	<chess name="Duke">
+		<styles>
+			<!-- frontMoveStyle -->
+			<style>
+				<action>Move</action>
+				<starter>1</starter>
+				<targets>
+					<target>
+						<destination>L</destination>
+						<movement>Slide</movement>
+					</target>
+					<target>
+						<destination>R</destination>
+						<movement>Slide</movement>
+					</target>
+				</targets>
+			</style>
+			<!-- backMoveStyle -->
+			<style>
+				<action>Move</action>
+				<starter>0</starter>
+				<targets>
+					<target>
+						<destination>U</destination>
+						<movement>Slide</movement>
+					</target>
+					<target>
+						<destination>D</destination>
+						<movement>Slide</movement>
+					</target>
+				</targets>
+			</style>
+			<!-- summonStyle -->
+			<style>
+				<action>Summon</action>
+				<targets>
+					<target>
+						<destination>U</destination>
+						<movement>Summon</movement>
+					</target>
+					<target>
+						<destination>D</destination>
+						<movement>Summon</movement>
+					</target>
+					<target>
+						<destination>L</destination>
+						<movement>Summon</movement>
+					</target>
+					<target>
+						<destination>R</destination>
+						<movement>Summon</movement>
 					</target>
 				</targets>
 			</style>
