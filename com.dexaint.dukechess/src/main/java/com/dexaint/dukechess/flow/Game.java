@@ -1,5 +1,8 @@
 package com.dexaint.dukechess.flow;
 
+import com.dexaint.dukechess.chess.Chess;
+import com.dexaint.dukechess.chess.ChessType;
+
 public class Game {
 	private Player[] playerList = new Player[2];
 	private Field field;
@@ -12,29 +15,18 @@ public class Game {
 		
 		this.field = new Field(maxRow, maxCol);
 	}
-	
-	private void Initialization() {
-		this.currentState = GameState.Initialization;
-	}
-	private void DukeInit() {
-		this.currentState = GameState.DukeInit;
-	}
-	private void FootmanSummon1() {
-		this.currentState = GameState.FootmanSummon1;
-	}
-	private void FootmanSummon2() {
-		this.currentState = GameState.FootmanSummon2;
-		
-		Initialization();
+
+	public void Initialization()
+	{
+		currentState = GameState.INITIALIZATION;
+		Chess[] map = field.getFieldMap();
+		map[2] = field.getChessFactory().createChess(ChessType.Duke, this.playerList[0]);
+		map[33] = field.getChessFactory().createChess(ChessType.Duke, this.playerList[1]);
+		currentState = GameState.INITIALSUMMON1;
+		PerformState();
 	}
 	
-	private void Initialization() {
-		this.currentState = GameState.INITIALIZATION;
-		// Do something
-		this.currentState= GameState.INITIALSUMMON1;
-	}
-	
-	public void NextStep(int userOp) {
+	public void PerformState() {
 		switch (currentState) {
 		case INITIALSUMMON1:
 			// Do something
@@ -44,10 +36,6 @@ public class Game {
 }
 
 enum GameState {
-	Initialization,
-	DukeInit,
-	FootmanSummon1,
-	FootmanSummon2,
 	INITIALIZATION,
 	INITIALSUMMON1,
 	INITIALSUMMON2,
