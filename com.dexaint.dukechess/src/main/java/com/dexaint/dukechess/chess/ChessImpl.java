@@ -4,11 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import org.apache.commons.lang3.ArrayUtils;
-import org.dom4j.Document;
 import org.dom4j.Element;
-import org.mockito.asm.Type;
 
-import com.dexaint.dukechess.action.ActionType;
 import com.dexaint.dukechess.movement.Destination;
 import com.dexaint.dukechess.movement.MovementType;
 import com.dexaint.dukechess.flow.Field;

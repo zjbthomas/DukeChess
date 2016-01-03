@@ -15,7 +15,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.dexaint.dukechess.action.ActionType;
 import com.dexaint.dukechess.flow.Player;
 import com.dexaint.dukechess.movement.Destination;
 import com.dexaint.dukechess.movement.MovementType;
