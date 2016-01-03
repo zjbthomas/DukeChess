@@ -81,11 +81,13 @@ public class ChessImpl implements Chess{
 	public void performAction(Field field, ActionType action, int[] dest, ChessType type, Player p) {
 		switch (action) {
 		case Move:
-			
+			field.setChess(field.getChess(dest[0]), dest[1]);
+			field.setChess(null, dest[0]);
 		case Summon:
 			field.setChess(field.getChessFactory().createChess(type, p), dest[0]);;
 		case Command:
-			
+			field.setChess(field.getChess(dest[0]), dest[1]);
+			field.setChess(null, dest[0]);
 		}
 	}
 	
