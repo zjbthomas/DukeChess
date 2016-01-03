@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import org.apache.commons.lang3.ArrayUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.mockito.asm.Type;
 
 import com.dexaint.dukechess.action.ActionType;
 import com.dexaint.dukechess.movement.Destination;
@@ -78,16 +79,27 @@ public class ChessImpl implements Chess{
 		return ret;
 	}	
 	
-	public void performAction(Field field, ActionType action, int[] dest, ChessType type, Player p) {
+	public void performAction(Field field, ActionType action, int[] dest, Object...objs){
+		ChessType type = null;
+		Player p = null;
+		for (Object obj : objs) {
+			if (obj.getClass().equals(ChessType.class)) {
+				type = (ChessType) obj;
+			}	
+			if (obj.getClass().equals(Player.class)) {
+				p = (Player) obj;
+			}	
+		}
 		switch (action) {
-		case Move:
-			field.setChess(field.getChess(dest[0]), dest[1]);
-			field.setChess(null, dest[0]);
 		case Summon:
-			field.setChess(field.getChessFactory().createChess(type, p), dest[0]);;
+			field.setChess(field.getChessFactory().createChess(type, p), dest[0]);
+			break;
+		case Move:
 		case Command:
 			field.setChess(field.getChess(dest[0]), dest[1]);
 			field.setChess(null, dest[0]);
+			this.starter=!starter;
+			break;
 		}
 	}
 	
