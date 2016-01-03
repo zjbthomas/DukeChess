@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import com.dexaint.dukechess.action.ActionType;
 import com.dexaint.dukechess.app.App;
+import com.dexaint.dukechess.chess.ActionType;
 import com.dexaint.dukechess.web.PageBuilder;
 import com.dexaint.dukechess.web.ServletStreamInbound;
 

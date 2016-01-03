@@ -7,7 +7,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
 
-import com.dexaint.dukechess.action.ActionType;
 import com.dexaint.dukechess.movement.Destination;
 import com.dexaint.dukechess.movement.MovementType;
 import com.dexaint.dukechess.flow.Field;
@@ -84,7 +83,7 @@ public class ChessImpl implements Chess{
 			field.setChess(field.getChess(dest[0]), dest[1]);
 			field.setChess(null, dest[0]);
 		case Summon:
-			field.setChess(field.getChessFactory().createChess(type, p), dest[0]);;
+			field.setChess(field.getChessFactory().createChess(type, p), dest[0]);
 		case Command:
 			field.setChess(field.getChess(dest[0]), dest[1]);
 			field.setChess(null, dest[0]);

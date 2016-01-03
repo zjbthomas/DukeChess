@@ -2,7 +2,6 @@ package com.dexaint.dukechess.chess;
 
 import java.util.HashMap;
 
-import com.dexaint.dukechess.action.ActionType;
 import com.dexaint.dukechess.flow.Field;
 import com.dexaint.dukechess.flow.Player;
 import com.dexaint.dukechess.movement.Destination;
