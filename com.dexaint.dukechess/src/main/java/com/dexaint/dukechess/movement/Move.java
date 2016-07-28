@@ -17,7 +17,7 @@ public class Move extends MovementImpl {
 		offsets[0] /= 2;
 		offsets[1] /= 2;
 		
-		if (0 != offsets[0] & 0 != offsets[1]) {
+		if (0 != offsets[0] || 0 != offsets[1]) {
 			if (!isInField(field, pos, offsets) || hasAnyChess(field, pos, offsets)) return ret;
 		}
 		

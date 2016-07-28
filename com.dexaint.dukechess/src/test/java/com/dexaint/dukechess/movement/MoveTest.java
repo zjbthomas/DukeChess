@@ -124,10 +124,10 @@ public class MoveTest {
 		assertTrue(Arrays.equals(move.validateMovement(field,pos,Destination.D,player),new int[]{14}));
 		assertTrue(Arrays.equals(move.validateMovement(field,pos,Destination.L,player),new int[]{19}));
 		assertTrue(Arrays.equals(move.validateMovement(field,pos,Destination.R,player),new int[]{21}));
-		assertTrue(Arrays.equals(move.validateMovement(field,pos,Destination.UU,player),new int[]{32}));
-		assertTrue(Arrays.equals(move.validateMovement(field,pos,Destination.DD,player),new int[]{8}));
-		assertTrue(Arrays.equals(move.validateMovement(field,pos,Destination.LL,player),new int[]{18}));
-		assertTrue(Arrays.equals(move.validateMovement(field,pos,Destination.RR,player),new int[]{22}));
+		assertTrue(Arrays.equals(move.validateMovement(field,pos,Destination.UU,player),new int[]{}));
+		assertTrue(Arrays.equals(move.validateMovement(field,pos,Destination.DD,player),new int[]{}));
+		assertTrue(Arrays.equals(move.validateMovement(field,pos,Destination.LL,player),new int[]{}));
+		assertTrue(Arrays.equals(move.validateMovement(field,pos,Destination.RR,player),new int[]{}));
 		assertTrue(Arrays.equals(move.validateMovement(field,pos,Destination.UR,player),new int[]{27}));
 		assertTrue(Arrays.equals(move.validateMovement(field,pos,Destination.UL,player),new int[]{25}));
 		assertTrue(Arrays.equals(move.validateMovement(field,pos,Destination.DR,player),new int[]{15}));
