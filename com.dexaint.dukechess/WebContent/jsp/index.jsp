@@ -12,11 +12,16 @@
 </head>
 
 <body>
-	<%=PageBuilder.getBuilder().initPage(6, 6) %>
+	<table>
+		<tr>
+			<td><%=PageBuilder.getBuilder().initPage(6, 6) %></td>
+			<td><div class="back"></div></td>
+		</tr>
+	</table>
+	
 	<div id="msgbar"></div>
 	
 	<div class="menu"></div>
-	<div class="back"></div>
 </body>
 	
 </html>

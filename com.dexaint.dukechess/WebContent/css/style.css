@@ -19,13 +19,13 @@
 
 .blue
 {
-	background-color: blue;
+	background-color: blueviolet;
 	background-blend-mode: multiply;
 }
 
 .green
 {
-	background-color: green;
+	background-color: lime;
 	background-blend-mode: multiply;
 }
 
@@ -46,15 +46,14 @@
 
 .hovering
 {
-	border:3px solid red;
-	margin:-3px;
+	border:2px dashed black;
+	margin:-2px;
 }
 
 .back
 {
 	display:none;
-	position: absolute;
-	border:3px dashed red;
+	border:2px solid black;
 	height:80px;
 	width:80px;
 }

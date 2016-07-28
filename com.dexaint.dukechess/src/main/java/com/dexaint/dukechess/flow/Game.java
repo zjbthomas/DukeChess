@@ -238,11 +238,12 @@ public class Game {
 		
 		if (hover && this.field.getChess(pos) != null) {
 			int tPos = playerOne? pos: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - pos);
-			ret.put(tPos, "blue");
+			String color = (playerOne == this.field.getChess(pos).getPlayer().equals(this.playerList[0]))? "blue": "red";
+			ret.put(tPos, color);
 			
 			for (int d : this.field.getChess(pos).getControlArea(this.field, pos)) {
 				tPos = playerOne? d: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - d);
-				ret.put(tPos, "blue");
+				ret.put(tPos, color);
 			}
 		} else {
 			int tPos;

@@ -75,8 +75,6 @@ $(document).ready(function(){
 			
 			$(".back").css("background-image",img);
 			
-			$(".back").css("left",$(event.target).offset().left + 85);
-			$(".back").css("top",$(event.target).offset().top + 85);
 			$(".back").show();
 		}
 	},
