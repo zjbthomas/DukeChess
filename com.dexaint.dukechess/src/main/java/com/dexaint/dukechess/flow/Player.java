@@ -38,4 +38,8 @@ public class Player {
 	public int getDirection() {
 		return direction;
 	}
+	
+	public LinkedList<ChessType> getChessList() {
+		return this.chessList;
+	}
 }

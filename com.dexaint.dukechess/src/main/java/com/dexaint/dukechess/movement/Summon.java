@@ -13,19 +13,11 @@ public class Summon extends MovementImpl {
 		
 		if (0 != offsets[0] & 0 != offsets[1] & Math.abs(offsets[0]) != Math.abs(offsets[1])) return ret;
 		
-		if (!(1 == Math.abs(offsets[0])) || (1 == Math.abs(offsets[1]))) return ret;
+		if (!(1 == Math.abs(offsets[0]) || 1 == Math.abs(offsets[1]))) return ret;
 		
-		for (int i = -1; i <= 1; i++)
-		{
-			for (int j = -1; j <= 1; j++)
-			{
-				int[] temp = {i, j};
-				if(0 != Math.abs(temp[0]) + Math.abs(temp[1]))
-				{
-					ret = ArrayUtils.add(ret, offset2Dest(field, pos, d.dest2Offset(p)));
-				}
-			}
-		}
+		if (!isInField(field, pos, offsets) || hasAnyChess(field, pos, offsets)) return ret;
+		
+		ret = ArrayUtils.add(ret, offset2Dest(field, pos, d.dest2Offset(p)));
 		
 		return ret;
 	}

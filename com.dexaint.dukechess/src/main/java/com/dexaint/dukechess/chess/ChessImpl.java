@@ -29,7 +29,7 @@ public class ChessImpl implements Chess{
 				this.chessRoot = chess;
 				List<Element> actionList = this.chessRoot.element("actions").elements("action");
 				for (Element action : actionList) {
-					ArrayUtils.add(actions, ActionType.valueOf(action.getText()));
+					actions = ArrayUtils.add(actions, ActionType.valueOf(action.getText()));
 				}
 				break;
 			}
@@ -76,10 +76,34 @@ public class ChessImpl implements Chess{
 		return ret;
 	}	
 	
+	public HashMap<Integer, MovementType> getAvailableMovements(Field field, int pos, ActionType action) {
+		HashMap<Integer, MovementType> ret = new HashMap<Integer, MovementType>();
+		for (Entry<Destination, MovementType> kvp : getStyle(action).entrySet()) {
+			@SuppressWarnings("static-access")
+			int[] dest = field.getMovementFactory().createMovement(kvp.getValue()).validateMovement(field, pos, kvp.getKey(), player);
+			for (int d : dest) {
+				ret.put(d, kvp.getValue());
+			}
+		}
+		return ret;
+	}
+	
+	public int[] getControlArea(Field field, int pos) {
+		int[] ret = new int[]{};
+		for (int d : this.getAvailableDests(field, pos, ActionType.Move)) {
+			if (!ArrayUtils.contains(ret, d)) ret = ArrayUtils.add(ret, d);	
+		}
+		for (int d : this.getAvailableDests(field, pos, ActionType.Command)) {
+			if (!ArrayUtils.contains(ret, d)) ret = ArrayUtils.add(ret, d);
+		}
+		return ret;
+	}
+	
 	public void performAction(Field field, ActionType action, int[] dest, Object...objs){
 		ChessType type = null;
 		Player p = null;
 		for (Object obj : objs) {
+			if (obj == null) continue;
 			if (obj.getClass().equals(ChessType.class)) {
 				type = (ChessType) obj;
 			}	
@@ -90,20 +114,31 @@ public class ChessImpl implements Chess{
 		switch (action) {
 		case Summon:
 			field.setChess(field.getChessFactory().createChess(type, p), dest[0]);
+			p.removeFromList(type);
 			break;
 		case Move:
 		case Command:
-			field.setChess(field.getChess(dest[0]), dest[1]);
-			field.setChess(null, dest[0]);
+			if (this.getAvailableMovements(field, dest[0], action).get(dest[1]).equals(MovementType.Strike)) {
+				field.setChess(null, dest[1]);
+			} else {
+				field.setChess(field.getChess(dest[0]), dest[1]);
+				field.setChess(null, dest[0]);
+			}
 			this.starter=!starter;
 			break;
 		}
 	}
 	
-	//public abstract HashMap<Destination, MovementType> getStyle(ActionType action);
-	
 	public Player getPlayer()
 	{
 		return player;
+	}
+	
+	public ChessType getChessType() {
+		return this.chessType;
+	}
+	
+	public boolean getStarter() {
+		return this.starter;
 	}
 }

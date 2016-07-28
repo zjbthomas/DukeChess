@@ -2,9 +2,9 @@ var webSocket;
 var clickEvent;
 
 // Local
-var host = "ws://localhost:8080/dukechess/controller";
+var host = "ws://localhost:8080/com.dexaint.dukechess/controller";
 // Server
-// var host = "wss://tomcat7-dexaint.rhcloud.com:8443/controller";
+//var host = "wss://tomcat7-dexaint.rhcloud.com:8443/controller";
 
 $(document).ready(function(){
 	window.WebSocket = window.WebSocket || window.MozWebSocket;  
@@ -23,34 +23,32 @@ $(document).ready(function(){
     	else {
     		$("#msgbar")[0].innerHTML = json.message;
     		switch (json.type){
-    		case "initialization":
+    		case "chess":
+    			$(".grid").css("background-image","");
     			$.each(json,function(key,value){
     				if (key.indexOf("grid")>=0) {
-    					$(document.getElementById(key)).css("background-image","url(image/Duke_f_1.png)");
+    					$(document.getElementById(key)).css("background-image",value);
     				}
 				});
     			break;
-    		case "grid_click":
+    		case "color":
+    			$(".grid").removeClass("red");
+    			$(".grid").removeClass("yellow");
+    			$(".grid").removeClass("blue");
+    			$(".grid").removeClass("green");
+    			$.each(json,function(key,value){
+    				if (key.indexOf("grid")>=0) {
+    					$(document.getElementById(key)).addClass(value);
+    				}
+				});
+    			break;
+    		case "menu":
     			$(".menu").empty();
-				$.each(json.actions,function(i,value){
+				$.each(json.menus,function(i,value){
 					$(".menu").css("left",clickEvent.pageX);
 					$(".menu").css("top",clickEvent.pageY);
 					$(".menu").append("<div><input class=\"ibutton\" type=\"button\" value=\""+value+"\"/></div>");
 					$(".menu").show();
-				});
-    			break;
-    		case "menu_click":
-    			$.each(json,function(key,value){
-    				if (key.indexOf("grid")>=0) {
-    					$(document.getElementById(key)).css("background-image","url(image/Duke_f_1.png)");
-    				}
-				});
-    			break;
-    		case "grid_hover":
-    			$.each(json,function(key,value){
-    				if (key.indexOf("grid")>=0) {
-    					$(document.getElementById(key)).addClass("effect red");
-    				}
 				});
     			break;
     		}
@@ -59,26 +57,38 @@ $(document).ready(function(){
     
     $(".grid").click(function(event){
     	clickEvent = event;
-		$(".grid").removeAttr("style");
-		$(".grid").removeClass().addClass("grid");
-		
 		webSocket.send('{"type":"grid_click","grid":'+event.target.id+'}');
-		
-		
 	});
 	
 	$(".grid").hover(function(){
+		$(event.target).addClass("hovering");
 		webSocket.send('{"type":"grid_hover","grid":'+event.target.id+'}');
+		
+		var img = $(event.target).css("background-image");
+		if (img.indexOf("BG") < 0) {
+			if (img.indexOf("f") >= 0) {
+				img = img.replace("f","b");
+			} else {
+				img = img.replace("b","f");
+			}
+			img = img.replace("1","0");
+			
+			$(".back").css("background-image",img);
+			
+			$(".back").css("left",$(event.target).offset().left + 85);
+			$(".back").css("top",$(event.target).offset().top + 85);
+			$(".back").show();
+		}
 	},
 	function(){
-		$(".grid").removeClass().addClass("grid");
+		$(event.target).removeClass("hovering");
+		webSocket.send('{"type":"hover_restore","grid":'+event.target.id+'}');
+		
+		$(".back").hide();
 	});
 	
 	$(".menu").delegate(".ibutton","click",function() {
-		webSocket.send('{"type":"menu_click","value":'+event.target.value+'}');
-	});
-	
-	$("body").click(function() {
 		$(".menu").hide();
+		webSocket.send('{"type":"menu_click","value":'+event.target.value+'}');
 	});
 });

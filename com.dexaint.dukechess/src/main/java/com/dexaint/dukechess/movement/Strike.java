@@ -10,7 +10,7 @@ public class Strike extends MovementImpl {
 		
 		int[] offsets = d.dest2Offset(p);
 		
-		if (!isInField(field, pos, offsets) || hasMyChess(field, pos, offsets, p)) return ret; // Short-Circuit-OR
+		if (!isInField(field, pos, offsets) || (hasMyChess(field, pos, offsets, p) && !hasAnyChess(field, pos, offsets))) return ret; // Short-Circuit-OR
 		
 		ret = ArrayUtils.add(ret, offset2Dest(field, pos, offsets));
 		

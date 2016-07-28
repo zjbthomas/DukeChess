@@ -10,6 +10,12 @@ import com.dexaint.dukechess.movement.MovementType;
 public interface Chess {
 	ActionType[] getAvailableActions(Field field, int pos);
 	HashMap<Destination, MovementType> getStyle(ActionType action);
-	Player getPlayer();
 	void performAction(Field field, ActionType action, int[] dest, Object...objs);
+	int[] getAvailableDests(Field field, int pos, ActionType action);
+	HashMap<Integer, MovementType> getAvailableMovements(Field field, int pos, ActionType action);
+	int[] getControlArea(Field field, int pos);
+	
+	Player getPlayer();
+	ChessType getChessType();
+	public boolean getStarter();
 }

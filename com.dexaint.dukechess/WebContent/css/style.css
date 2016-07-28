@@ -5,9 +5,27 @@
 	width:80px;
 }
 
-.effect.red
+.red
 {
 	background-color: red;
+	background-blend-mode: multiply;
+}
+
+.yellow
+{
+	background-color: yellow;
+	background-blend-mode: multiply;
+}
+
+.blue
+{
+	background-color: blue;
+	background-blend-mode: multiply;
+}
+
+.green
+{
+	background-color: green;
 	background-blend-mode: multiply;
 }
 
@@ -23,5 +41,20 @@
 .ibutton
 {
 	height:20px;
+	width:80px;
+}
+
+.hovering
+{
+	border:3px solid red;
+	margin:-3px;
+}
+
+.back
+{
+	display:none;
+	position: absolute;
+	border:3px dashed red;
+	height:80px;
 	width:80px;
 }
