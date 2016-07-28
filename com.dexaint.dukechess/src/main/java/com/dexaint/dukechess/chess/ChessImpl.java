@@ -117,13 +117,17 @@ public class ChessImpl implements Chess{
 			p.removeFromList(type);
 			break;
 		case Move:
-		case Command:
 			if (this.getAvailableMovements(field, dest[0], action).get(dest[1]).equals(MovementType.Strike)) {
 				field.setChess(null, dest[1]);
 			} else {
 				field.setChess(field.getChess(dest[0]), dest[1]);
 				field.setChess(null, dest[0]);
 			}
+			this.starter=!starter;
+			break;
+		case Command:
+			field.setChess(field.getChess(dest[0]), dest[1]);
+			field.setChess(null, dest[0]);
 			this.starter=!starter;
 			break;
 		}

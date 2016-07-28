@@ -95,6 +95,27 @@ public class Controller implements App {
 			id = Integer.parseInt(grid_click.substring("grid_".length()));
 			// Perform
 			if (game.performState(id)) {
+				// Event point chess output
+				out = new HashMap<Object, Object>();
+				out.put("connection", "true");
+				out.put("message", game.getMessage(point2Player.get(eventPoint) == 0));
+				out.put("type", "chess");
+				for (Entry<Integer, String> kvp : game.getChessMap(point2Player.get(eventPoint) == 0).entrySet()) {
+					String grid = "grid_" + kvp.getKey();
+					out.put(grid, kvp.getValue());
+				}
+				eventPoint.send(out);
+				// Peer point chess output
+				out = new HashMap<Object, Object>();
+				out.put("connection", "true");
+				out.put("message", game.getMessage(point2Player.get(peerPoint) == 0));
+				out.put("type", "chess");
+				for (Entry<Integer, String> kvp : game.getChessMap(point2Player.get(peerPoint) == 0).entrySet()) {
+					String grid = "grid_" + kvp.getKey();
+					out.put(grid, kvp.getValue());
+				}
+				peerPoint.send(out);
+				// Game over Output
 				out = new HashMap<Object, Object>();
 				out.put("connection", "true");
 				out.put("message", game.checkPlayerWin(true)? "Player One Win": "Player Two Win");
@@ -168,6 +189,27 @@ public class Controller implements App {
 			}
 			// Perform
 			if (game.performState(userOp)) {
+				// Event point chess output
+				out = new HashMap<Object, Object>();
+				out.put("connection", "true");
+				out.put("message", game.getMessage(point2Player.get(eventPoint) == 0));
+				out.put("type", "chess");
+				for (Entry<Integer, String> kvp : game.getChessMap(point2Player.get(eventPoint) == 0).entrySet()) {
+					String grid = "grid_" + kvp.getKey();
+					out.put(grid, kvp.getValue());
+				}
+				eventPoint.send(out);
+				// Peer point chess output
+				out = new HashMap<Object, Object>();
+				out.put("connection", "true");
+				out.put("message", game.getMessage(point2Player.get(peerPoint) == 0));
+				out.put("type", "chess");
+				for (Entry<Integer, String> kvp : game.getChessMap(point2Player.get(peerPoint) == 0).entrySet()) {
+					String grid = "grid_" + kvp.getKey();
+					out.put(grid, kvp.getValue());
+				}
+				peerPoint.send(out);
+				// Game over Output
 				out = new HashMap<Object, Object>();
 				out.put("connection", "true");
 				out.put("message", game.checkPlayerWin(true)? "Player One Win": "Player Two Win");

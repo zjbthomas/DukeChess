@@ -41,6 +41,9 @@ public class Game {
 		this.field.setChess(this.field.getChessFactory().createChess(ChessType.Duke, this.playerList[0]), 2);
 		this.field.setChess(this.field.getChessFactory().createChess(ChessType.Duke, this.playerList[1]), 33);
 		
+		this.playerList[0].removeFromList(ChessType.Duke);
+		this.playerList[1].removeFromList(ChessType.Duke);
+		
 		this.waitingMenu = false;
 		
 		this.currentState = GameState.values()[this.currentState.ordinal() + 1];
@@ -236,102 +239,106 @@ public class Game {
 		
 		HashMap<Integer, String> ret = new HashMap<Integer, String>();
 		
+		int tPos;
+		switch (this.currentState) {
+		case INITSUMMONPLAYERONEFOOTMANONE:
+		case INITSUMMONPLAYERONEFOOTMANTWO:
+			for (Entry<Integer, MovementType> kvp : this.field.getChess(2).getAvailableMovements(this.field, 2, ActionType.Summon).entrySet()) {
+				tPos = playerOne? kvp.getKey(): (this.field.getMaxRow() * this.field.getMaxCol() - 1 - kvp.getKey());
+				ret.put(tPos, "yellow");
+			}
+			break;
+		case INITSUMMONPLAYERTWOFOOTMANONE:
+		case INITSUMMONPLAYERTWOFOOTMANTWO:
+			for (Entry<Integer, MovementType> kvp : this.field.getChess(33).getAvailableMovements(this.field, 33, ActionType.Summon).entrySet()) {
+				tPos = playerOne? kvp.getKey(): (this.field.getMaxRow() * this.field.getMaxCol() - 1 - kvp.getKey());
+				ret.put(tPos, "yellow");
+			}
+			break;
+		case CHOOSECHESS:
+			for(int i = 0; i < this.field.getMaxRow() * this.field.getMaxCol(); i++) {
+				if (this.field.getChess(i) != null) {
+					if (this.field.getChess(i).getPlayer().equals(this.currentPlayer)) {
+						tPos = playerOne? i: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - i);
+						ret.put(tPos, "yellow");
+					}
+				}
+			}
+			break;
+		case CHOOSEACTION:
+			tPos = playerOne? this.currentChessPos: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - this.currentChessPos);
+			ret.put(tPos, "yellow");
+			break;
+		case CHOOSEDESTONE:
+			tPos = playerOne? this.currentChessPos: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - this.currentChessPos);
+			ret.put(tPos, "yellow");
+			
+			switch (this.currentAction) {
+			case Summon:
+				for (Entry<Integer, MovementType> kvp : this.field.getChess(this.currentChessPos).getAvailableMovements(this.field, this.currentChessPos, ActionType.Summon).entrySet()) {
+					tPos = playerOne? kvp.getKey(): (this.field.getMaxRow() * this.field.getMaxCol() - 1 - kvp.getKey());
+					ret.put(tPos, "yellow");
+				}
+				break;
+			case Move:
+				for (Entry<Integer, MovementType> kvp : this.field.getChess(this.currentChessPos).getAvailableMovements(this.field, this.currentChessPos, ActionType.Move).entrySet()) {
+					tPos = playerOne? kvp.getKey(): (this.field.getMaxRow() * this.field.getMaxCol() - 1 - kvp.getKey());
+					switch (kvp.getValue()) {
+					case Strike: ret.put(tPos, "red"); break;
+					default: ret.put(tPos, "green"); break;
+					}
+					
+				}
+				break;
+			case Command:
+				for (Entry<Integer, MovementType> kvp : this.field.getChess(this.currentChessPos).getAvailableMovements(this.field, this.currentChessPos, ActionType.Command).entrySet()) {
+					if (this.field.getChess(kvp.getKey()) != null && this.field.getChess(kvp.getKey()).getPlayer().equals(this.currentPlayer)) {
+						tPos = playerOne? kvp.getKey(): (this.field.getMaxRow() * this.field.getMaxCol() - 1 - kvp.getKey());
+						ret.put(tPos, "yellow");
+					}
+				}
+				break;
+			}
+			break;
+		case CHOOSEDESTTWO:
+			switch (this.currentAction) {
+			case Summon:
+				tPos = playerOne? this.summonPos: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - this.summonPos);
+				ret.put(tPos, "yellow");
+				
+				for (int d : this.field.getChess(this.summonPos).getControlArea(this.field, this.summonPos)) {
+					tPos = playerOne? d: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - d);
+					ret.put(tPos, "yellow");
+				}
+				break;
+			case Command:
+				tPos = playerOne? this.commandPos: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - this.commandPos);
+				ret.put(tPos, "blue");
+				
+				for (int d : this.field.getChess(this.currentChessPos).getAvailableDests(this.field, this.currentChessPos, ActionType.Command)) {
+					if (d != this.commandPos &&
+						((this.field.getChess(d) != null && !this.field.getChess(d).getPlayer().equals(this.currentPlayer)) || this.field.getChess(d) == null)) {
+						tPos = playerOne? d: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - d);
+						ret.put(tPos, "yellow");
+					}
+				}
+			}
+		}
+	
 		if (hover && this.field.getChess(pos) != null) {
-			int tPos = playerOne? pos: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - pos);
+			tPos = playerOne? pos: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - pos);
 			String color = (playerOne == this.field.getChess(pos).getPlayer().equals(this.playerList[0]))? "blue": "red";
-			ret.put(tPos, color);
+			
+			if (!ret.keySet().contains(tPos)) {
+				ret.put(tPos, color);
+			}
 			
 			for (int d : this.field.getChess(pos).getControlArea(this.field, pos)) {
 				tPos = playerOne? d: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - d);
 				ret.put(tPos, color);
 			}
-		} else {
-			int tPos;
-			switch (this.currentState) {
-			case INITSUMMONPLAYERONEFOOTMANONE:
-			case INITSUMMONPLAYERONEFOOTMANTWO:
-				for (Entry<Integer, MovementType> kvp : this.field.getChess(2).getAvailableMovements(this.field, 2, ActionType.Summon).entrySet()) {
-					tPos = playerOne? kvp.getKey(): (this.field.getMaxRow() * this.field.getMaxCol() - 1 - kvp.getKey());
-					ret.put(tPos, "yellow");
-				}
-				break;
-			case INITSUMMONPLAYERTWOFOOTMANONE:
-			case INITSUMMONPLAYERTWOFOOTMANTWO:
-				for (Entry<Integer, MovementType> kvp : this.field.getChess(33).getAvailableMovements(this.field, 33, ActionType.Summon).entrySet()) {
-					tPos = playerOne? kvp.getKey(): (this.field.getMaxRow() * this.field.getMaxCol() - 1 - kvp.getKey());
-					ret.put(tPos, "yellow");
-				}
-				break;
-			case CHOOSECHESS:
-				for(int i = 0; i < this.field.getMaxRow() * this.field.getMaxCol(); i++) {
-					if (this.field.getChess(i) != null) {
-						if (this.field.getChess(i).getPlayer().equals(this.currentPlayer)) {
-							tPos = playerOne? i: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - i);
-							ret.put(tPos, "blue");
-						}
-					}
-				}
-				break;
-			case CHOOSEACTION:
-				tPos = playerOne? this.currentChessPos: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - this.currentChessPos);
-				ret.put(tPos, "blue");
-				break;
-			case CHOOSEDESTONE:
-				tPos = playerOne? this.currentChessPos: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - this.currentChessPos);
-				ret.put(tPos, "blue");
-				
-				switch (this.currentAction) {
-				case Summon:
-					for (Entry<Integer, MovementType> kvp : this.field.getChess(this.currentChessPos).getAvailableMovements(this.field, this.currentChessPos, ActionType.Summon).entrySet()) {
-						tPos = playerOne? kvp.getKey(): (this.field.getMaxRow() * this.field.getMaxCol() - 1 - kvp.getKey());
-						ret.put(tPos, "yellow");
-					}
-					break;
-				case Move:
-					for (Entry<Integer, MovementType> kvp : this.field.getChess(this.currentChessPos).getAvailableMovements(this.field, this.currentChessPos, ActionType.Move).entrySet()) {
-						tPos = playerOne? kvp.getKey(): (this.field.getMaxRow() * this.field.getMaxCol() - 1 - kvp.getKey());
-						switch (kvp.getValue()) {
-						case Strike: ret.put(tPos, "red"); break;
-						default: ret.put(tPos, "green"); break;
-						}
-						
-					}
-					break;
-				case Command:
-					for (Entry<Integer, MovementType> kvp : this.field.getChess(this.currentChessPos).getAvailableMovements(this.field, this.currentChessPos, ActionType.Command).entrySet()) {
-						if (this.field.getChess(kvp.getKey()) != null && this.field.getChess(kvp.getKey()).getPlayer().equals(this.currentPlayer)) {
-							tPos = playerOne? kvp.getKey(): (this.field.getMaxRow() * this.field.getMaxCol() - 1 - kvp.getKey());
-							ret.put(tPos, "yellow");
-						}
-					}
-					break;
-				}
-				break;
-			case CHOOSEDESTTWO:
-				switch (this.currentAction) {
-				case Summon:
-					tPos = playerOne? this.summonPos: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - this.summonPos);
-					ret.put(tPos, "yellow");
-					
-					for (int d : this.field.getChess(this.summonPos).getControlArea(this.field, this.summonPos)) {
-						tPos = playerOne? d: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - d);
-						ret.put(tPos, "yellow");
-					}
-					break;
-				case Command:
-					tPos = playerOne? this.commandPos: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - this.commandPos);
-					ret.put(tPos, "yellow");
-					
-					for (int d : this.field.getChess(this.currentChessPos).getAvailableDests(this.field, this.currentChessPos, ActionType.Command)) {
-						if (d != this.commandPos && this.field.getChess(d) != null && !this.field.getChess(d).getPlayer().equals(this.currentPlayer)) {
-							tPos = playerOne? d: (this.field.getMaxRow() * this.field.getMaxCol() - 1 - d);
-							ret.put(tPos, "yellow");
-						}
-					}
-				}
-			}
 		}
-		
+			
 		return ret;
 	}
 	
