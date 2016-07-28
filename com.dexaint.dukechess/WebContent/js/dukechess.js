@@ -71,7 +71,6 @@ $(document).ready(function(){
 			} else {
 				img = img.replace("b","f");
 			}
-			img = img.replace("1","0");
 			
 			$(".back").css("background-image",img);
 			
