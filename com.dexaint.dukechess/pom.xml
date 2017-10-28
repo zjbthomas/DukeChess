@@ -38,6 +38,18 @@
 		<artifactId>dom4j</artifactId>
 		<version>1.6.1</version>
 	</dependency>
+	<dependency>
+		<groupId>org.apache.tomcat</groupId>
+		<artifactId>tomcat-catalina</artifactId>
+		<version>7.0.82</version>
+		<scope>provided</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.tomcat</groupId>
+		<artifactId>tomcat-coyote</artifactId>
+		<version>7.0.82</version>
+		<scope>provided</scope>
+	</dependency>
   </dependencies>
   <build>
     <plugins>
