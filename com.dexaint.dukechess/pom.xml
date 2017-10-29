@@ -69,7 +69,7 @@
 	        <configuration>    
 				<webXml>WebContent\WEB-INF\web.xml</webXml>
 				<outputDirectory>webapps</outputDirectory>
-				<warName>ROOT</warName>
+				<warName>dukechess</warName>
 	        </configuration> 
       </plugin>
     </plugins>
