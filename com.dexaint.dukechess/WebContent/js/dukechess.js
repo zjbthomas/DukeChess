@@ -1,7 +1,7 @@
 var webSocket;
 var clickEvent;
 
-var host = "ws://localhost:8080/dukechess/controller";
+var host = "ws://" + window.location.host + "/dukechess/controller";
 
 $(document).ready(function(){
 	window.WebSocket = window.WebSocket || window.MozWebSocket;  
