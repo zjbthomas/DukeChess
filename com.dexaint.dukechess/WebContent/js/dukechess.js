@@ -1,10 +1,7 @@
 var webSocket;
 var clickEvent;
 
-// Local
-var host = "ws://localhost:8080/com.dexaint.dukechess/controller";
-// Server
-//var host = "wss://tomcat7-dexaint.rhcloud.com:8443/controller";
+var host = "ws://localhost:8080/dukechess/controller";
 
 $(document).ready(function(){
 	window.WebSocket = window.WebSocket || window.MozWebSocket;  

@@ -68,6 +68,7 @@
 	        <version>2.1.1</version>    
 	        <configuration>    
 				<webXml>WebContent\WEB-INF\web.xml</webXml>
+				<warSourceDirectory>WebContent</warSourceDirectory>
 				<outputDirectory>webapps</outputDirectory>
 				<warName>dukechess</warName>
 	        </configuration> 
