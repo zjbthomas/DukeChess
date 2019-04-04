@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js-frontend/jquery-1.11.3.min.js"></script>
+<script src="/js-frontend/dukechess.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/style.css"/>
+<title>DukeChess</title>
+</head>
+
+
+
+<body>
+	<a href="https://github.com/zjbthomas/DukeChess"><img style="position: absolute; top: 0; right: 0; border: 0;" width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
+
+	<div class="container">
+		<h1>DuckChess</h1>
+		<p>This is a demo my favourite boardgame <a href="https://boardgamegeek.com/boardgame/36235/duke">The Duke</a>.</p>
+		<table class="frame">
+			<tr>
+				<td id="board"></td>
+				<td></td>
+			</tr>
+		</table>
+		
+		<div class="info">
+			<h3>Incoming message:</h3>
+			<p id="msgbar"></p>
+		</div>
+		
+		<div class="info">
+			<h3>Back of selected chess:</h3>
+			<div class="back"></div>
+		</div>
+	</div>
+	
+	<div class="menu"></div>
+	
+	
+</body>
+
+<script>
+		function initPage(maxRow, maxCol) {
+			var board = document.getElementById("board");
+			var table = document.createElement("table");
+			for (var i = maxRow - 1; i >= 0; i--) {
+				var tr = document.createElement("tr");
+				for (var j = 0; j < maxCol; j++) {
+					var td = document.createElement("td");
+	
+					var tile = document.createElement("input");
+					tile.setAttribute("type", "image");
+					tile.setAttribute("alt", "")
+					tile.setAttribute("id", "grid_" + (i*maxCol+j));
+					tile.setAttribute("class", "grid");
+					tile.setAttribute("value", " ");
+	
+					td.appendChild(tile);
+	
+					tr.appendChild(td);
+				}
+				table.appendChild(tr);
+			}
+			board.appendChild(table);
+		}
+		
+		initPage(6, 6);
+	</script>
+
+</html>
