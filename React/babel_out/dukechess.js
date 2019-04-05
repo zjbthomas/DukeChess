@@ -42,6 +42,9 @@ var View = function (_React$Component) {
 
         _this.socket = io();
 
+        _this.X = null;
+        _this.Y = null;
+
         _this.socket.on("game", function (json) {
             _this.setState({
                 connection: json.connection,
@@ -132,7 +135,6 @@ var View = function (_React$Component) {
                                 var key = _step3.value;
 
                                 menus.push(_this.renderMenuButton(key, json.menus[key]));
-                                _this.setState({ showMenu: true });
                             }
                         } catch (err) {
                             _didIteratorError3 = true;
@@ -149,7 +151,14 @@ var View = function (_React$Component) {
                             }
                         }
 
-                        _this.setState({ menu: menus });
+                        if (menus.length != 0) {
+                            _this.setState({
+                                menu: menus,
+                                showMenu: true,
+                                X: _this.X,
+                                Y: _this.Y
+                            });
+                        }
                         break;
                 }
             }
@@ -173,10 +182,8 @@ var View = function (_React$Component) {
     _createClass(View, [{
         key: "onGridClick",
         value: function onGridClick(i, event) {
-            this.setState({
-                X: event.pageX - window.scrollX,
-                Y: event.pageY - window.scrollY
-            });
+            this.X = event.pageX - window.scrollX;
+            this.Y = event.pageY - window.scrollY;
 
             this.socket.emit("game", {
                 type: "grid_click",

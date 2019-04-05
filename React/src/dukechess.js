@@ -4,6 +4,9 @@ class View extends React.Component {
 
         this.socket = io()
 
+        this.X = null
+        this.Y = null
+
         this.socket.on("game", json => {
             this.setState({
                 connection: json.connection,
@@ -45,10 +48,16 @@ class View extends React.Component {
 
                         for (var key of Object.keys(json.menus)) {
                             menus.push(this.renderMenuButton(key, json.menus[key]))
-                            this.setState({showMenu: true})
                         }
 
-                        this.setState({menu: menus})
+                        if (menus.length != 0) {
+                            this.setState({
+                                menu: menus,
+                                showMenu: true,
+                                X: this.X,
+                                Y: this.Y
+                            })
+                        }
                         break;
                     }
             }
@@ -69,10 +78,8 @@ class View extends React.Component {
     }
 
     onGridClick(i, event) {
-        this.setState({
-            X: event.pageX - window.scrollX,
-            Y: event.pageY - window.scrollY
-        })
+        this.X = event.pageX - window.scrollX
+        this.Y = event.pageY - window.scrollY
 
         this.socket.emit("game", {
 			type: "grid_click",
