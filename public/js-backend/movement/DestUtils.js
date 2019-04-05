@@ -1,5 +1,3 @@
-const DestType = require("./DestType").DestType;
-
 class DestUtils {
 	static dest2Offset(ds, player){
 		var ret = [0, 0];
@@ -12,19 +10,19 @@ class DestUtils {
 	
 	static addDests(ret, player, d){
 		switch (d) {
-			case DestType.U:
+			case "U":
 				ret[0] += player.direction * 1;
 				ret[1] += 0;
 				break;
-			case DestType.D:
+			case "D":
 				ret[0] += player.direction * -1;
 				ret[1] += 0;
 				break;
-			case DestType.L:
+			case "L":
 				ret[0] += 0;
 				ret[1] += -1;
 				break;
-			case DestType.R:
+			case "R":
 				ret[0] += 0;
 				ret[1] += 1;
 				break;
