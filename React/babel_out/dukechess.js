@@ -54,7 +54,7 @@ var View = function (_React$Component) {
             if (json.connection == "true") {
                 switch (json.type) {
                     case "chess":
-                        var chess = Array(maxRow * maxCol).fill("url(../image/BG.png)");
+                        var chess = Array(maxRow * maxCol).fill("url(image/BG.png)");
 
                         var _iteratorNormalCompletion = true;
                         var _didIteratorError = false;
@@ -167,14 +167,14 @@ var View = function (_React$Component) {
         _this.state = {
             connection: false,
             msg: "",
-            chess: Array(maxRow * maxCol).fill("url(../image/BG.png)"),
+            chess: Array(maxRow * maxCol).fill("url(image/BG.png)"),
             color: Array(maxRow * maxCol).fill("grid"),
             hover: Array(maxRow * maxCol).fill(""),
             menu: null,
             showMenu: false,
             X: null,
             Y: null,
-            backImg: "url(../image/BG.png)"
+            backImg: "url(image/BG.png)"
         };
         return _this;
     }
@@ -225,7 +225,7 @@ var View = function (_React$Component) {
                 grid: "grid_" + i
             });
 
-            this.setState({ backImg: "url(../image/BG.png)" });
+            this.setState({ backImg: "url(image/BG.png)" });
         }
     }, {
         key: "onMenuButtonClick",
