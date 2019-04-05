@@ -2,9 +2,9 @@
 
 This is a demo of my favourite boardgame [The Duke](https://boardgamegeek.com/boardgame/36235/duke).
 
-It is originally based on Java 7 with Tomcat 7 websocket (see folder ["Java (deprecated)"](./Java (deprecated))). However, Java is not convinient to re-deploy, and its server is too costly, I convert the project to one based on [Node.js](https://nodejs.org/en/) and [socket.io](https://socket.io/).
+It is originally based on Java 7 with Tomcat 7 websocket (see folder ["Java-deprecated"](./Java-deprecated)). However, Java is incovenient to deploy, and its server is too costly, I convert the project to one based on [Node.js](https://nodejs.org/en/) and [socket.io](https://socket.io/).
 
-You can play it [here](http://www.dexaint.com/dukechess/).
+**The game is available [here](http://www.dexaint.com/dukechess/) to play.**
 
 ## How to play?
 
