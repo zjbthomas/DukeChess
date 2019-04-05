@@ -10,7 +10,7 @@ a
 	color: lightskyblue;
 }
 
-#container
+.container
 {
 	position: relative;
 	width: 960px;
@@ -18,7 +18,7 @@ a
 	margin-left: auto;
 }
 
-#game
+.game
 {
 	width: 100%;
 }
@@ -95,9 +95,10 @@ a
 	background-blend-mode: multiply;
 }
 
-#menu
+.menu
 {
-	position: fixed;
+	display: none;
+	position: absolute;
 	border: 1px solid black;
 	background-color: White;
 	padding: 5px;

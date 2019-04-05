@@ -1,11 +1,29 @@
 {
-    "name": "socket-chat-example",
-    "version": "0.0.1",
-    "description": "my first socket.io app",
-    "dependencies": {
-        "express": "^4.16.4",
-        "socket.io": "^2.2.0",
-        "xml2js": "^0.4.19",
-        "xmldoc": "^1.1.2"
-    }
+  "name": "socket-chat-example",
+  "version": "0.0.1",
+  "description": "my first socket.io app",
+  "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-react-app": "^3.1.2",
+    "express": "^4.16.4",
+    "socket.io": "^2.2.0",
+    "xml2js": "^0.4.19",
+    "xmldoc": "^1.1.2"
+  },
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zjbthomas/DukeChess.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zjbthomas/DukeChess/issues"
+  },
+  "homepage": "https://github.com/zjbthomas/DukeChess#readme"
 }

@@ -1,0 +1,1 @@
+npx terser -c -m -o ../public/js-frontend/dukechess.js -- ./babel_out/dukechess.js

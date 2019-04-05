@@ -2,15 +2,17 @@
 
 This is a demo of my favourite boardgame [The Duke](https://boardgamegeek.com/boardgame/36235/duke).
 
-It is originally based on Java 7 with Tomcat 7 websocket (see folder ["Java-deprecated"](./Java-deprecated)). However, Java is incovenient to deploy, and its server is too costly, I convert the project to one based on [Node.js](https://nodejs.org/en/) and [socket.io](https://socket.io/).
-
-**The game is available [here](http://www.dexaint.com/dukechess/) to play.**
+It is originally based on Java 7 with Tomcat 7 websocket (see folder ["/Java-deprecated/"](./Java-deprecated/)), and jQurey (see folder ["/jQuery-deprecated/"](./jQuery-deprecated/)). The latest version is based on [Node.js](https://nodejs.org/en/), [socket.io](https://socket.io/), and [React](https://reactjs.org/).
 
 ## How to play?
 
 ### Game rules
 
 You can get the full rules from [here](https://www.catalystgamelabs.com/download/The%20Duke%20Rulebook%20Hi-Res_FINAL.pdf). For your convenience, a movement reference is provided [here](https://www.catalystgamelabs.com/download/Movement%20Reference%20Card_Final.pdf").
+
+### Online version
+
+**This game is available [here](http://www.dexaint.com/dukechess/) to play.**
 
 ### Run it locally
 
@@ -22,4 +24,11 @@ You can get the full rules from [here](https://www.catalystgamelabs.com/download
   - Path to ["Chess.xml"](./public/resources/Chess.xml) in ["/public/js-backend/chess/ChessFactory.js"](./public/js-backend/chess/ChessFactory.js);
   - Path to ["Player.properties"](./public/resources/Player.properties) in ["/public/js-backend/flow/Player.js"](./public/js-backend/flow/Player.js)
 - Run `node index.js` at the root directory.
-- Visit `http://host:port/path` (the default is ["http://localhost:80"](http://localhost)) on two or more pages and enjoy!
+- Visit `http://host:port/path` (the default is ["http://localhost:80/"](http://localhost/)) on two or more pages and enjoy!
+
+### Build it yourself
+
+- Source code of [React](https://reactjs.org/) is under folder ["/React/src/"](./React/src).
+- You need ["/React/0_babel.bat"](./React/0_babel.bat) to preprocess JSX.
+- You need ["/React/1_terser.bat"](./React/1_terser.bat) to minify JavaScript for Production.
+- More details can be found [here](https://reactjs.org/docs/add-react-to-a-website.html).
