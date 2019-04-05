@@ -161,6 +161,8 @@ var View = function (_React$Component) {
                         }
                         break;
                 }
+            } else {
+                _this.reset(maxRow, maxCol);
             }
         });
 
@@ -180,6 +182,20 @@ var View = function (_React$Component) {
     }
 
     _createClass(View, [{
+        key: "reset",
+        value: function reset(maxRow, maxCol) {
+            this.setState({
+                chess: Array(maxRow * maxCol).fill("url(image/BG.png)"),
+                color: Array(maxRow * maxCol).fill("grid"),
+                hover: Array(maxRow * maxCol).fill(""),
+                menu: null,
+                showMenu: false,
+                X: null,
+                Y: null,
+                backImg: "url(image/BG.png)"
+            });
+        }
+    }, {
         key: "onGridClick",
         value: function onGridClick(i, event) {
             this.X = event.pageX - window.scrollX;

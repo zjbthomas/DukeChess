@@ -60,6 +60,8 @@ class View extends React.Component {
                         }
                         break;
                     }
+            } else {
+                this.reset(maxRow, maxCol)
             }
         })
 
@@ -75,6 +77,19 @@ class View extends React.Component {
             Y: null,
             backImg: "url(image/BG.png)"
         }
+    }
+
+    reset(maxRow, maxCol) {
+        this.setState({
+            chess: Array(maxRow * maxCol).fill("url(image/BG.png)"),
+            color: Array(maxRow * maxCol).fill("grid"),
+            hover: Array(maxRow * maxCol).fill(""),
+            menu: null,
+            showMenu: false,
+            X: null,
+            Y: null,
+            backImg: "url(image/BG.png)"
+        })
     }
 
     onGridClick(i, event) {
