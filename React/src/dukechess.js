@@ -83,7 +83,6 @@ class View extends React.Component {
         this.setState({
             chess: Array(maxRow * maxCol).fill("url(image/BG.png)"),
             color: Array(maxRow * maxCol).fill("grid"),
-            hover: Array(maxRow * maxCol).fill(""),
             menu: null,
             showMenu: false,
             X: null,
