@@ -13,24 +13,55 @@ a
 .container
 {
 	position: relative;
-	max-width: 960px;
+	width: 960px;
     margin-right: auto;
 	margin-left: auto;
 }
 
-.frame
+.game
+{
+	width: 100%;
+}
+
+.left
+{
+	width: 70%;
+	vertical-align: top;
+}
+
+#board
 {
 	margin-right: auto;
 	margin-left: auto;
 }
 
-.info
+.right
+{
+	width: 30%;
+	vertical-align: top;
+}
+
+.chess-info
+{
+	text-align: center;
+}
+
+.chess-holder
+{
+	margin-right: auto;
+	margin-left: auto;
+	border:2px solid black;
+	height:80px;
+	width:80px;
+}
+
+#msgbar
 {
 	border: 1px solid;
-	border-radius: 10px;
-	margin-top: 5px;
-	margin-bottom: 5px;
-	padding: 5px;
+	border-radius: 8px;
+	margin-top: 3px;
+	margin-bottom: 3px;
+	padding: 5px 8px;
 }
 
 .grid
@@ -85,11 +116,3 @@ a
 	margin:-2px;
 }
 
-.back
-{
-	margin-right: auto;
-	margin-left: auto;
-	border:2px solid black;
-	height:80px;
-	width:80px;
-}

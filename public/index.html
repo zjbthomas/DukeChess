@@ -15,24 +15,25 @@
 	<a href="https://github.com/zjbthomas/DukeChess"><img style="position: absolute; top: 0; right: 0; border: 0;" width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
 
 	<div class="container">
-		<h1>DuckChess</h1>
-		<p>This is a demo my favourite boardgame <a href="https://boardgamegeek.com/boardgame/36235/duke">The Duke</a>.</p>
-		<table class="frame">
+		<h1>DukeChess Demo</h1>
+		<p>This is a demo of my favourite boardgame <a href="https://boardgamegeek.com/boardgame/36235/duke">The Duke</a>.</p>
+		<p>You can get the full rules from <a href="https://www.catalystgamelabs.com/download/The%20Duke%20Rulebook%20Hi-Res_FINAL.pdf">here</a>. For your convenience, a movement reference is provided <a href="https://www.catalystgamelabs.com/download/Movement%20Reference%20Card_Final.pdf">here</a>. In the future, the rules and the movement reference will be embedded in this demo, in addition with a simple interactive tutorial.</p>
+
+		<hr>
+
+		<table class="game">
 			<tr>
-				<td id="board"></td>
-				<td></td>
+				<td class="left" id="board-container"></td>
+				<td class="right">
+					<div class="chess-info">
+						<h4>Back</h4>
+						<div class="chess-holder"></div>
+					</div>
+				</td>
 			</tr>
 		</table>
 		
-		<div class="info">
-			<h3>Incoming message:</h3>
-			<p id="msgbar"></p>
-		</div>
-		
-		<div class="info">
-			<h3>Back of selected chess:</h3>
-			<div class="back"></div>
-		</div>
+		<div id="msgbar"></p>
 	</div>
 	
 	<div class="menu"></div>
@@ -42,8 +43,9 @@
 
 <script>
 		function initPage(maxRow, maxCol) {
-			var board = document.getElementById("board");
+			var board = document.getElementById("board-container");
 			var table = document.createElement("table");
+			table.setAttribute("id","board");
 			for (var i = maxRow - 1; i >= 0; i--) {
 				var tr = document.createElement("tr");
 				for (var j = 0; j < maxCol; j++) {
