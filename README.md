@@ -12,7 +12,7 @@ You can get the full rules from [here](https://www.catalystgamelabs.com/download
 
 ### Online version
 
-**This game is available [here](http://www.dexaint.com/dukechess/) to play.**
+**This game is available [here](http://www.junbinzhang.com/dukechess/) to play.**
 
 ### Run it locally
 
