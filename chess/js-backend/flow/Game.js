@@ -194,7 +194,7 @@ class Game {
 				var chess = "url(image/" +
 							   this.field.fieldMap[i].chessType.toString() +
 							   "_" +
-							   (playerOne == (this.field.fieldMap[i].player == this.playerList[0])? 0: 1) +
+							   ((this.field.fieldMap[i].player == this.playerList[0])? 0: 1) +
 							   ".png)";
 				ret.set(pos, chess);
 			}

@@ -21,6 +21,22 @@
 						<destination>R</destination>
 						<movement>Move</movement>
 					</target>
+					<target>
+						<destination>UR</destination>
+						<movement>Move</movement>
+					</target>
+					<target>
+						<destination>UL</destination>
+						<movement>Move</movement>
+					</target>
+					<target>
+						<destination>DR</destination>
+						<movement>Move</movement>
+					</target>
+					<target>
+						<destination>DL</destination>
+						<movement>Move</movement>
+					</target>
 				</targets>
 			</style>
 			<style>

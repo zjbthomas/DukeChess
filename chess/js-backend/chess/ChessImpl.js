@@ -154,13 +154,26 @@ class ChessImpl {
 			break;
 
 		case ActionType.CASTLING:
-			var temp = field.fieldMap[dest[1]];
-			field.fieldMap[dest[1]] = field.fieldMap[dest[0]];
-			field.fieldMap[dest[0]] = temp;
-
-			// cancel castling
+			// cancel castling first
 			field.fieldMap[dest[0]].castling = false;
 			field.fieldMap[dest[1]].castling = false;
+
+			if (dest[1] % field.maxCol == 0) {
+				// move King
+				field.fieldMap[dest[1] + 1] = field.fieldMap[dest[0]]; 
+				field.fieldMap[dest[0]] = null;
+				// move Rook
+				field.fieldMap[dest[1] + 2] = field.fieldMap[dest[1]];
+				field.fieldMap[dest[1]] = null;
+
+			} else {
+				// move King
+				field.fieldMap[dest[1] - 1] = field.fieldMap[dest[0]]; 
+				field.fieldMap[dest[0]] = null;
+				// move Rook
+				field.fieldMap[dest[1] - 2] = field.fieldMap[dest[1]];
+				field.fieldMap[dest[1]] = null;
+			}
 
 			break;
 		
