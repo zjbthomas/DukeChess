@@ -1,0 +1,133 @@
+body
+{
+	padding-top: 4em;
+    font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+a
+{
+	text-decoration: none;
+	color: lightskyblue;
+}
+
+#container
+{
+	position: relative;
+	width: 960px;
+    margin-right: auto;
+	margin-left: auto;
+}
+
+#game
+{
+	width: 100%;
+}
+
+.left
+{
+	width: 70%;
+	vertical-align: top;
+}
+
+#board
+{
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.right
+{
+	width: 30%;
+	vertical-align: top;
+}
+
+.chess-info
+{
+	text-align: center;
+}
+
+.chess-holder
+{
+	margin-right: auto;
+	margin-left: auto;
+	border:2px solid black;
+	height:80px;
+	width:80px;
+}
+
+#msgbar
+{
+	border: 1px solid;
+	border-radius: 8px;
+	margin-top: 3px;
+	margin-bottom: 3px;
+	padding: 5px 8px;
+}
+
+.chess-container
+{
+	position:relative;
+	height:80px;
+	width:80px;
+}
+
+.chess-background
+{
+	position:absolute;
+	top:0;
+	left:0;
+	height:80px;
+	width:80px;
+}
+
+.grid
+{
+	position:relative;
+	background-image: url(image/empty.png);
+	height:80px;
+	width:80px;
+}
+
+.red
+{
+	background-color: red;
+	background-blend-mode: multiply;
+}
+
+.yellow
+{
+	background-color: yellow;
+	background-blend-mode: multiply;
+}
+
+.blue
+{
+	background-color: lightskyblue;
+	background-blend-mode: multiply;
+}
+
+.green
+{
+	background-color: lime;
+	background-blend-mode: multiply;
+}
+
+#menu
+{
+	position: fixed;
+	border: 1px solid black;
+	background-color: White;
+	padding: 5px;
+}
+
+.ibutton
+{
+	height:20px;
+	width:80px;
+}
+
+.hovering
+{
+	border:2px dashed black;
+	margin:-2px;
+}

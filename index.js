@@ -3,9 +3,11 @@ const app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-const Controller = require("./public/js-backend/flow/Controller");
+const DukeChessController = require("./dukechess/js-backend/flow/Controller");
+const ChessController = require("./chess/js-backend/flow/Controller");
 
-app.use(express.static("public"));
+app.use('/dukechess', express.static("dukechess"));
+app.use('/chess', express.static("chess"));
 
 http.listen(80, function(){
     console.log('HTTP on 80');
@@ -13,10 +15,19 @@ http.listen(80, function(){
 
 var pool = new Map();
 
-function match(id, socket) {
+function getController(name, id, session, socket) {
+    switch (name) {
+        case 'dukechess':
+            return new DukeChessController(id, session, socket);
+        case 'chess':
+            return new ChessController(id, session, socket);
+    }
+}
+
+function match(name, id, socket) {
     for (var [session, peer] of pool) {
         if (session != id && null == peer) {
-            var peers = new Controller(id, session, socket);
+            var peers = getController(name, id, session, socket);
             pool.set(id, peers);
             pool.set(session, peers);
 
@@ -47,11 +58,11 @@ function match(id, socket) {
     return false;
 }
 
-io.on('connection', function(socket){
+function handleSocket(socket, name) {
     if (!pool.has(socket.id)) {
         pool.set(socket.id, null);
 
-        if (!match(socket.id, socket)) {
+        if (!match(name, socket.id, socket)) {
             socket.emit("game", {
                 connection: "false",
                 message: "Wait for another player to join."
@@ -67,7 +78,7 @@ io.on('connection', function(socket){
             session = (peers.firstPoint == socket.id)? peers.secondPoint: peers.firstPoint;
             pool.set(session, null);
 
-            if (!match(session, socket)) {
+            if (!match(name, session, socket)) {
                 socket.to(session).emit("game", {
                     connection: "false",
                     message: "Wait for another player to join."
@@ -88,4 +99,7 @@ io.on('connection', function(socket){
             });
         }
     })
-  });
+}
+
+io.of('/dukechess').on('connection', (socket) => handleSocket(socket, 'dukechess'));
+io.of('/chess').on('connection', (socket) => handleSocket(socket, 'chess'));

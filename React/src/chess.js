@@ -2,7 +2,7 @@ class View extends React.Component {
     constructor({maxRow, maxCol}) {
         super()
 
-        this.socket = io('/dukechess')
+        this.socket = io('/chess')
 
         this.X = null
         this.Y = null
@@ -16,7 +16,7 @@ class View extends React.Component {
             if (json.connection == "true") {
                 switch (json.type){
                     case "chess":
-                        var chess = Array(maxRow * maxCol).fill("url(image/BG.png)")
+                        var chess = Array(maxRow * maxCol).fill("url(image/empty.png)")
 
                         for (var key of Object.keys(json)) {
                             if (key.indexOf("grid")>=0) {
@@ -68,26 +68,24 @@ class View extends React.Component {
         this.state = {
             connection: false,
             msg: "",
-            chess: Array(maxRow * maxCol).fill("url(image/BG.png)"),
+            chess: Array(maxRow * maxCol).fill("url(image/empty.png)"),
             color: Array(maxRow * maxCol).fill("grid"),
             hover: Array(maxRow * maxCol).fill(""),
             menu: null,
             showMenu: false,
             X: null,
-            Y: null,
-            backImg: "url(image/BG.png)"
+            Y: null
         }
     }
 
     reset(maxRow, maxCol) {
         this.setState({
-            chess: Array(maxRow * maxCol).fill("url(image/BG.png)"),
+            chess: Array(maxRow * maxCol).fill("url(image/empty.png)"),
             color: Array(maxRow * maxCol).fill("grid"),
             menu: null,
             showMenu: false,
             X: null,
-            Y: null,
-            backImg: "url(image/BG.png)"
+            Y: null
         })
     }
 
@@ -111,17 +109,6 @@ class View extends React.Component {
 				type: "grid_hover",
 				grid: "grid_" + i
             });
-            
-            var img = this.state.chess[i]
-            if (img.indexOf("BG") < 0) {
-				if (img.indexOf("f") >= 0) {
-					img = img.replace("f","b");
-				} else {
-					img = img.replace("b","f");
-                }
-
-                this.setState({backImg: img})
-            }
         }
     }
 
@@ -132,8 +119,6 @@ class View extends React.Component {
 			type: "hover_restore",
 			grid: "grid_" + i
         });
-        
-        this.setState({backImg: "url(image/BG.png)"})
     }
 
     onMenuButtonClick(value) {
@@ -162,6 +147,7 @@ class View extends React.Component {
         return (
             <Tile
                 id={i}
+                background={((Math.floor(i / this.props.maxRow) % 2 + i % 2) % 2) == 0? "url(image/black.png)": "url(image/white.png)"}
                 chess={this.state.chess[i]}
                 color={this.state.color[i]}
                 hover={this.state.hover[i]}
@@ -192,18 +178,12 @@ class View extends React.Component {
             <table key="game" id="game">
                 <tbody>
                     <tr>
-                        <td className="left" id="board-container">
+                        <td id="board-container">
                             <table id="board">
                                 <tbody>
                                     {this.createTable()}
                                 </tbody>
                             </table>
-                        </td>
-                        <td className="right">
-                            <div className="chess-info">
-                                <h4>Back</h4>
-                                <Back img={this.state.backImg} />
-                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -243,15 +223,6 @@ function Menu(props) {
     )
 }
 
-function Back(props) {
-    return (
-        <div
-            className="chess-holder"
-            style={{backgroundImage : props.img}}
-        />
-    )
-}
-
 class Tile extends React.Component {
     render() {
         return (
@@ -260,7 +231,7 @@ class Tile extends React.Component {
                 alt=""
                 id={"grid_" + this.props.id}
                 className={this.props.color + " " + this.props.hover}
-                style={{backgroundImage : this.props.chess}}
+                style={{backgroundImage : this.props.chess + "," + this.props.background}}
                 value=""
                 onClick={(event) => this.props.onClick(event)}
                 onMouseEnter={() => this.props.onMouseEnter()}
@@ -271,6 +242,6 @@ class Tile extends React.Component {
 }
 
 ReactDOM.render(
-    <View maxRow={6} maxCol={6} />,
+    <View maxRow={8} maxCol={8} />,
     document.getElementById("view")
 );

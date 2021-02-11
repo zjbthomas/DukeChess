@@ -1,3 +1,5 @@
+const { ChessType } = require("../chess/ChessType");
+
 class MovementImpl {
 	offset2Dest(field, pos, offsets) {
 		return pos + offsets[0] * field.maxRow + offsets[1];
@@ -22,10 +24,31 @@ class MovementImpl {
 		return this.hasAnyChess(field, pos, offsets) && 
 				!this.hasMyChess(field, pos, offsets, p);
 	}
+
+	allowFirstMove(field, pos) {
+		return (field.fieldMap[pos] != null &&
+				field.fieldMap[pos].chessType == ChessType.PAWN &&
+				field.fieldMap[pos].firstMove);
+	}
 	
+	storedCapture(field, pos) {
+		if (field.fieldMap[pos] !=null && field.fieldMap[pos].capture != null) {
+			return field.fieldMap[pos].capture;
+		} else {
+			return [];
+		}
+	}
+	
+	hasMyUnmovedRook(field, pos, offsets, p) {
+		return (this.hasAnyChess(field, pos, offsets) &&
+				field.fieldMap[this.offset2Dest(field, pos, offsets)].player == p &&
+				field.fieldMap[this.offset2Dest(field, pos, offsets)].chessType == ChessType.ROOK &&
+				field.fieldMap[this.offset2Dest(field, pos, offsets)].castling);
+	}
+
 	pos2RowCol(field, pos) {
 		var ret = [];
-		ret[0] = Math.floor(pos / field.maxCol);
+		ret[0] = Math.floor(pos / field.maxCol);;
 		ret[1] = pos % field.maxCol;
 		return ret;
 	}

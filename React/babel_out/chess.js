@@ -40,7 +40,7 @@ var View = function (_React$Component) {
             return table;
         };
 
-        _this.socket = io('/dukechess');
+        _this.socket = io('/chess');
 
         _this.X = null;
         _this.Y = null;
@@ -54,7 +54,7 @@ var View = function (_React$Component) {
             if (json.connection == "true") {
                 switch (json.type) {
                     case "chess":
-                        var chess = Array(maxRow * maxCol).fill("url(image/BG.png)");
+                        var chess = Array(maxRow * maxCol).fill("url(image/empty.png)");
 
                         var _iteratorNormalCompletion = true;
                         var _didIteratorError = false;
@@ -169,14 +169,13 @@ var View = function (_React$Component) {
         _this.state = {
             connection: false,
             msg: "",
-            chess: Array(maxRow * maxCol).fill("url(image/BG.png)"),
+            chess: Array(maxRow * maxCol).fill("url(image/empty.png)"),
             color: Array(maxRow * maxCol).fill("grid"),
             hover: Array(maxRow * maxCol).fill(""),
             menu: null,
             showMenu: false,
             X: null,
-            Y: null,
-            backImg: "url(image/BG.png)"
+            Y: null
         };
         return _this;
     }
@@ -185,13 +184,12 @@ var View = function (_React$Component) {
         key: "reset",
         value: function reset(maxRow, maxCol) {
             this.setState({
-                chess: Array(maxRow * maxCol).fill("url(image/BG.png)"),
+                chess: Array(maxRow * maxCol).fill("url(image/empty.png)"),
                 color: Array(maxRow * maxCol).fill("grid"),
                 menu: null,
                 showMenu: false,
                 X: null,
-                Y: null,
-                backImg: "url(image/BG.png)"
+                Y: null
             });
         }
     }, {
@@ -217,17 +215,6 @@ var View = function (_React$Component) {
                     type: "grid_hover",
                     grid: "grid_" + i
                 });
-
-                var img = this.state.chess[i];
-                if (img.indexOf("BG") < 0) {
-                    if (img.indexOf("f") >= 0) {
-                        img = img.replace("f", "b");
-                    } else {
-                        img = img.replace("b", "f");
-                    }
-
-                    this.setState({ backImg: img });
-                }
             }
         }
     }, {
@@ -239,8 +226,6 @@ var View = function (_React$Component) {
                 type: "hover_restore",
                 grid: "grid_" + i
             });
-
-            this.setState({ backImg: "url(image/BG.png)" });
         }
     }, {
         key: "onMenuButtonClick",
@@ -277,6 +262,7 @@ var View = function (_React$Component) {
 
             return React.createElement(Tile, {
                 id: i,
+                background: (Math.floor(i / this.props.maxRow) % 2 + i % 2) % 2 == 0 ? "url(image/black.png)" : "url(image/white.png)",
                 chess: this.state.chess[i],
                 color: this.state.color[i],
                 hover: this.state.hover[i],
@@ -305,7 +291,7 @@ var View = function (_React$Component) {
                         null,
                         React.createElement(
                             "td",
-                            { className: "left", id: "board-container" },
+                            { id: "board-container" },
                             React.createElement(
                                 "table",
                                 { id: "board" },
@@ -314,20 +300,6 @@ var View = function (_React$Component) {
                                     null,
                                     this.createTable()
                                 )
-                            )
-                        ),
-                        React.createElement(
-                            "td",
-                            { className: "right" },
-                            React.createElement(
-                                "div",
-                                { className: "chess-info" },
-                                React.createElement(
-                                    "h4",
-                                    null,
-                                    "Back"
-                                ),
-                                React.createElement(Back, { img: this.state.backImg })
                             )
                         )
                     )
@@ -373,13 +345,6 @@ function Menu(props) {
     );
 }
 
-function Back(props) {
-    return React.createElement("div", {
-        className: "chess-holder",
-        style: { backgroundImage: props.img }
-    });
-}
-
 var Tile = function (_React$Component2) {
     _inherits(Tile, _React$Component2);
 
@@ -399,7 +364,7 @@ var Tile = function (_React$Component2) {
                 alt: "",
                 id: "grid_" + this.props.id,
                 className: this.props.color + " " + this.props.hover,
-                style: { backgroundImage: this.props.chess },
+                style: { backgroundImage: this.props.chess + "," + this.props.background },
                 value: "",
                 onClick: function onClick(event) {
                     return _this5.props.onClick(event);
@@ -417,4 +382,4 @@ var Tile = function (_React$Component2) {
     return Tile;
 }(React.Component);
 
-ReactDOM.render(React.createElement(View, { maxRow: 6, maxCol: 6 }), document.getElementById("view"));
+ReactDOM.render(React.createElement(View, { maxRow: 8, maxCol: 8 }), document.getElementById("view"));

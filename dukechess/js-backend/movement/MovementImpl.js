@@ -25,7 +25,7 @@ class MovementImpl {
 	
 	pos2RowCol(field, pos) {
 		var ret = [];
-		ret[0] = pos / field.maxCol;
+		ret[0] = Math.floor(pos / field.maxCol);
 		ret[1] = pos % field.maxCol;
 		return ret;
 	}
