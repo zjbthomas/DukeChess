@@ -6,8 +6,8 @@ var io = require('socket.io')(http);
 const DukeChessController = require("./dukechess/js-backend/flow/Controller");
 const ChessController = require("./chess/js-backend/flow/Controller");
 
-app.use('/dukechess', express.static("dukechess"));
-app.use('/chess', express.static("chess"));
+app.use('/dukechess', express.static(__dirname + "/dukechess"));
+app.use('/chess', express.static(__dirname + "/chess"));
 
 http.listen(80, function(){
     console.log('HTTP on 80');

@@ -19,10 +19,10 @@ You can get the full rules from [here](https://www.catalystgamelabs.com/download
 - Clone the project.
 - Make sure you have [`npm`](https://www.npmjs.com/) and `node` ([Node.js](https://nodejs.org/en/)) installed.
 - Go to the root directory of the project, and run `npm install` in command point to install all dependencies.
-- (Optional) Modify ["/index.js"](./index.js) and ["/public/index.html"](./public/index.html) for port and path.
+- (Optional) Modify ["/index.js"](./index.js) and ["/dukechess/index.html"](./dukechess/index.html) for port and path.
 - (Optional) This project is originally designed on **Windows**. For **Linux**, please modify paths to the following files:
-  - Path to ["Chess.xml"](./public/resources/Chess.xml) in ["/public/js-backend/chess/ChessFactory.js"](./public/js-backend/chess/ChessFactory.js);
-  - Path to ["Player.properties"](./public/resources/Player.properties) in ["/public/js-backend/flow/Player.js"](./public/js-backend/flow/Player.js)
+  - Path to ["Chess.xml"](./dukechess/resources/Chess.xml) in ["/dukechess/js-backend/chess/ChessFactory.js"](./dukechess/js-backend/chess/ChessFactory.js);
+  - Path to ["Player.properties"](./dukechess/resources/Player.properties) in ["/dukechess/js-backend/flow/Player.js"](./dukechess/js-backend/flow/Player.js)
 - Run `node index.js` at the root directory.
 - Visit `http://host:port/path` (the default is ["http://localhost:80/"](http://localhost/)) on two or more pages and enjoy!
 
@@ -32,3 +32,7 @@ You can get the full rules from [here](https://www.catalystgamelabs.com/download
 - You need ["/React/0_babel.bat"](./React/0_babel.bat) to preprocess JSX.
 - You need ["/React/1_terser.bat"](./React/1_terser.bat) to minify JavaScript for Production.
 - More details can be found [here](https://reactjs.org/docs/add-react-to-a-website.html).
+
+# Chess Demo
+
+The code is also adapted for Chess, under the folder ["/chess/"](./chess/)). Chess is available [here](http://junbinzhang.com/chess/) to play.
