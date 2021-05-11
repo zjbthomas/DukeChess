@@ -1,18 +1,33 @@
 const express = require("express");
+
+// For webpages
 const app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+// Specific for Unity
+const app_unity = express();
+var http_unity = require('http').Server(app_unity);
+var io_unity = require('socket.io')(http_unity);
+
+// Controllers
 const DukeChessController = require("./dukechess/js-backend/flow/Controller");
 const ChessController = require("./chess/js-backend/flow/Controller");
 
+// Serve pages
 app.use('/dukechess', express.static(__dirname + "/dukechess"));
 app.use('/chess', express.static(__dirname + "/chess"));
 
+// Ports
 http.listen(80, function(){
     console.log('HTTP on 80');
 });
 
+http_unity.listen(4115, function(){
+    console.log('HTTP (Unity) on 4115');
+});
+
+// Connection pool
 var pool = new Map();
 
 function getController(name, id, session, socket) {
@@ -103,3 +118,5 @@ function handleSocket(socket, name) {
 
 io.of('/dukechess').on('connection', (socket) => handleSocket(socket, 'dukechess'));
 io.of('/chess').on('connection', (socket) => handleSocket(socket, 'chess'));
+
+io_unity.on('connection', (socket) => handleSocket(socket, 'dukechess'));
