@@ -12,7 +12,7 @@ You can get the full rules from [here](https://www.catalystgamelabs.com/download
 
 ### Online version
 
-**This game is available [here](http://junbinzhang.com/dukechess/) to play.**
+**This game is available [here](http://games.junbinzhang.com/dukechess/) to play.**
 
 ### Run it locally
 
@@ -35,4 +35,4 @@ You can get the full rules from [here](https://www.catalystgamelabs.com/download
 
 # Chess Demo
 
-The code is also adapted for Chess, under the folder ["/chess/"](./chess/)). Chess is available [here](http://junbinzhang.com/chess/) to play.
+The code is also adapted for Chess, under the folder ["/chess/"](./chess/)). Chess is available [here](http://games.junbinzhang.com/chess/) to play.
