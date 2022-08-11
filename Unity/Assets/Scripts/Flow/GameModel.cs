@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -37,137 +38,275 @@ public class GameModel
 
     // Player
     private List<Player> playerList = new List<Player>();
-    private int nowPlayer;
 
     public void AddPlayer(Player p)
     {
         this.playerList.Add(p);
     }
 
-    public void RemoveFromList(int i, ChessData.ChessType type)
+    bool firstPlayer;
+
+    // Cached chess pos
+    private int cachedChessPos;
+    private int cachedCommandChess;
+
+    // Cached animation
+    private bool isFlying;
+
+    public void StartGame(bool firstPlayer)
     {
-        this.playerList[i].RemoveFromList(type);
-    }
+        // Set first player
+        this.firstPlayer = firstPlayer;
 
-    // State
-    private GameState nowState;
-
-    public void SetState(GameState s) {
-        this.nowState = s;
-    }
-
-    public void NextState() {
-        this.nowState++;
-    }
-
-    private void NextTurn()
-    {
-        nowPlayer = nowPlayer == 0? 1 : 0;
-
-        waitMenu = false;
-        nowState = GameState.CHOOSECHESS;
-    }
-
-    private int nowChessPos;
-
-    // Menu
-    private bool waitMenu;
-
-    public void SetWaitMenu(bool b) {
-        this.waitMenu = b;
-    }
-
-    public void StartGame()
-    {
         // Add two initial duke
         ChessFactory.CreateChess(board[2], ChessData.ChessType.Duke, playerList[0]);
         ChessFactory.CreateChess(board[33], ChessData.ChessType.Duke, playerList[1]);
 
-        // Remove duke from player's chess
-        RemoveFromList(0, ChessData.ChessType.Duke);
-        RemoveFromList(1, ChessData.ChessType.Duke);
-
-        // Move to next state
-        NextState();
-
-        RenderMask(false, -1);
+        RenderMask(null);
     }
 
-    public void PerformOp(int userOp)
+    public void TryChess(int pos) {
+        Dictionary<string, string> json = new Dictionary<string, string>();
+        json.Add("type", "grid_click");
+        json.Add("grid", "grid_" + pos);
+
+        SocketManager.socketManager.EmitMessage("game", json);
+    }
+
+    void TryMenu(string s)
     {
-        switch (nowState)
+        Dictionary<string, string> json = new Dictionary<string, string>();
+        json.Add("type", "menu_click");
+        json.Add("value", s);
+
+        SocketManager.socketManager.EmitMessage("game", json);
+    }
+
+    public void RenderMenu(Dictionary<string, object> json) {
+        if (json != null)
+        {
+            GameManager.SetIsWaitingMenu(true);
+
+            // Remove all buttons
+            UltimateRadialMenu.RemoveAllRadialButtons("ActionMenu");
+
+            // Add buttons
+            List<object> menus = (List<object>) json["menus"];
+            foreach (object o in menus) {
+                string s = o.ToString();
+
+                UltimateRadialButtonInfo info = new UltimateRadialButtonInfo();
+                info.name = s;
+                info.key = s;
+                info.UpdateText(s);
+
+                UltimateRadialMenu.RegisterToRadialMenu("ActionMenu", TryMenu, info);
+            }
+           
+            // Update menu position
+            Vector3 scrPos = Camera.main.WorldToScreenPoint(board[cachedChessPos].gameObject.transform.position);
+            UltimateRadialMenu.SetPosition("ActionMenu", scrPos);
+
+            UltimateRadialMenu.EnableRadialMenu("ActionMenu");
+        }
+        else {
+            GameManager.SetIsWaitingMenu(false);
+            UltimateRadialMenu.DisableRadialMenu("ActionMenu");
+            UltimateRadialMenu.SetPosition("ActionMenu", new Vector3(2000, 2000));
+        }
+    }
+
+    public void PerformOp(Dictionary<string, object> json)
+    {
+        GameState state = (GameState)int.Parse(json["state"].ToString());
+        int userOp = int.Parse(json["userop"].ToString());
+        bool active = String.Equals(json["active"], "true");
+        string action = "";
+
+        Debug.Log(state);
+        Debug.Log(active);
+
+        switch (state)
         {
             case GameState.INITSUMMONPLAYERONEFOOTMANONE:
             case GameState.INITSUMMONPLAYERONEFOOTMANTWO:
-                if (board[2].GetChessData().GetAvailableDests(board, 2, ChessData.ActionType.Summon).Contains(userOp))
-                {
-                    board[2].GetChessData().PerformAction(board, ChessData.ActionType.Summon, new int[] { userOp }, new object[] { ChessData.ChessType.Footman, playerList[0] });
-
-                    waitMenu = false;
-
-                    if (nowState == GameState.INITSUMMONPLAYERONEFOOTMANTWO)
-                    {
-                        nowPlayer = 1;
-                    }
-                    NextState();
-
-                    // Play animation
-                    board[userOp].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Generate);
-                }
+                ChessFactory.CreateChess(board[userOp], ChessData.ChessType.Footman, playerList[firstPlayer ? 0 : 1]);
+                // Play animation
+                board[userOp].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Generate);
+                
                 break;
             case GameState.INITSUMMONPLAYERTWOFOOTMANONE:
             case GameState.INITSUMMONPLAYERTWOFOOTMANTWO:
-                if (board[33].GetChessData().GetAvailableDests(board, 33, ChessData.ActionType.Summon).Contains(userOp))
-                {
-                    board[33].GetChessData().PerformAction(board, ChessData.ActionType.Summon, new int[] { userOp }, new object[] { ChessData.ChessType.Footman, playerList[1] });
+                ChessFactory.CreateChess(board[userOp], ChessData.ChessType.Footman, playerList[firstPlayer ? 1 : 0]);
+                // Play animation
+                board[userOp].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Generate);
 
-                    waitMenu = false;
-                    if (nowState == GameState.INITSUMMONPLAYERTWOFOOTMANTWO)
-                    {
-                        nowPlayer = 0;
-                    }
-                    NextState();
-
-                    // Play animation
-                    board[userOp].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Generate);
-                }
                 break;
             case GameState.CHOOSECHESS:
-                // Empty position?
-                if (board[userOp].GetChessData() == null) return;
-                // Non-current player?
-                if (board[userOp].GetChessData().GetPlayer().GetIndex() != this.nowPlayer) return;
-
-                nowChessPos = userOp;
-
-                waitMenu = true;
+                // Store current chess pos so the animation can be played later
+                cachedChessPos = userOp;
 
                 // Play animation
-                board[userOp].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Select);
-
-                // TODO: now temporarily skip action selction
-                // NextState();
-                nowState = GameState.CHOOSEDESTONE;
+                if (active)
+                {
+                    string subtype = json["subtype"].ToString();
+                    switch (json["subtype"].ToString()) {
+                        case "nomenu":
+                            board[userOp].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Select);
+                            isFlying = true;
+                            break;
+                        case "inmenu":
+                            board[userOp].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.WaitSelect);
+                            isFlying = false;
+                            break;
+                    }
+                }
+                else {
+                    string subtype = json["subtype"].ToString();
+                    switch (json["subtype"].ToString())
+                    {
+                        case "nomenu":
+                            board[userOp].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Select);
+                            isFlying = true;
+                            break;
+                        case "inmenu":
+                            board[userOp].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.WaitSelect);
+                            isFlying = false;
+                            break;
+                    }
+                }
+                break;
+            case GameState.CHOOSEACTION:
+                if (userOp == 0)
+                {
+                    board[cachedChessPos].gameObject.GetComponent<ChessAnimation>().PlayAnimation(isFlying? ChessAnimation.AnimationType.Deselect: ChessAnimation.AnimationType.Kill);
+                    isFlying = false;
+                    break;
+                }
+                action = json["action"].ToString();
+                switch (action)
+                {
+                    case "Summon":
+                        // Deselect duke at cachedChessPos
+                        board[cachedChessPos].gameObject.GetComponent<ChessAnimation>().PlayAnimation(isFlying ? ChessAnimation.AnimationType.Deselect : ChessAnimation.AnimationType.Kill);
+                        isFlying = false;
+                        break;
+                    case "Move":
+                        if (!isFlying) {
+                            board[cachedChessPos].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Kill);
+                            board[cachedChessPos].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Select);
+                            isFlying = true;
+                        }
+                        break;
+                    case "Command":
+                        this.cachedCommandChess = cachedChessPos;
+                        break;
+                }
                 break;
             case GameState.CHOOSEDESTONE:
-                // TODO: summon
+                action = json["action"].ToString();
+                
+                switch (action) {
+                    case "Summon":
+                        // Store summon chess pos so the animation can be played later
+                        cachedChessPos = userOp;
 
-                // TODO: only handle Move action now
-                if (board[nowChessPos].GetChessData().GetAvailableDests(board, nowChessPos, ChessData.ActionType.Move).Contains(userOp)) {
-                    // Play animation first
-                    board[nowChessPos].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Move, userOp);
+                        // Summon
+                        ChessData.ChessType chessType = (ChessData.ChessType) Enum.Parse(typeof(ChessData.ChessType), json["summon"].ToString());
+                        ChessFactory.CreateChess(board[userOp], chessType, playerList[active? 0 : 1]);
+                        // Play a deselect sound
+                        SoundManager.soundManager.PlayMoveSound();
+                        break;
+                    case "Move":
+                        if (userOp == cachedChessPos)
+                        {
+                            board[cachedChessPos].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Deselect);
+                            isFlying = false;
+                        }
+                        else
+                        {
+                            if (!isFlying) {
+                                board[cachedChessPos].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Kill);
+                                isFlying = false;
+                            }
+                            board[cachedChessPos].GetChessData().Flip();
+                            board[cachedChessPos].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Move, userOp);
+                        }
+                        break;
+                    case "Command":
+                        // If the command chess is clicked, then cancel
+                        if (userOp == this.cachedCommandChess)
+                        {
+                            board[this.cachedCommandChess].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Kill);
+                            break;
+                        }
+                        // Make command chess WaitSelect
+                        board[this.cachedCommandChess].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.WaitSelect);
 
-                    board[nowChessPos].GetChessData().PerformAction(board, ChessData.ActionType.Move, new int[] { nowChessPos, userOp }, new object[] { null });
+                        // Store be-commanded chess pos so the animation can be played later
+                        cachedChessPos = userOp;
+                        
+                        board[cachedChessPos].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Select);
+                        isFlying = true;
+                        break;
+                }
+                break;
+            case GameState.CHOOSEDESTTWO:
+                action = json["action"].ToString();
 
-                    // TODO: check player win
+                switch (action)
+                {
+                    case "Summon":
+                        if (userOp == 0) {
+                            board[cachedChessPos].DestoryChess();
+                            break;
+                        }
 
-                    NextTurn();
+                        board[cachedChessPos].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Generate);
+                        break;
+                    case "Command":
+                        // If the command chess is clicked, then cancel
+                        if (userOp == this.cachedCommandChess) {
+                            board[this.cachedCommandChess].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Kill);
+                            board[cachedChessPos].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Deselect);
+                            isFlying = false;
+                            break;
+                        }
+
+                        // Move be-commanded chess
+                        board[cachedChessPos].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Move, userOp);
+
+                        // Flip command chess
+                        board[this.cachedCommandChess].GetChessData().Flip();
+                        board[this.cachedCommandChess].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Kill);
+                        board[this.cachedCommandChess].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Flip);
+                        break;
                 }
                 break;
         }
     }
 
-    public void RenderMask(bool hover, int pos)
+    public void NextState(Dictionary<string, object> json) {
+        RenderMask(json);
+    }
+
+    public void HandleHover(bool isHovering, int pos) {
+        Dictionary<string, string> json = new Dictionary<string, string>();
+
+        if (isHovering)
+        {
+            json.Add("type", "grid_hover");
+            json.Add("grid", "grid_" + pos);
+        }
+        else {
+            json.Add("type", "hover_restore");
+            json.Add("grid", "grid_" + pos);
+        }
+        
+        SocketManager.socketManager.EmitMessage("game", json);
+    }
+
+    public void RenderMask(Dictionary<string, object> json)
     {
         // Reset all masks
         for (int r = 0; r < GameModel.MAXROW; r++)
@@ -181,44 +320,34 @@ public class GameModel
             }
         }
 
-        // Check hovering
-        if (hover && pos < 0) {
-            return;
-        }
-
-        switch (nowState)
+        if (json != null)
         {
-            case GameState.INITSUMMONPLAYERONEFOOTMANONE:
-            case GameState.INITSUMMONPLAYERONEFOOTMANTWO:
-                foreach (KeyValuePair<int, MovementFactory.MovementType> kvp in board[2].GetChessData().GetAvailableMovements(board, 2, ChessData.ActionType.Summon))
-                {
-                    DyeMask(kvp.Key, MaskColor.YELLOW);
-                }
-                break;
-            case GameState.INITSUMMONPLAYERTWOFOOTMANONE:
-            case GameState.INITSUMMONPLAYERTWOFOOTMANTWO:
-                foreach (KeyValuePair<int, MovementFactory.MovementType> kvp in board[33].GetChessData().GetAvailableMovements(board, 33, ChessData.ActionType.Summon))
-                {
-                    DyeMask(kvp.Key, MaskColor.YELLOW);
-                }
-                break;
-            case GameState.CHOOSEDESTONE:
-                foreach (int p in board[nowChessPos].GetChessData().GetAvailableDests(board, nowChessPos, ChessData.ActionType.Move))
-                {
-                    DyeMask(p, MaskColor.GREEN);
-                }
-                break;
-        }
-
-        // Handle hovering
-        if (hover && board[pos].GetChessData() != null) {
-            Color c = board[pos].GetChessData().GetPlayer() == this.playerList[0] ? MaskColor.BLUE : MaskColor.RED;
-            // dye hovering chess
-            DyeMask(pos, c);
-            // dye control area
-            foreach (int d in board[pos].GetChessData().GetControlArea(board, pos))
+            foreach (KeyValuePair<string, object> kvp in json)
             {
-                DyeMask(d, c);
+                string key = kvp.Key;
+                if (key.Contains("grid"))
+                {
+                    int pos = int.Parse(key.Substring("grid_".Length));
+
+                    Color color = MaskColor.TRANSPARENT;
+                    switch (kvp.Value.ToString())
+                    {
+                        case "red":
+                            color = MaskColor.RED;
+                            break;
+                        case "yellow":
+                            color = MaskColor.YELLOW;
+                            break;
+                        case "blue":
+                            color = MaskColor.BLUE;
+                            break;
+                        case "green":
+                            color = MaskColor.GREEN;
+                            break;
+                    }
+
+                    DyeMask(pos, color);
+                }
             }
         }
     }

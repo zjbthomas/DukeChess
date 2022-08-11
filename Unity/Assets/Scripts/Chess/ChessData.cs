@@ -48,24 +48,10 @@ public class ChessData
     private XElement chessRoot;
     private List<ActionType> actions;
 
-    public ChessData(ChessType type, List<XElement> chessList, Player player) {
+    public ChessData(ChessType type, Player player) {
         this.starter = true;
         this.player = player;
         this.chessType = type;
-
-        foreach (XElement chess in chessList) {
-            // Find the XElement for given ChessType
-            if (chess.Attribute("name").Value.Equals(type.ToString())) {
-                this.chessRoot = chess;
-                // Parse possible actions
-                this.actions = new List<ActionType>();
-                IEnumerable<XElement> actionList = this.chessRoot.Element("actions").Elements("action");
-                foreach (XElement action in actionList) {
-                    this.actions.Add((ActionType)Enum.Parse(typeof(ActionType), action.Value));
-                }
-                break;
-            }
-        }
     }
 
     public Dictionary<DestinationParser.Destination, MovementFactory.MovementType> GetStyle(ActionType action) {
@@ -136,6 +122,10 @@ public class ChessData
         return ret;
     }
 
+    public void Flip() {
+        starter = !starter;
+    }
+
     public void PerformAction(List<ChessController> board, ActionType action, int[] dest, params object[] objs)
     {
         ChessType? type = null;
@@ -153,7 +143,6 @@ public class ChessData
 		switch (action) {
 		case ActionType.Summon:
             ChessFactory.CreateChess(board[dest[0]], (ChessType) type, p);
-			p.RemoveFromList((ChessType) type);
 			break;
 		case ActionType.Move:
             if (GetAvailableMovements(board, dest[0], action)[dest[1]].Equals(MovementFactory.MovementType.Strike))

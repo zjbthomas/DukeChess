@@ -4,6 +4,11 @@ class View extends React.Component {
 
         this.socket = io('/dukechess')
 
+        // Send platform
+        this.socket.on("connect", () => {
+            this.socket.emit("platform", "browser")
+        })
+
         this.X = null
         this.Y = null
 

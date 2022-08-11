@@ -9,7 +9,11 @@ public class ChessAnimation : MonoBehaviour
         Generate,
         Destroy,
         Select,
-        Move
+        WaitSelect,
+        Deselect,
+        Move,
+        Flip,
+        Kill
     }
 
     // Constants
@@ -21,13 +25,18 @@ public class ChessAnimation : MonoBehaviour
     public ParticleSystem destroy;
 
     private Sequence shakeChessSeq;
+    private Sequence twistChessSeq;
 
     private int swapPos;
 
     public void PlayAnimation(AnimationType type, int pos = -1) {
-        // No matter how, hold on for animation, and always kill shakeChessSeq
+        // No matter how, hold on for animation, and always kill shakeChessSeq and twistChessSeq
         GameManager.SetInAnimation(true);
         shakeChessSeq.Kill();
+        twistChessSeq.Kill();
+
+        GameObject chessEntity;
+
         // Play animation depending on type
         switch (type) {
             case AnimationType.Generate:
@@ -65,19 +74,42 @@ public class ChessAnimation : MonoBehaviour
                     {
                         GameManager.SetInAnimation(false);
                         // Keep floating
-                        shakeChessSeq = DOTween.Sequence();
+                        this.shakeChessSeq = DOTween.Sequence();
                             shakeChessSeq
                                 .Append(this.transform.DOLocalMoveZ(HEIGHT + 30, 0.7f))
                                 .SetLoops(-1, LoopType.Yoyo);
                     });
                 break;
+            case AnimationType.WaitSelect:
+                // For WaitSelect, no need to keep inAnimation flag
+                GameManager.SetInAnimation(false);
+
+                this.twistChessSeq = DOTween.Sequence();
+                twistChessSeq
+                    .Append(this.transform.DOLocalRotateQuaternion(Quaternion.Euler(0, 0, 5), 0.1f))
+                    .Append(this.transform.DOLocalRotateQuaternion(Quaternion.Euler(0, 0, -5), 0.2f))
+                    .Append(this.transform.DOLocalRotateQuaternion(Quaternion.Euler(0, 0, 0), 0.1f))
+                    .SetLoops(-1);
+                break;
+            case AnimationType.Deselect:
+                Sequence deselChessSeq = DOTween.Sequence();
+                deselChessSeq
+                    .Append(this.transform.DOLocalMoveZ(0, 0.3f)) // Go down
+                    .OnComplete(() =>
+                    {
+                        GameManager.SetInAnimation(false);
+
+                        // Play sound
+                        SoundManager.soundManager.PlayMoveSound();
+                    });
+                    break;
             case AnimationType.Move:
                 if (pos == -1) {
                     return;
                 }
 
                 // Obtain necessary scripts and objects
-                GameObject chessEntity = this.transform.Find("ChessEntity").gameObject;
+                chessEntity = this.transform.Find("ChessEntity").gameObject;
                 GameObject chessMask = this.transform.Find("ChessMask").gameObject;
                 ChessController chess = this.GetComponent<ChessController>();
                 
@@ -90,7 +122,7 @@ public class ChessAnimation : MonoBehaviour
                 Sequence moveChessSeq = DOTween.Sequence();
                 moveChessSeq
                     .Append(this.transform.DOLocalMove(targetSky, 0.5f)) // Move to target position
-                    .Append(chessEntity.transform.DOLocalRotateQuaternion(Quaternion.Euler(0, chess.GetChessData().GetStarter() ? 180.0f : 0.0f, 0), 0.2f)) // Rotate, notice the starter is the old one
+                    .Append(chessEntity.transform.DOLocalRotateQuaternion(Quaternion.Euler(0, chess.GetChessData().GetStarter() ? 0.0f : 180.0f, 0), 0.2f)) // Rotate
                     .Append(this.transform.DOLocalMoveZ(0, 0.3f)) // Go down
                     .OnComplete(() =>
                     {
@@ -119,6 +151,21 @@ public class ChessAnimation : MonoBehaviour
                         }
 
                     });
+                break;
+            case AnimationType.Flip:
+                Sequence flipChessSeq = DOTween.Sequence();
+                flipChessSeq
+                    .Append(this.transform.DOLocalMoveZ(HEIGHT, 0.3f)) // Go up
+                    .Append(this.transform.Find("ChessEntity").gameObject.transform.DOLocalRotateQuaternion(Quaternion.Euler(0, this.GetComponent<ChessController>().GetChessData().GetStarter() ? 0.0f : 180.0f, 0), 0.2f)) // Rotate
+                    .Append(this.transform.DOLocalMoveZ(0, 0.3f)); // Go down
+                break;
+            case AnimationType.Kill:
+            default:
+                // Return to default position
+                Sequence restoreChessSeq = DOTween.Sequence();
+                restoreChessSeq.Append(this.transform.DOLocalRotateQuaternion(Quaternion.Euler(0, 0, 0), 0.2f));
+
+                GameManager.SetInAnimation(false);
                 break;
         }
     }

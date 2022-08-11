@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,12 +9,17 @@ public class GameManager : MonoBehaviour
     public static GameManager gameManager;
 
     // Bound to UI
+    public GameObject message;
     public GameObject board;
     public ChessController chessContainerPrefab;
 
     // Model of game
     GameModel gameModel;
+    
+    // Message
+    private TextMeshProUGUI msgText;
 
+    // Animation
     private static bool inAnimation;
 
     public static void SetInAnimation(bool b) {
@@ -24,16 +30,35 @@ public class GameManager : MonoBehaviour
         return inAnimation;
     }
 
+    // Menu
+    private static bool isWaitingMenu = false;
+
+    public static void SetIsWaitingMenu(bool b)
+    {
+        isWaitingMenu = b;
+    }
+
+    public static bool GetIsWaitingMenu()
+    {
+        return isWaitingMenu;
+    }
+
     void Awake()
     {
         if (gameManager == null) {
             gameManager = this;
         }
-
-        this.gameModel = new GameModel();
     }
 
     void Start() {
+        // Initialize message box
+        this.msgText = message.GetComponent<TextMeshProUGUI>();
+    }
+
+    public void StartGame(bool firstPlayer) {
+        // Initialize GameModel
+        this.gameModel = new GameModel();
+
         // Create board
         CreateBoard();
 
@@ -41,14 +66,12 @@ public class GameManager : MonoBehaviour
         gameModel.AddPlayer(new Player(0, 1));
         gameModel.AddPlayer(new Player(1, -1));
 
-        // Initialize state
-        gameModel.SetState(GameModel.GameState.INITIALIZATION);
-
-        // Initialize menu
-        gameModel.SetWaitMenu(false);
-
         // Start game
-        gameModel.StartGame();
+        gameModel.StartGame(firstPlayer);
+    }
+
+    public GameModel GetGameModel() {
+        return this.gameModel;
     }
 
     void CreateBoard()
@@ -76,5 +99,9 @@ public class GameManager : MonoBehaviour
         }
 
         gameModel.SetBoard(chessObjects);
+    }
+
+    public void SetMessage(string msg) {
+        this.msgText.SetText(msg);
     }
 }

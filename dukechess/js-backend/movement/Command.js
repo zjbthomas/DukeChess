@@ -7,7 +7,7 @@ class Command extends MovementImpl {
 		
 		var offsets = DestUtils.dest2Offset(d, p);
 		
-		if (!isInField(field, pos, offsets)) return ret;
+		if (!this.isInField(field, pos, offsets)) return ret;
 		
 		ret = ret.concat(this.offset2Dest(field, pos, offsets));
 		

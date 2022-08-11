@@ -30,13 +30,20 @@ class Game {
 		this.currentState++;
 	}
 	
+	/*
+	 * Return: if the userOp is valid
+	*/
 	performState(userOp) {
-		if (!this.waitingMenu) userOp = (this.currentPlayer == this.playerList[0])? userOp: (this.field.maxRow * this.field.maxCol - 1 - userOp);
+		if (!this.waitingMenu) {
+			userOp = (this.currentPlayer == this.playerList[0])? userOp: (this.field.maxRow * this.field.maxCol - 1 - userOp);
+		}
+
+		this.cachedState = this.currentState;
 		
 		switch (this.currentState) {
 		case GameState.INITIALIZATION:
 			this.init();
-			break;
+			return true;
 		case GameState.INITSUMMONPLAYERONEFOOTMANONE:
 		case GameState.INITSUMMONPLAYERONEFOOTMANTWO:
 			if (this.field.fieldMap[2].getAvailableDests(this.field, 2, ActionType.SUMMON).includes( userOp)) {
@@ -47,8 +54,8 @@ class Game {
 					this.currentPlayer = this.playerList[1];
 				}
 				this.currentState++;
+				return true;
 			} else return false;
-			break;
 		case GameState.INITSUMMONPLAYERTWOFOOTMANONE:
 		case GameState.INITSUMMONPLAYERTWOFOOTMANTWO:
 			if (this.field.fieldMap[33].getAvailableDests(this.field, 33, ActionType.SUMMON).includes( userOp)) {
@@ -59,8 +66,8 @@ class Game {
 					this.currentPlayer = this.playerList[0];
 				}
 				this.currentState++;
+				return true;
 			} else return false;
-			break;
 		case GameState.CHOOSECHESS:
 			if (this.field.fieldMap[userOp] == null) return false;
 			
@@ -68,14 +75,29 @@ class Game {
 			
 			this.currentChessPos = userOp;
 			
-			this.waitingMenu = true;
-			this.currentState++;
-			break;
+			var actions = this.field.fieldMap[this.currentChessPos].getAvailableActions(this.field, this.currentChessPos);
+
+			// No action, then invalid chess selection
+			if (actions.length == 0) return false;
+
+			if (actions.length == 1 && actions[0] != ActionType.SUMMON) {
+				// If there is only one possible action, set it
+				// And skip CHOOSEACTION stage
+				this.currentAction = actions[0];
+
+				this.waitingMenu = false;
+				this.currentState = GameState.CHOOSEDESTONE;
+			} else {
+				this.waitingMenu = true;
+				this.currentState++;
+			}
+			
+			return true;
 		case GameState.CHOOSEACTION:
 			if (userOp == 0) {
 				this.waitingMenu = false;
 				this.currentState = GameState.CHOOSECHESS;
-				return false;
+				return true;
 			}
 			
 			switch (userOp) {
@@ -91,50 +113,50 @@ class Game {
 			if (this.field.fieldMap[this.currentChessPos].getAvailableActions(this.field, this.currentChessPos).includes(this.currentAction)) {
 				this.waitingMenu = false;
 				this.currentState++;
+				return true;
 			} else return false;
-			break;
 		case GameState.CHOOSEDESTONE:
+			// If clicking on the selected chess, then cancel action
 			if (this.currentAction != ActionType.SUMMON && userOp == this.currentChessPos) {
 				this.waitingMenu = false;
 				this.currentState = GameState.CHOOSECHESS;
-				return false;
+				return true;
 			}
 			
 			if (this.field.fieldMap[this.currentChessPos].getAvailableDests(this.field, this.currentChessPos, this.currentAction).includes(userOp)) {
 				switch (this.currentAction) {
 				case ActionType.SUMMON:
 					this.field.fieldMap[userOp] = this.field.chessFactory.createChess(this.summonChess, this.currentPlayer);
+					console.log(this.currentPlayer);
 					this.summonPos = userOp;
 					
 					this.waitingMenu = true;
 					this.currentState = GameState.CHOOSEDESTTWO;
-					break;
+					return true;
 				case ActionType.MOVE:
 					this.field.fieldMap[this.currentChessPos].performAction(this.field, ActionType.MOVE, [this.currentChessPos, userOp], null, null);
 					
 					if (this.checkPlayerWin(true) || this.checkPlayerWin(false)) {
-						this.waitingMenu = false;
 						this.currentState = GameState.ENDSTATE;
-						return true;
 					} else {
 						this.nextTurn();
 					}
-					break;
+
+					return true;
 				case ActionType.COMMAND: 
 					if (this.field.fieldMap[userOp] != null && this.field.fieldMap[userOp].player == this.currentPlayer) {
 						this.commandPos = userOp;
 						
 						this.waitingMenu = false;
 						this.currentState = GameState.CHOOSEDESTTWO;
+						return true;
 					} else return false;
-					break;
 				default:
 					this.waitingMenu = false;
 					this.currentState = GameState.CHOOSECHESS;
-					return false;
+					return true;
 				}
 			} else return false;
-			break;
 		case GameState.CHOOSEDESTTWO:
 			if ((this.waitingMenu && userOp == 0) || (!this.waitingMenu && userOp == this.currentChessPos)) {
 				switch (this.currentAction) {
@@ -149,7 +171,7 @@ class Game {
 					this.currentState = GameState.CHOOSECHESS;
 					break;
 				}
-				return false;
+				return true;
 			}
 			
 			switch (this.currentAction) {
@@ -158,23 +180,22 @@ class Game {
 					this.field.fieldMap[this.currentChessPos].performAction(this.field, ActionType.SUMMON, [this.summonPos], this.summonChess, this.currentPlayer);
 					
 					this.nextTurn();
+					return true;
 				} else return false;
-				break;
 			case ActionType.COMMAND:
 				if (userOp != this.commandPos &&
-					this.field.fieldMap[currentChessPos].getAvailableDests(this.field, this.currentChessPos, ActionType.COMMAND).includes(userOp) &&
+					this.field.fieldMap[this.currentChessPos].getAvailableDests(this.field, this.currentChessPos, ActionType.COMMAND).includes(userOp) &&
 					(this.field.fieldMap[userOp] == null || this.field.fieldMap[userOp].player != this.currentPlayer)) {
-					this.field.fieldMap[currentChessPos].performAction(this.field, ActionType.COMMMAND, [this.commandPos, userOp], null, null);
+					this.field.fieldMap[this.currentChessPos].performAction(this.field, ActionType.COMMMAND, [this.commandPos, userOp], null, null);
 				} else return false;
 				if (this.checkPlayerWin(true) || this.checkPlayerWin(false)) {
 					this.currentState = GameState.ENDSTATE;
-					return true;
 				} else {
 					this.nextTurn();
 				}
-				break;
+				return true;
 			}
-			break;
+			return false;
 		}
 		return false;
 	}
@@ -345,6 +366,9 @@ class Game {
 		var ret = "";
 		
 		switch (this.currentState) {
+		case GameState.INITIALIZATION:
+			ret = "Game started.";
+			break;
 		case GameState.INITSUMMONPLAYERONEFOOTMANONE:
 			ret = playerOne? "Please summon your first footman." : "Waiting another player to summon footmen.";
 			break;
@@ -393,6 +417,30 @@ class Game {
 	
 	getCurrentPlayer() {
 		return (this.playerList[0] == this.currentPlayer)? 0: 1;
+	}
+
+	getWaitingMenu() {
+		return this.waitingMenu;
+	}
+
+	getPreviousState() {
+		return this.cachedState;
+	}
+
+	getCurrentState() {
+		return this.currentState;
+	}
+
+	getTransformedUserOp(userOp) {
+		return this.field.maxRow * this.field.maxCol - 1 - userOp;
+	}
+
+	getSummonChess() {
+		return this.summonChess;
+	}
+
+	getAction() {
+		return this.currentAction;
 	}
 }
 

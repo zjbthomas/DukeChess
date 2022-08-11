@@ -42,6 +42,11 @@ var View = function (_React$Component) {
 
         _this.socket = io('/dukechess');
 
+        // Send platform
+        _this.socket.on("connect", function () {
+            _this.socket.emit("platform", "browser");
+        });
+
         _this.X = null;
         _this.Y = null;
 

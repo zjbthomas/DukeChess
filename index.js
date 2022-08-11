@@ -5,11 +5,6 @@ const app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-// Specific for Unity
-const app_unity = express();
-var http_unity = require('http').Server(app_unity);
-var io_unity = require('socket.io')(http_unity);
-
 // Controllers
 const DukeChessController = require("./dukechess/js-backend/flow/Controller");
 const ChessController = require("./chess/js-backend/flow/Controller");
@@ -23,17 +18,14 @@ http.listen(80, function(){
     console.log('HTTP on 80');
 });
 
-http_unity.listen(4115, function(){
-    console.log('HTTP (Unity) on 4115');
-});
-
 // Connection pool
 var pool = new Map();
+var platforms = new Map();
 
-function getController(name, id, session, socket) {
+function getController(name, id, firstPointPlatform, session, secondPointPlatform, socket) {
     switch (name) {
         case 'dukechess':
-            return new DukeChessController(id, session, socket);
+            return new DukeChessController(id, firstPointPlatform, session, secondPointPlatform, socket);
         case 'chess':
             return new ChessController(id, session, socket);
     }
@@ -42,7 +34,12 @@ function getController(name, id, session, socket) {
 function match(name, id, socket) {
     for (var [session, peer] of pool) {
         if (session != id && null == peer) {
-            var peers = getController(name, id, session, socket);
+            console.log('Match ' + id + ' and ' + session);
+
+            firstPointPlatform = platforms.get(id)
+            secondPointPlatform = platforms.get(session)
+            
+            var peers = getController(name, id, firstPointPlatform, session, secondPointPlatform, socket);
             pool.set(id, peers);
             pool.set(session, peers);
 
@@ -74,8 +71,15 @@ function match(name, id, socket) {
 }
 
 function handleSocket(socket, name) {
+    console.log('Connected from ' + socket.id);
+
     if (!pool.has(socket.id)) {
         pool.set(socket.id, null);
+    }
+
+    socket.on('platform', function(platform) {
+        console.log('Platform received from ' + socket.id + ': ' + platform);
+        platforms.set(socket.id, platform);
 
         if (!match(name, socket.id, socket)) {
             socket.emit("game", {
@@ -83,15 +87,19 @@ function handleSocket(socket, name) {
                 message: "Wait for another player to join."
             });
         }
-    }
+    });
 
     socket.on('disconnect', function(){
+        console.log('Disconnected from ' + socket.id);
+
         peers = pool.get(socket.id);
         pool.delete(socket.id);
+        platforms.delete(socket.id);
 
         if (null != peers) {
             session = (peers.firstPoint == socket.id)? peers.secondPoint: peers.firstPoint;
             pool.set(session, null);
+            // no need to update platforms here
 
             if (!match(name, session, socket)) {
                 socket.to(session).emit("game", {
@@ -113,10 +121,8 @@ function handleSocket(socket, name) {
                 message: "Wait for another player to join."
             });
         }
-    })
+    });
 }
 
 io.of('/dukechess').on('connection', (socket) => handleSocket(socket, 'dukechess'));
 io.of('/chess').on('connection', (socket) => handleSocket(socket, 'chess'));
-
-io_unity.on('connection', (socket) => handleSocket(socket, 'dukechess'));

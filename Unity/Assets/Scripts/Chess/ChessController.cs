@@ -55,9 +55,9 @@ public class ChessController : MonoBehaviour
         }
     }
 
-    public void UpdateChess(ChessData.ChessType type, List<XElement> chessList, Player player) {
+    public void UpdateChess(ChessData.ChessType type, Player player) {
         // Create new ChessData
-        this.chessData = new ChessData(type, chessList, player);
+        this.chessData = new ChessData(type, player);
 
         // Set front and back image
         this.front.sprite = Resources.Load<Sprite>("Graphics/UI/Chess/"

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SoundManager : MonoBehaviour
 {
@@ -8,6 +9,10 @@ public class SoundManager : MonoBehaviour
 
     // Bound to UI
     public AudioSource bgmPrefab;
+    public Button bgmPlayButton;
+    public Button bgmStopButton;
+    public Animator bgmControlAnimator;
+
     public AudioSource moveSoundPrefab;
     public AudioSource destroySoundPrefab;
     public AudioSource summonSoundPrefab;
@@ -18,6 +23,8 @@ public class SoundManager : MonoBehaviour
     AudioSource destroySound;
     AudioSource summonSound;
 
+    
+
     void Start()
     {
         bgm = Instantiate(bgmPrefab);
@@ -25,7 +32,22 @@ public class SoundManager : MonoBehaviour
         destroySound = Instantiate(destroySoundPrefab);
         summonSound = Instantiate(summonSoundPrefab);
 
+        // BGM related
+        bgmPlayButton.onClick.AddListener(PlayBGM);
+        bgmStopButton.onClick.AddListener(StopBGM);
+
+        PlayBGM();
+    }
+
+    void PlayBGM() {
+        bgmControlAnimator.Play("Pause In");
         bgm.Play();
+    }
+
+    void StopBGM()
+    {
+        bgmControlAnimator.Play("Play In");
+        bgm.Stop();
     }
 
     void Awake()
