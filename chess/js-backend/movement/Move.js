@@ -11,8 +11,8 @@ class Move extends MovementImpl {
 
 		if (!this.isInField(field, pos, offsets) || this.hasMyChess(field, pos, offsets, p)) return ret; 
 		
-		offsets[0] = Math.floor(offsets[0] / 2);
-		offsets[1] = Math.floor(offsets[1] / 2);
+		offsets[0] = Math.trunc(offsets[0] / 2);
+		offsets[1] = Math.trunc(offsets[1] / 2);
 		
 		if (0 != offsets[0] || 0 != offsets[1]) {
 			if (!this.isInField(field, pos, offsets) || this.hasAnyChess(field, pos, offsets)) return ret;
