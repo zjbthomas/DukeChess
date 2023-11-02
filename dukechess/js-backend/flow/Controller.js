@@ -94,6 +94,62 @@ class Controller {
 		this.send(point, out);
 	}
 
+	unityDefaultOutput(op, point, needTransform) {
+		var out = new Map();
+		out.set("connection", "true");
+		out.set("message", this.game.getMessage(this.point2Player.get(point) == 0));
+		out.set("type", "game");
+		// Confirm previous state op
+		out.set("state", this.game.getPreviousState());
+		out.set("userop", needTransform? this.game.getTransformedUserOp(op): op);
+		out.set("action", this.game.getAction());
+		out.set("summon", this.game.getSummonChess());
+		
+		// Always store color
+		for (var [i, s] of this.game.getColorMap(this.point2Player.get(point) == 0, false, 0)) {
+			var grid = "grid_" + i;
+			out.set(grid, s);
+		}
+
+		// Show current state op
+		if (this.point2Player.get(point) == this.game.getCurrentPlayer()) {
+			out.set("active", "true");
+	
+			if (this.game.getWaitingMenu()) {
+				out.set("menus", this.game.getMenu());
+			}
+		} else {
+			out.set("active", "false");
+		}
+		if (this.game.getWaitingMenu()) {
+			out.set("subtype", "inmenu");
+		} else {
+			out.set("subtype", "nomenu");
+		}
+		
+		this.send(point, out);
+	}
+
+	unityGameoverOutput(op, point, needTransform) {
+		var out = new Map();
+		out.set("connection", "true");
+		out.set("message", this.game.getMessage(this.point2Player.get(point) == 0));
+		out.set("type", "gameover");
+		// Confirm previous state op
+		out.set("state", this.game.getPreviousState());
+		out.set("userop", needTransform? this.game.getTransformedUserOp(op): op);
+		out.set("action", this.game.getAction());
+		out.set("summon", this.game.getSummonChess());
+		
+		// No need to store color; reset all colors at client side
+
+		// No animation and no menu
+		out.set("active", "false");
+		out.set("subtype", "nomenu");
+	
+		this.send(point, out);
+	}
+
     init() {
 		// For Unity, send an initialization signal
 		if (this.firstPlatform.localeCompare("unity") == 0) {
@@ -163,7 +219,7 @@ class Controller {
 				// Gameover
 				var end_out = new Map();
 				end_out.set("connection", "true");
-				end_out.set("message", this.game.checkPlayerWin(true)? "Player One Win.": "Player Two Win.");
+				end_out.set("message", this.game.getMessage(this.point2Player.get(eventPoint) == 0));
 
 				switch (eventPointPlatform) {
 					case "browser":
@@ -183,7 +239,7 @@ class Controller {
 
 						break;
 					case "unity":
-						// TODO
+						this.unityGameoverOutput(op, eventPoint, false)
 						break;
 				}
 
@@ -204,7 +260,7 @@ class Controller {
 						this.send(peerPoint, end_out);
 						break;
 					case "unity":
-						// TODO
+						this.unityGameoverOutput(op, peerPoint, !isMenu)
 						break;
 				}
 			} else {

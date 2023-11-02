@@ -410,6 +410,9 @@ class Game {
 				break;
 			}
 			break;
+		case GameState.ENDSTATE:
+			ret = this.checkPlayerWin(playerOne)? "You win!": "You lose..."
+			break;
 		}
 		
 		return ret;

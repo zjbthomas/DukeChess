@@ -65,6 +65,19 @@ public class SocketManager : MonoBehaviour
                             GameManager.gameManager.GetGameModel().RenderMenu(null);
                         }
                         break;
+                    case "gameover":
+                        // Still perform action for last op
+                        GameManager.gameManager.GetGameModel().PerformOp(json);
+                        GameManager.gameManager.GetGameModel().RenderMask(json);
+                        
+                        // Hide menu
+                        GameManager.gameManager.GetGameModel().RenderMenu(null);
+
+                        // Kill all losing chess
+                        GameManager.gameManager.GetGameModel().PerformGameover(json);
+
+                        break;
+                    
                 }
 
                 //if (int.Parse(json["state"].ToString()) == (int)GameModel.GameState.INITIALIZATION)
@@ -73,6 +86,7 @@ public class SocketManager : MonoBehaviour
                 //}
             }
             else {
+                GameManager.gameManager.StopGame();
                 this.isGaming = false;
             }
         });

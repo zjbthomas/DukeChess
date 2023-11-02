@@ -220,6 +220,7 @@ public class GameModel
                     case "Move":
                         if (userOp == cachedChessPos)
                         {
+                            // If clicking on the selected chess, then cancel action
                             board[cachedChessPos].gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Deselect);
                             isFlying = false;
                         }
@@ -359,5 +360,36 @@ public class GameModel
         chessMask.GetComponent<Image>().color = color;
         // Change ChessMask active
         chessMask.SetActive(true);
+    }
+
+    public void PerformGameover(Dictionary<string, object> json) {
+        GameManager.gameManager.StartCoroutine(DestroyLosingChessWaiter(json));
+        
+    }
+
+    IEnumerator DestroyLosingChessWaiter(Dictionary<string, object> json)
+    {
+        yield return new WaitUntil(() => GameManager.GetInAnimation() == false);
+
+        int userOp = int.Parse(json["userop"].ToString());
+        Player winningPlayer = board[userOp].GetChessData().GetPlayer();
+        
+        foreach (ChessController chess in board) {
+            if (chess.GetChessData() != null && chess.GetChessData().GetPlayer() != winningPlayer) {
+                GameManager.SetInAnimation(true);
+                yield return new WaitForSeconds(0.5F);
+                GameManager.SetInAnimation(false);
+
+                chess.gameObject.GetComponent<ChessAnimation>().PlayAnimation(ChessAnimation.AnimationType.Destroy);
+                chess.DestoryChess();
+            }
+        }
+
+    }
+
+    public void StopGame() {
+        foreach (ChessController chess in board) {
+            chess.DestoryChess();
+        }
     }
 }

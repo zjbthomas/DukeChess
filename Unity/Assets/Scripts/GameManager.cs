@@ -70,6 +70,10 @@ public class GameManager : MonoBehaviour
         gameModel.StartGame(firstPlayer);
     }
 
+    public void StopGame() {
+        this.gameModel.StopGame();
+    }
+
     public GameModel GetGameModel() {
         return this.gameModel;
     }
