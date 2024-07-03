@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://ftm0wad78jmg" path="res://images/chess/center_back.png" id="2_he838"]
 [ext_resource type="Material" uid="uid://bpdu4tuy1jqxu" path="res://materials/Chess0.tres" id="2_pc6lx"]
 [ext_resource type="Texture2D" uid="uid://c68ffyj3xoun4" path="res://images/chess/center_front.png" id="3_g1sx0"]
-[ext_resource type="Texture2D" path="res://images/chess/Duke.jpg" id="4_nwo0o"]
+[ext_resource type="Texture2D" uid="uid://cnl1bsfki6jo1" path="res://chess/Assassin/Assassin.png" id="4_smjb7"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cke0c"]
 size = Vector3(0.8, 0.2, 0.8)
@@ -16,7 +16,8 @@ material = ExtResource("2_pc6lx")
 size = Vector3(0.8, 0.2, 0.8)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_00r3o"]
-albedo_texture = ExtResource("4_nwo0o")
+transparency = 1
+albedo_texture = ExtResource("4_smjb7")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_nnvhr"]
 material = SubResource("StandardMaterial3D_00r3o")
@@ -39,8 +40,8 @@ texture = ExtResource("1_4miah")
 [node name="Name" type="Label3D" parent="Front"]
 transform = Transform3D(1, 0, 1.69407e-21, 0, 1, 8.35188e-23, 1.69407e-21, 8.35187e-23, 1, -0.54961, -1.31927, 0)
 modulate = Color(0, 0, 0, 1)
-text = "Assassin"
-font_size = 120
+text = "LongBowman"
+font_size = 80
 outline_size = 0
 
 [node name="SideImage" type="MeshInstance3D" parent="Front"]
@@ -51,8 +52,6 @@ mesh = SubResource("PlaneMesh_nnvhr")
 transform = Transform3D(0.85, 1.62408e-15, -3.71547e-08, 7.09909e-23, 0.85, 3.71547e-08, 3.71547e-08, -3.71547e-08, 0.85, -0.55, 0.55, -0.0250001)
 texture = ExtResource("3_g1sx0")
 
-[node name="Movements" type="Node" parent="Front"]
-
 [node name="Back" type="Sprite3D" parent="."]
 transform = Transform3D(-0.2, -1.74846e-08, -8.74228e-09, 8.74228e-09, 3.82137e-16, -0.2, 1.74846e-08, -0.2, 3.82137e-16, 0, -0.11, 0)
 texture = ExtResource("1_4miah")
@@ -60,8 +59,8 @@ texture = ExtResource("1_4miah")
 [node name="Name" type="Label3D" parent="Back"]
 transform = Transform3D(1, 0, 1.67037e-22, 0, 1, -2.11758e-22, 1.67037e-22, -2.11758e-22, 1, -0.54961, -1.31927, 0)
 modulate = Color(0, 0, 0, 1)
-text = "Assassin"
-font_size = 120
+text = "LongBowman"
+font_size = 80
 outline_size = 0
 
 [node name="SideImage" type="MeshInstance3D" parent="Back"]
@@ -71,5 +70,3 @@ mesh = SubResource("PlaneMesh_nnvhr")
 [node name="Center" type="Sprite3D" parent="Back"]
 transform = Transform3D(0.95, 1.81515e-15, -4.15258e-08, 7.93428e-23, 0.95, 4.15258e-08, 4.15258e-08, -4.15258e-08, 0.95, -0.55, 0.55, 0)
 texture = ExtResource("2_he838")
-
-[node name="Movements" type="Node" parent="Back"]

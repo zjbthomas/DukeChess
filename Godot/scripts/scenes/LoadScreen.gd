@@ -9,7 +9,7 @@ func _ready():
 	_load_game_resources()
 	
 	if (_is_loading_smooth):
-		get_tree().change_scene_to_packed(main_scene)
+		get_tree().change_scene_to_packed.bind(main_scene).call_deferred()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -18,11 +18,16 @@ func _process(delta):
 func _load_game_resources():
 	$VBoxContainer/ProgressBar.value = 0
 
-	# load chess
+	# load chess info
 	Global.chess_loader = ChessLoader.new()
 	Global.chess_loader.connect("error_message", _on_chess_loader_error_message)
 	
 	Global.chess_loader.load_chess()
+	
+	$VBoxContainer/ProgressBar.value = 50
+	
+	# load chess texture
+	Global.chess_loader.load_chess_textures()
 	
 	# finish loading
 	$VBoxContainer/ProgressBar.value = 100
