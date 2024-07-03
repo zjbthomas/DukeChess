@@ -1,9 +1,8 @@
-[gd_scene load_steps=11 format=3 uid="uid://cqwayhgnllvvv"]
+[gd_scene load_steps=10 format=3 uid="uid://cqwayhgnllvvv"]
 
 [ext_resource type="Script" path="res://scripts/scenes/Chess.gd" id="1_1u2tg"]
 [ext_resource type="Texture2D" uid="uid://ymryxj8phnv0" path="res://images/chess/frame.png" id="1_4miah"]
 [ext_resource type="Texture2D" uid="uid://ftm0wad78jmg" path="res://images/chess/center_back.png" id="2_he838"]
-[ext_resource type="Material" uid="uid://bpdu4tuy1jqxu" path="res://materials/Chess0.tres" id="2_pc6lx"]
 [ext_resource type="Texture2D" uid="uid://c68ffyj3xoun4" path="res://images/chess/center_front.png" id="3_g1sx0"]
 [ext_resource type="Texture2D" uid="uid://cnl1bsfki6jo1" path="res://chess/Assassin/Assassin.png" id="4_smjb7"]
 
@@ -12,7 +11,6 @@ size = Vector3(0.8, 0.2, 0.8)
 
 [sub_resource type="BoxMesh" id="BoxMesh_ud18u"]
 resource_local_to_scene = true
-material = ExtResource("2_pc6lx")
 size = Vector3(0.8, 0.2, 0.8)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_00r3o"]
