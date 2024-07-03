@@ -1,0 +1,57 @@
+[gd_scene load_steps=10 format=3 uid="uid://cfd8jcleybuec"]
+
+[ext_resource type="PackedScene" uid="uid://blvbnngqi673u" path="res://scenes/ChessTile.tscn" id="1_h0u3b"]
+[ext_resource type="Script" path="res://scripts/Main.gd" id="1_h17yc"]
+[ext_resource type="Material" uid="uid://c6apg776gl23j" path="res://materials/ChessTile0.tres" id="1_tbdx6"]
+[ext_resource type="Material" uid="uid://dxwd5wxtra6xu" path="res://materials/ChessTile1.tres" id="2_u0hxi"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tp6sn"]
+size = Vector3(60, 2, 60)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_symdh"]
+albedo_color = Color(0, 0, 0, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_alcxu"]
+material = SubResource("StandardMaterial3D_symdh")
+size = Vector3(60, 2, 60)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m2inq"]
+albedo_color = Color(0.0627451, 0.0627451, 0.0627451, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_av6kj"]
+material = SubResource("StandardMaterial3D_m2inq")
+size = Vector3(6, 0.1, 6)
+
+[node name="Main" type="Node"]
+script = ExtResource("1_h17yc")
+chess_tile = ExtResource("1_h0u3b")
+chess_tile_meterial1 = ExtResource("1_tbdx6")
+chess_tile_meterial2 = ExtResource("2_u0hxi")
+
+[node name="Ground" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00970078, -1, 0.054203)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("BoxShape3D_tp6sn")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("BoxMesh_alcxu")
+skeleton = NodePath("../..")
+
+[node name="Board" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.392, -0.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Board"]
+mesh = SubResource("BoxMesh_av6kj")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 20, 0)
+light_energy = 2.067
+
+[node name="CameraPivot" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 20, 0)
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot"]
+projection = 1
+current = true
+size = 8.0
