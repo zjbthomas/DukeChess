@@ -1,9 +1,10 @@
-[gd_scene load_steps=10 format=3 uid="uid://cfd8jcleybuec"]
+[gd_scene load_steps=11 format=3 uid="uid://cfd8jcleybuec"]
 
 [ext_resource type="PackedScene" uid="uid://blvbnngqi673u" path="res://scenes/ChessTile.tscn" id="1_h0u3b"]
-[ext_resource type="Script" path="res://scripts/Main.gd" id="1_h17yc"]
+[ext_resource type="Script" path="res://scripts/scenes/Main.gd" id="1_h17yc"]
 [ext_resource type="Material" uid="uid://c6apg776gl23j" path="res://materials/ChessTile0.tres" id="1_tbdx6"]
 [ext_resource type="Material" uid="uid://dxwd5wxtra6xu" path="res://materials/ChessTile1.tres" id="2_u0hxi"]
+[ext_resource type="PackedScene" uid="uid://cqwayhgnllvvv" path="res://scenes/Chess.tscn" id="5_pfq4i"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_tp6sn"]
 size = Vector3(60, 2, 60)
@@ -24,9 +25,10 @@ size = Vector3(6, 0.1, 6)
 
 [node name="Main" type="Node"]
 script = ExtResource("1_h17yc")
-chess_tile = ExtResource("1_h0u3b")
+chess_tile_scene = ExtResource("1_h0u3b")
 chess_tile_meterial1 = ExtResource("1_tbdx6")
 chess_tile_meterial2 = ExtResource("2_u0hxi")
+chess_scene = ExtResource("5_pfq4i")
 
 [node name="Ground" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00970078, -1, 0.054203)

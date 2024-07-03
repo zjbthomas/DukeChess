@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://jrpg2lf2cnoa"]
 
-[ext_resource type="Script" path="res://scripts/LoadScreen.gd" id="1_uxmhp"]
+[ext_resource type="Script" path="res://scripts/scenes/LoadScreen.gd" id="1_uxmhp"]
 [ext_resource type="PackedScene" uid="uid://cfd8jcleybuec" path="res://scenes/Main.tscn" id="2_kdhre"]
 
 [node name="LoadScreen" type="ColorRect"]
