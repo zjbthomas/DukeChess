@@ -24,5 +24,9 @@ text = "Check All Chess"
 [node name="BlurContainer" parent="." instance=ExtResource("2_tp78g")]
 layout_mode = 0
 anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+grow_horizontal = 1
+grow_vertical = 1
 
 [connection signal="pressed" from="CollectionButton" to="." method="_on_collection_button_pressed"]

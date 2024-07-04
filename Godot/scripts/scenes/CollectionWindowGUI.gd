@@ -10,8 +10,9 @@ signal ok_button_pressed
 func _ready():
 	for chess in Global.chess_loader.chess_name_list:
 		var node = chess_in_show_scene.instantiate()
+		node.chess = chess
 		chess_container.add_child(node)
-		node.setup_ui(chess)
+		node.setup_ui()
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

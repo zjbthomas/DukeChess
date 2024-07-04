@@ -1,11 +1,6 @@
 extends Node
 
-@export_category("ChessTile")
 @export var chess_tile_scene:PackedScene
-@export var chess_tile_meterial1:StandardMaterial3D
-@export var chess_tile_meterial2:StandardMaterial3D
-
-@export_category("Chess")
 @export var chess_scene:PackedScene
 
 const _CHESSTILEOFFSET = -2.5
@@ -32,19 +27,24 @@ func _init_board():
 	for ir in range(Global.MAXR):
 		for ic in range(Global.MAXC):
 			var node = chess_tile_scene.instantiate()
-			node.name = "ChessTile" + str(ir) + str(ic)
+			node.name = _get_tile_name_at_rc(ir, ic)
 			
 			node.r = ir
 			node.c = ic
 			
 			# set material
-			if (ir + ic) % 2 == 0:
-				node.get_node("MeshInstance3D").get_mesh().set_material(chess_tile_meterial1)
-			else:
-				node.get_node("MeshInstance3D").get_mesh().set_material(chess_tile_meterial2)
+			node.update_material(false)
 
-			# set position
-			node.position.x = _CHESSTILEOFFSET + ir
-			node.position.z = _CHESSTILEOFFSET + ic
+			# set position, (0, 0) is the top-left corner
+			node.position.x = _CHESSTILEOFFSET + ic
+			node.position.z = _CHESSTILEOFFSET + ir
+			
+			node.connect("on_mouse_entered", _on_tile_mouse_entered)
 			
 			$Board.add_child(node)
+
+func _get_tile_name_at_rc(r, c):
+	return "ChessTile" + str(r) + str(c)
+
+func _on_tile_mouse_entered(r, c):
+	print(c)

@@ -1,18 +1,20 @@
 extends AspectRatioContainer
 
-@onready var front_container = $VBoxContainer/HBoxContainer/Front/AspectRatioContainer
-@onready var front_name_label = $VBoxContainer/HBoxContainer/Front/AspectRatioContainer/Name/NameLabel
-@onready var front_side_image = $VBoxContainer/HBoxContainer/Front/AspectRatioContainer/SideImage
+@onready var front_container = $VBoxContainer/ChessInfoContainer/Front/AspectRatioContainer
+@onready var front_name_label = $VBoxContainer/ChessInfoContainer/Front/AspectRatioContainer/Name/NameLabel
+@onready var front_side_image = $VBoxContainer/ChessInfoContainer/Front/AspectRatioContainer/SideImage
 
-@onready var back_container = $VBoxContainer/HBoxContainer/Back/AspectRatioContainer
-@onready var back_name_label = $VBoxContainer/HBoxContainer/Back/AspectRatioContainer/Name/NameLabel
-@onready var back_side_image = $VBoxContainer/HBoxContainer/Back/AspectRatioContainer/SideImage
+@onready var back_container = $VBoxContainer/ChessInfoContainer/Back/AspectRatioContainer
+@onready var back_name_label = $VBoxContainer/ChessInfoContainer/Back/AspectRatioContainer/Name/NameLabel
+@onready var back_side_image = $VBoxContainer/ChessInfoContainer/Back/AspectRatioContainer/SideImage
 
-@onready var name_label = $VBoxContainer/NameLabel
+@onready var name_label = $VBoxContainer/HBoxContainer/NameLabel
 
 const CENTER_X = 71
 const CENTER_Y = 71
 const OFFSET = 28
+
+var chess
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -24,9 +26,9 @@ func _process(delta):
 	pass
 
 # TODO: this is similar to the one in Chess.gd, can we combine into one function?
-func setup_ui(chess_name):
+func setup_ui():
 	# set movements
-	var chess_model = Global.chess_loader.chessmodel_dict[chess_name]
+	var chess_model = Global.chess_loader.chessmodel_dict[chess]
 	
 	for is_front in [true, false]:
 		var movements_dict = chess_model.front_dict if is_front else chess_model.back_dict
@@ -44,60 +46,13 @@ func setup_ui(chess_name):
 					var node = Sprite2D.new()
 					
 					# set texture
-					match type:
-						ChessModel.MOVEMENT_TYPE.MOVE:
-							node.set_texture(Global.chess_loader.chess_textures["Move"])
-							
-						ChessModel.MOVEMENT_TYPE.JUMP:
-							node.set_texture(Global.chess_loader.chess_textures["Jump"])
-							
-						ChessModel.MOVEMENT_TYPE.SLIDE:
-							if (offset_x == -1 and offset_y == -1):
-								node.set_texture(Global.chess_loader.chess_textures["SlideUL"])
-							elif (offset_x == 0 and offset_y == -1):
-								node.set_texture(Global.chess_loader.chess_textures["SlideU"])
-							elif (offset_x == -1 and offset_y == 1):
-								node.set_texture(Global.chess_loader.chess_textures["SlideUR"])
-							elif (offset_x == -1 and offset_y == 0):
-								node.set_texture(Global.chess_loader.chess_textures["SlideL"])
-							elif (offset_x == 1 and offset_y == 0):
-								node.set_texture(Global.chess_loader.chess_textures["SlideR"])
-							elif (offset_x == -1 and offset_y == 1):
-								node.set_texture(Global.chess_loader.chess_textures["SlideDL"])
-							elif (offset_x == 0 and offset_y == 1):
-								node.set_texture(Global.chess_loader.chess_textures["SlideD"])
-							elif (offset_x == 1 and offset_y == 1):
-								node.set_texture(Global.chess_loader.chess_textures["SlideDR"])
-								
-						ChessModel.MOVEMENT_TYPE.JUMPSLIDE:
-							if (offset_x == -2 and offset_y == -2):
-								node.set_texture(Global.chess_loader.chess_textures["JumpSlideUULL"])
-							elif (offset_x == 0 and offset_y == -2):
-								node.set_texture(Global.chess_loader.chess_textures["JumpSlideUU"])
-							elif (offset_x == 2 and offset_y == -2):
-								node.set_texture(Global.chess_loader.chess_textures["JumpSlideUURR"])
-							elif (offset_x == -2 and offset_y == 0):
-								node.set_texture(Global.chess_loader.chess_textures["JumpSlideLL"])
-							elif (offset_x == 2 and offset_y == 0):
-								node.set_texture(Global.chess_loader.chess_textures["JumpSlideRR"])
-							elif (offset_x == -2 and offset_y == 2):
-								node.set_texture(Global.chess_loader.chess_textures["JumpSlideDDLL"])
-							elif (offset_x == 0 and offset_y == 2):
-								node.set_texture(Global.chess_loader.chess_textures["JumpSlideDD"])
-							elif (offset_x == 2 and offset_y == 2):
-								node.set_texture(Global.chess_loader.chess_textures["JumpSlideDDRR"])
-						
-						ChessModel.MOVEMENT_TYPE.STRIKE:
-							node.set_texture(Global.chess_loader.chess_textures["Strike"])
-							
-						ChessModel.MOVEMENT_TYPE.COMMAND:
-								node.set_texture(Global.chess_loader.chess_textures["Command"])
+					node.set_texture(Global.chess_loader.type_to_texture(type, offset_x, offset_y))
 							
 					# set node position and scale
 					node.position.x = CENTER_X + offset_x * OFFSET
 					node.position.y = CENTER_Y + offset_y * OFFSET
 
-					node.scale = Vector2(0.5, 0.5)
+					node.scale = Vector2(0.55, 0.55)
 
 					if (is_front):
 						front_container.add_child(node)
@@ -105,10 +60,24 @@ func setup_ui(chess_name):
 						back_container.add_child(node)
 	
 	# set name
-	front_name_label.text = chess_name
-	back_name_label.text = chess_name
-	name_label.text = chess_name
+	front_name_label.text = chess
+	back_name_label.text = chess
+	name_label.text = chess
 	
 	# set image
 	front_side_image.set_texture(ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null)
 	back_side_image.set_texture(ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null)
+
+	# set amount value
+	$VBoxContainer/HBoxContainer/SpinBox.set_value_no_signal(Global.chess_loader.chess_max_amount_dict[chess])
+	
+	# some special rules
+	if (chess == "Duke"):
+		$VBoxContainer/HBoxContainer/SpinBox.editable = false
+		
+	if (chess == "Footman"):
+		$VBoxContainer/HBoxContainer/SpinBox.min_value = 2
+
+# TODO: do we need to add special rules here to filter value?
+func _on_spin_box_value_changed(value):
+	Global.chess_loader.chess_max_amount_dict[chess] = int(value)

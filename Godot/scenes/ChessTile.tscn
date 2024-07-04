@@ -1,6 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://blvbnngqi673u"]
+[gd_scene load_steps=9 format=3 uid="uid://blvbnngqi673u"]
 
 [ext_resource type="Script" path="res://scripts/scenes/ChessTile.gd" id="1_xfi4c"]
+[ext_resource type="Material" uid="uid://c6apg776gl23j" path="res://materials/ChessTile0.tres" id="2_i1y1m"]
+[ext_resource type="Material" uid="uid://dxwd5wxtra6xu" path="res://materials/ChessTile1.tres" id="3_01t56"]
+[ext_resource type="Texture2D" uid="uid://dfhgnv10s2tx0" path="res://images/chess/border.png" id="4_2h154"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_7weh3"]
 size = Vector3(1, 0.3, 1)
@@ -9,9 +12,19 @@ size = Vector3(1, 0.3, 1)
 resource_local_to_scene = true
 size = Vector3(1, 0.3, 1)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pw30o"]
+transparency = 1
+albedo_texture = ExtResource("4_2h154")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_2a7qr"]
+material = SubResource("StandardMaterial3D_pw30o")
+size = Vector2(1, 1)
+
 [node name="ChessTile" type="StaticBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
 script = ExtResource("1_xfi4c")
+meterial1 = ExtResource("2_i1y1m")
+meterial2 = ExtResource("3_01t56")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape3D_7weh3")
@@ -19,3 +32,10 @@ shape = SubResource("BoxShape3D_7weh3")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("BoxMesh_kb7ic")
 skeleton = NodePath("../CollisionShape3D")
+
+[node name="Selector" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.16, 0)
+mesh = SubResource("PlaneMesh_2a7qr")
+
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

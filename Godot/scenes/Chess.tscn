@@ -23,6 +23,7 @@ size = Vector2(1, 3.5)
 
 [node name="Chess" type="StaticBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+input_ray_pickable = false
 script = ExtResource("1_1u2tg")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
@@ -68,3 +69,5 @@ mesh = SubResource("PlaneMesh_nnvhr")
 [node name="Center" type="Sprite3D" parent="Back"]
 transform = Transform3D(0.95, 1.81515e-15, -4.15258e-08, 7.93428e-23, 0.95, 4.15258e-08, 4.15258e-08, -4.15258e-08, 0.95, -0.55, 0.55, 0)
 texture = ExtResource("2_he838")
+
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]

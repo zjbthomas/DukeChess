@@ -7,4 +7,4 @@ const WINDOW_TYPE = {
 	"collection": "res://scenes//CollectionWindowGUI.tscn",
 }
 
-var chess_loader
+var chess_loader:ChessLoader

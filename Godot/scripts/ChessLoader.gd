@@ -4,8 +4,10 @@ signal error_message(msg)
 
 const RESCHESSDIR = "res://chess"
 const USERCHESSDIR = "user://chess"
+const CHESSAMOUNTJSON = "chess_amount.json"
 
 var chess_name_list = []
+var chess_max_amount_dict = {}
 var chessmodel_dict = {}
 
 var chess_textures = {}
@@ -49,7 +51,57 @@ func load_chess_textures():
 	chess_textures["Strike"] = load("res://images//chess//movements//Strike.png")
 	
 	chess_textures["Command"] = load("res://images//chess//movements//Command.png")
-	
+
+func type_to_texture(type, offset_x, offset_y):
+	match type:
+		ChessModel.MOVEMENT_TYPE.MOVE:
+			return chess_textures["Move"]
+			
+		ChessModel.MOVEMENT_TYPE.JUMP:
+			return chess_textures["Jump"]
+			
+		ChessModel.MOVEMENT_TYPE.SLIDE:
+			if (offset_x == -1 and offset_y == -1):
+				return chess_textures["SlideUL"]
+			elif (offset_x == 0 and offset_y == -1):
+				return chess_textures["SlideU"]
+			elif (offset_x == 1 and offset_y == -1):
+				return chess_textures["SlideUR"]
+			elif (offset_x == -1 and offset_y == 0):
+				return chess_textures["SlideL"]
+			elif (offset_x == 1 and offset_y == 0):
+				return chess_textures["SlideR"]
+			elif (offset_x == -1 and offset_y == 1):
+				return chess_textures["SlideDL"]
+			elif (offset_x == 0 and offset_y == 1):
+				return chess_textures["SlideD"]
+			elif (offset_x == 1 and offset_y == 1):
+				return chess_textures["SlideDR"]
+				
+		ChessModel.MOVEMENT_TYPE.JUMPSLIDE:
+			if (offset_x == -2 and offset_y == -2):
+				return chess_textures["JumpSlideUULL"]
+			elif (offset_x == 0 and offset_y == -2):
+				return chess_textures["JumpSlideUU"]
+			elif (offset_x == 2 and offset_y == -2):
+				return chess_textures["JumpSlideUURR"]
+			elif (offset_x == -2 and offset_y == 0):
+				return chess_textures["JumpSlideLL"]
+			elif (offset_x == 2 and offset_y == 0):
+				return chess_textures["JumpSlideRR"]
+			elif (offset_x == -2 and offset_y == 2):
+				return chess_textures["JumpSlideDDLL"]
+			elif (offset_x == 0 and offset_y == 2):
+				return chess_textures["JumpSlideDD"]
+			elif (offset_x == 2 and offset_y == 2):
+				return chess_textures["JumpSlideDDRR"]
+		
+		ChessModel.MOVEMENT_TYPE.STRIKE:
+			return chess_textures["Strike"]
+			
+		ChessModel.MOVEMENT_TYPE.COMMAND:
+				return chess_textures["Command"]
+
 func _load_chess_files():
 	var chess_dir = DirAccess.open(USERCHESSDIR)
 	
@@ -106,6 +158,35 @@ func _load_chess_files():
 		# add chess to list
 		chess_name_list.append(chess_name)
 		chessmodel_dict[chess_name] = chess
+		
+	# set default chess num from JSON
+	var json_as_text = FileAccess.get_file_as_string(USERCHESSDIR + "/" + CHESSAMOUNTJSON)
+	var json_as_dict = JSON.parse_string(json_as_text)
+	if not json_as_dict:
+		error_message.emit('ERROR: cannot parse JSON %s.' % [USERCHESSDIR + "/" + CHESSAMOUNTJSON])
+		return
+			
+	for chess_name in chess_name_list:
+		var amount_str = json_as_dict[chess_name]
+		
+		if not amount_str:
+			error_message.emit('ERROR: amount for %s cannot be load from %s.' % [chess_name, USERCHESSDIR + "/" + CHESSAMOUNTJSON])
+			return
+		
+		var amount = int(amount_str)
+		
+		# some special rules
+		if (chess_name == "Duke"):
+			if (amount != 1):
+				error_message.emit('ERROR: incorrect amount %s for Duke in %s.' % [amount, USERCHESSDIR + "/" + CHESSAMOUNTJSON])
+				return
+				
+		if (chess_name == "Footman"):
+			if (amount < 2):
+				error_message.emit('ERROR: there should at least 2 (now only %s) Footman in %s.' % [amount, USERCHESSDIR + "/" + CHESSAMOUNTJSON])
+				return
+		
+		chess_max_amount_dict[chess_name] = amount
 	
 func _parse_xml_root(xml_path, xml_movement):
 	# parse targets
@@ -136,6 +217,11 @@ func _copy_dir_recursively(source: String, destination: String):
 	var source_dir = DirAccess.open(source)
 	
 	for filename in source_dir.get_files():
+		if (filename == CHESSAMOUNTJSON):
+			# copy only when not exists
+			if not FileAccess.file_exists(destination + filename):
+				source_dir.copy(source + "/" + filename, destination + "/" + filename)
+		
 		if (filename.ends_with(".png") or filename.ends_with(".xml")): # TODO: only PNG and XML are supported now
 			source_dir.copy(source + filename, destination + filename)
 		
