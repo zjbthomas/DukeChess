@@ -1,0 +1,21 @@
+[gd_scene load_steps=5 format=3 uid="uid://crcpfgmiooaa4"]
+
+[ext_resource type="Shader" path="res://shaders/Blur.gdshader" id="1_t732d"]
+[ext_resource type="PackedScene" uid="uid://dg4x834egge1a" path="res://scenes/WrapperWindow.tscn" id="2_1g2lg"]
+[ext_resource type="Script" path="res://scripts/scenes/BlurContainer.gd" id="2_5he1h"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_07ipb"]
+shader = ExtResource("1_t732d")
+shader_parameter/blur_amount = 2.0
+
+[node name="BlurContainer" type="ColorRect"]
+material = SubResource("ShaderMaterial_07ipb")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_5he1h")
+
+[node name="WrapperWindow" parent="." instance=ExtResource("2_1g2lg")]
+visible = false

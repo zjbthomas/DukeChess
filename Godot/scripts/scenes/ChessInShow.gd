@@ -1,20 +1,32 @@
-extends StaticBody3D
+extends AspectRatioContainer
 
-const CENTER_X = -0.54
-const CENTER_Y = 0.55
-const OFFSET = -0.54
+@onready var front_container = $VBoxContainer/HBoxContainer/Front/AspectRatioContainer
+@onready var front_name_label = $VBoxContainer/HBoxContainer/Front/AspectRatioContainer/Name/NameLabel
+@onready var front_side_image = $VBoxContainer/HBoxContainer/Front/AspectRatioContainer/SideImage
+
+@onready var back_container = $VBoxContainer/HBoxContainer/Back/AspectRatioContainer
+@onready var back_name_label = $VBoxContainer/HBoxContainer/Back/AspectRatioContainer/Name/NameLabel
+@onready var back_side_image = $VBoxContainer/HBoxContainer/Back/AspectRatioContainer/SideImage
+
+@onready var name_label = $VBoxContainer/NameLabel
+
+const CENTER_X = 71
+const CENTER_Y = 71
+const OFFSET = 28
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
 
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass
 
-func setup_ui(chess):
+# TODO: this is similar to the one in Chess.gd, can we combine into one function?
+func setup_ui(chess_name):
 	# set movements
-	var chess_model = Global.chess_loader.chessmodel_dict[chess.name]
+	var chess_model = Global.chess_loader.chessmodel_dict[chess_name]
 	
 	for is_front in [true, false]:
 		var movements_dict = chess_model.front_dict if is_front else chess_model.back_dict
@@ -29,7 +41,7 @@ func setup_ui(chess):
 					var offset_x = ChessModel.dest_to_offsets_for_chess(dest)[0]
 					var offset_y = ChessModel.dest_to_offsets_for_chess(dest)[1]
 					
-					var node = Sprite3D.new()
+					var node = Sprite2D.new()
 					
 					# set texture
 					match type:
@@ -81,20 +93,22 @@ func setup_ui(chess):
 						ChessModel.MOVEMENT_TYPE.COMMAND:
 								node.set_texture(Global.chess_loader.chess_textures["Command"])
 							
-					# set node position
-					node.position.x = CENTER_X - offset_x * OFFSET
+					# set node position and scale
+					node.position.x = CENTER_X + offset_x * OFFSET
 					node.position.y = CENTER_Y + offset_y * OFFSET
 
+					node.scale = Vector2(0.5, 0.5)
+
 					if (is_front):
-						$Front.add_child(node)
+						front_container.add_child(node)
 					else:
-						$Back.add_child(node)
+						back_container.add_child(node)
 	
 	# set name
-	$Front/Name.text = chess.name
-	$Back/Name.text = chess.name
+	front_name_label.text = chess_name
+	back_name_label.text = chess_name
+	name_label.text = chess_name
 	
 	# set image
-	$Front/SideImage.get_mesh().get_material().albedo_texture = ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null
-	$Back/SideImage.get_mesh().get_material().albedo_texture = ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null
-		
+	front_side_image.set_texture(ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null)
+	back_side_image.set_texture(ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null)

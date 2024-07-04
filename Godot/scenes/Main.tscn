@@ -1,10 +1,11 @@
-[gd_scene load_steps=11 format=3 uid="uid://cfd8jcleybuec"]
+[gd_scene load_steps=12 format=3 uid="uid://cfd8jcleybuec"]
 
 [ext_resource type="PackedScene" uid="uid://blvbnngqi673u" path="res://scenes/ChessTile.tscn" id="1_h0u3b"]
 [ext_resource type="Script" path="res://scripts/scenes/Main.gd" id="1_h17yc"]
 [ext_resource type="Material" uid="uid://c6apg776gl23j" path="res://materials/ChessTile0.tres" id="1_tbdx6"]
 [ext_resource type="Material" uid="uid://dxwd5wxtra6xu" path="res://materials/ChessTile1.tres" id="2_u0hxi"]
 [ext_resource type="PackedScene" uid="uid://cqwayhgnllvvv" path="res://scenes/Chess.tscn" id="5_pfq4i"]
+[ext_resource type="PackedScene" uid="uid://bweec6jbyouee" path="res://scenes/MainGUI.tscn" id="6_g86v1"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_tp6sn"]
 size = Vector3(60, 2, 60)
@@ -57,3 +58,5 @@ transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 20,
 projection = 1
 current = true
 size = 8.0
+
+[node name="MainGUI" parent="." instance=ExtResource("6_g86v1")]

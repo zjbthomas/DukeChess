@@ -18,8 +18,7 @@ func _ready():
 	var chess = ChessInst.new(Global.chess_loader.chess_name_list[1])
 	
 	var node = chess_scene.instantiate()
-	node.chess = chess
-	node.setup_ui()
+	node.setup_ui(chess)
 	
 	node.rotate_z(deg_to_rad(180))
 	

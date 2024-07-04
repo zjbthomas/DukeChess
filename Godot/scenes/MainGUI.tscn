@@ -1,0 +1,28 @@
+[gd_scene load_steps=3 format=3 uid="uid://bweec6jbyouee"]
+
+[ext_resource type="Script" path="res://scripts/scenes/MainGUI.gd" id="1_u4eab"]
+[ext_resource type="PackedScene" uid="uid://crcpfgmiooaa4" path="res://scenes/BlurContainer.tscn" id="2_tp78g"]
+
+[node name="MainGUI" type="ColorRect"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0)
+script = ExtResource("1_u4eab")
+
+[node name="CollectionButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1330.0
+offset_top = 98.0
+offset_right = 1788.0
+offset_bottom = 189.0
+theme_override_font_sizes/font_size = 60
+text = "Check All Chess"
+
+[node name="BlurContainer" parent="." instance=ExtResource("2_tp78g")]
+layout_mode = 0
+anchors_preset = 0
+
+[connection signal="pressed" from="CollectionButton" to="." method="_on_collection_button_pressed"]

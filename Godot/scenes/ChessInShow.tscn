@@ -1,0 +1,142 @@
+[gd_scene load_steps=6 format=3 uid="uid://dgqwu74wnrkfr"]
+
+[ext_resource type="Script" path="res://scripts/scenes/ChessInShow.gd" id="1_fu8jq"]
+[ext_resource type="Texture2D" uid="uid://ymryxj8phnv0" path="res://images/chess/frame.png" id="1_iqpdg"]
+[ext_resource type="Texture2D" uid="uid://dj6acywckbeas" path="res://chess/Duke/Duke.png" id="2_ay8l5"]
+[ext_resource type="Texture2D" uid="uid://c68ffyj3xoun4" path="res://images/chess/center_front.png" id="3_urrhu"]
+[ext_resource type="Texture2D" uid="uid://ftm0wad78jmg" path="res://images/chess/center_back.png" id="4_gpkne"]
+
+[node name="ChessInShow" type="AspectRatioContainer"]
+offset_right = 200.0
+offset_bottom = 271.0
+script = ExtResource("1_fu8jq")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Front" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="FrontLabel" type="Label" parent="VBoxContainer/HBoxContainer/Front"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 24
+text = "Front"
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="VBoxContainer/HBoxContainer/Front"]
+layout_mode = 2
+
+[node name="Background" type="ColorRect" parent="VBoxContainer/HBoxContainer/Front/AspectRatioContainer"]
+layout_mode = 2
+
+[node name="Frame" type="TextureRect" parent="VBoxContainer/HBoxContainer/Front/AspectRatioContainer"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("1_iqpdg")
+expand_mode = 1
+
+[node name="SideImage" type="TextureRect" parent="VBoxContainer/HBoxContainer/Front/AspectRatioContainer"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+texture = ExtResource("2_ay8l5")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Center" type="Sprite2D" parent="VBoxContainer/HBoxContainer/Front/AspectRatioContainer"]
+position = Vector2(72, 72)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("3_urrhu")
+
+[node name="Name" type="Node2D" parent="VBoxContainer/HBoxContainer/Front/AspectRatioContainer"]
+position = Vector2(72, 168)
+metadata/_edit_group_ = true
+
+[node name="NameLabel" type="Label" parent="VBoxContainer/HBoxContainer/Front/AspectRatioContainer/Name"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -53.0
+offset_top = -11.5
+offset_right = 53.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 20
+text = "LongBowman"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Back" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="BackLabel" type="Label" parent="VBoxContainer/HBoxContainer/Back"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 24
+text = "Back"
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="VBoxContainer/HBoxContainer/Back"]
+layout_mode = 2
+
+[node name="Background" type="ColorRect" parent="VBoxContainer/HBoxContainer/Back/AspectRatioContainer"]
+layout_mode = 2
+
+[node name="Frame" type="TextureRect" parent="VBoxContainer/HBoxContainer/Back/AspectRatioContainer"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("1_iqpdg")
+expand_mode = 1
+
+[node name="SideImage" type="TextureRect" parent="VBoxContainer/HBoxContainer/Back/AspectRatioContainer"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+texture = ExtResource("2_ay8l5")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Center" type="Sprite2D" parent="VBoxContainer/HBoxContainer/Back/AspectRatioContainer"]
+position = Vector2(72, 72)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("4_gpkne")
+
+[node name="Name" type="Node2D" parent="VBoxContainer/HBoxContainer/Back/AspectRatioContainer"]
+position = Vector2(72, 168)
+metadata/_edit_group_ = true
+
+[node name="NameLabel" type="Label" parent="VBoxContainer/HBoxContainer/Back/AspectRatioContainer/Name"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -53.0
+offset_top = -11.5
+offset_right = 53.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 20
+text = "LongBowman"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NameLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+text = "LongBowman"

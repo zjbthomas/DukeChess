@@ -115,7 +115,7 @@ func _parse_xml_root(xml_path, xml_movement):
 		var type = xml_target.type.content
 		
 		# validate
-		if (not validate_type(type) or not validate_destination(destination)):
+		if (not validate_type(type, destination) or not validate_destination(destination)):
 			error_message.emit('ERROR: invald type %s or destination %s in XML %s.' % [type, destination, xml_path])
 			return null
 		
@@ -149,10 +149,30 @@ func validate_action(a):
 
 	return false
 
-func validate_type(t):
+func validate_type(t, d):
 	for vt in ChessModel.MOVEMENT_TYPE.keys():
 		if (t.to_upper() == str(vt)):
 			return true
+
+	var offset_x = ChessModel.dest_to_offsets_for_chess(d)[0]
+	var offset_y = ChessModel.dest_to_offsets_for_chess(d)[1]
+
+	# check for Jump
+	if (t.to_upper() == "JUMP"):
+		if (abs(offset_x) >= 2 or abs(offset_y >= 2)):
+			return false
+			
+	# check for Slide
+	if (t.to_upper() == "SLIDE"):
+		if (abs(offset_x) >= 2 or abs(offset_y >= 2)):
+			return false
+			
+	# check for JumpSlide
+	if (t.to_upper() == "JUMPSLIDE"):
+		if (abs(offset_x) <= 1 or abs(offset_y <= 1)):
+			return false
+		elif ((abs(offset_x) + abs(offset_y)) % 2 != 0):
+			return false
 
 	return false
 
