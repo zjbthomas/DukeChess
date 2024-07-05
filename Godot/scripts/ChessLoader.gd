@@ -182,7 +182,7 @@ func _load_chess_files():
 		return
 			
 	for chess_name in chess_name_list:
-		var amount_str = json_as_dict[chess_name]
+		var amount_str = json_as_dict.get(chess_name)
 		
 		if not amount_str:
 			error_message.emit('ERROR: amount for %s cannot be load from %s.' % [chess_name, USERCHESSDIR + "/" + CHESSAMOUNTJSON])
@@ -234,7 +234,7 @@ func _copy_dir_recursively(source: String, destination: String):
 	for filename in source_dir.get_files():
 		if (filename == CHESSAMOUNTJSON):
 			# copy only when not exists
-			if not FileAccess.file_exists(destination + filename):
+			if not FileAccess.file_exists(destination + "/" + filename):
 				source_dir.copy(source + "/" + filename, destination + "/" + filename)
 		
 		if (filename.ends_with(".png") or filename.ends_with(".xml")): # TODO: only PNG and XML are supported now
