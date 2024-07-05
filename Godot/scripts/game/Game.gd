@@ -53,3 +53,10 @@ func game_start():
 	
 	add_chess.emit(Global.rc_to_n(5, 2), duke0)
 	add_chess.emit(Global.rc_to_n(0, 3), duke1)
+
+func get_chess_back(r, c):
+	if board[Global.rc_to_n(r, c)] == null:
+		return null
+	else:
+		var chess = board[Global.rc_to_n(r, c)]
+		return [chess.name, !board[Global.rc_to_n(r, c)].is_front]

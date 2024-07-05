@@ -65,6 +65,11 @@ func _get_tile_name_at_rc(r, c):
 	return "ChessTile" + str(r) + str(c)
 
 func _on_tile_mouse_entered(r, c):
+	var chess_back = game.get_chess_back(r, c)
+	if (chess_back != null):
+		$MainGUI.setup_chess_back(chess_back[0], chess_back[1])
+		$MainGUI/CardBack.visible = true
+	
 	# DEBUG
 	var cover_effects = []
 	
@@ -107,6 +112,8 @@ func _on_tile_mouse_entered(r, c):
 	_cover_effect_dict[_get_tile_name_at_rc(r,c)] = cover_effects
 
 func _on_tile_mouse_exited(r, c):
+	$MainGUI/CardBack.visible = false
+	
 	var cover_effects = _cover_effect_dict[_get_tile_name_at_rc(r,c)]
 	for ce in cover_effects:
 		ce.queue_free()
