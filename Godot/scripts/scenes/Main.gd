@@ -5,7 +5,8 @@ extends Node
 
 const _CHESSTILEOFFSET = -2.5
 
-var _cover_effect_dict = {}
+var _state_cover_effects = []
+var _hover_cover_effect_dict = {}
 
 # variables for logic
 var game = Game.new()
@@ -17,6 +18,8 @@ func _ready():
 	
 	# init game
 	game.connect("add_chess", _on_add_chess)
+	game.connect("state_cover_effect", _on_game_state_cover_effect)
+	game.connect("game_message", _on_game_message)
 	
 	game.game_start()
 	
@@ -35,9 +38,33 @@ func _on_add_chess(pos, chess:ChessInst):
 	$Board.get_node(_get_tile_name_at_rc(r, c)).add_child(node)
 	node.setup_ui(chess)
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
+func _on_game_state_cover_effect(cover_effect_dict):
+	for n in cover_effect_dict:
+		var node = _get_cover_effect_node(cover_effect_dict[n])
+		
+		var r = Global.n_to_rc(n)[0]
+		var c = Global.n_to_rc(n)[1]
+		$Board.get_node(_get_tile_name_at_rc(r, c)).add_child(node)
+			
+		_state_cover_effects.append(node)
+
+func _get_cover_effect_node(color):
+	var material = StandardMaterial3D.new()
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.albedo_color = Color(color, 0.5)
+	
+	var mesh = PlaneMesh.new()
+	mesh.size = Vector2(1, 1)
+	mesh.set_material(material)
+	
+	var node = MeshInstance3D.new()
+	node.set_mesh(mesh)
+	node.position.y = 0.16
+	
+	return node
+
+func _on_game_message(msg):
+	$MainGUI/MarginContainer/Panel/MarginContainer/MessageLabel.text = msg
 
 func _init_board():
 	for ir in range(Global.MAXR):
@@ -71,53 +98,57 @@ func _on_tile_mouse_entered(r, c):
 		$MainGUI/CardBack.visible = true
 	
 	# DEBUG
-	var cover_effects = []
-	
-	for ir in range(Global.MAXR):
-		if (ir != r):
-			var material = StandardMaterial3D.new()
-			material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-			material.albedo_color = Color(Color.YELLOW, 0.5)
-			
-			var mesh = PlaneMesh.new()
-			mesh.size = Vector2(1, 1)
-			mesh.set_material(material)
-			
-			var node = MeshInstance3D.new()
-			node.set_mesh(mesh)
-			node.position.y = 0.16
-			
-			$Board.get_node(_get_tile_name_at_rc(ir, c)).add_child(node)
-			
-			cover_effects.append(node)
-			
-	for ic in range(Global.MAXC):
-		if (ic != c):
-			var material = StandardMaterial3D.new()
-			material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-			material.albedo_color = Color(Color.YELLOW, 0.5)
-			
-			var mesh = PlaneMesh.new()
-			mesh.size = Vector2(1, 1)
-			mesh.set_material(material)
-			
-			var node = MeshInstance3D.new()
-			node.set_mesh(mesh)
-			node.position.y = 0.16
-			
-			$Board.get_node(_get_tile_name_at_rc(r, ic)).add_child(node)
-			
-			cover_effects.append(node)
-			
-	_cover_effect_dict[_get_tile_name_at_rc(r,c)] = cover_effects
+	#var cover_effects = []
+	#
+	#for ir in range(Global.MAXR):
+		#if (ir != r):
+			#var material = StandardMaterial3D.new()
+			#material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			#material.albedo_color = Color(Color.YELLOW, 0.5)
+			#
+			#var mesh = PlaneMesh.new()
+			#mesh.size = Vector2(1, 1)
+			#mesh.set_material(material)
+			#
+			#var node = MeshInstance3D.new()
+			#node.set_mesh(mesh)
+			#node.position.y = 0.16
+			#
+			#$Board.get_node(_get_tile_name_at_rc(ir, c)).add_child(node)
+			#
+			#cover_effects.append(node)
+			#
+	#for ic in range(Global.MAXC):
+		#if (ic != c):
+			#var material = StandardMaterial3D.new()
+			#material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			#material.albedo_color = Color(Color.YELLOW, 0.5)
+			#
+			#var mesh = PlaneMesh.new()
+			#mesh.size = Vector2(1, 1)
+			#mesh.set_material(material)
+			#
+			#var node = MeshInstance3D.new()
+			#node.set_mesh(mesh)
+			#node.position.y = 0.16
+			#
+			#$Board.get_node(_get_tile_name_at_rc(r, ic)).add_child(node)
+			#
+			#cover_effects.append(node)
+			#
+	#_hover_cover_effect_dict[_get_tile_name_at_rc(r,c)] = cover_effects
 
 func _on_tile_mouse_exited(r, c):
 	$MainGUI/CardBack.visible = false
 	
-	var cover_effects = _cover_effect_dict[_get_tile_name_at_rc(r,c)]
-	for ce in cover_effects:
-		ce.queue_free()
+	var cover_effects = _hover_cover_effect_dict.get(_get_tile_name_at_rc(r,c))
+	if (cover_effects != null):
+		for ce in cover_effects:
+			ce.queue_free()
 		
 func _on_tile_mouse_pressed(r, c):
-	print(r)
-	print(c)
+	# TODO: perform game op
+	
+	# remove cover effects for state if op can be performed
+	for ce in _state_cover_effects:
+		ce.queue_free()
