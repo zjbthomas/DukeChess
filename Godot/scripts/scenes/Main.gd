@@ -39,6 +39,11 @@ func _on_add_chess(pos, chess:ChessInst):
 	node.setup_ui(chess)
 
 func _on_game_state_cover_effect(cover_effect_dict):
+	# first, remove previous cover effects
+	for ce in _state_cover_effects:
+		ce.queue_free()
+	_state_cover_effects = []
+	
 	for n in cover_effect_dict:
 		var node = _get_cover_effect_node(cover_effect_dict[n])
 		
@@ -64,7 +69,8 @@ func _get_cover_effect_node(color):
 	return node
 
 func _on_game_message(msg):
-	$MainGUI/MarginContainer/Panel/MarginContainer/MessageLabel.text = msg
+	if msg != null:
+		$MainGUI/MarginContainer/Panel/MarginContainer/MessageLabel.text = msg
 
 func _init_board():
 	for ir in range(Global.MAXR):
@@ -148,9 +154,4 @@ func _on_tile_mouse_exited(r, c):
 		_hover_cover_effect_dict.erase(_get_tile_name_at_rc(r,c))
 		
 func _on_tile_mouse_pressed(r, c):
-	# TODO: perform game op
-	
-	# remove cover effects for state if op can be performed
-	for ce in _state_cover_effects:
-		ce.queue_free()
-	_state_cover_effects = []
+	var valid_op = game.perform_op(Global.rc_to_n(r, c))

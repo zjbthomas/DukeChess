@@ -20,12 +20,25 @@ enum GAMESTATE {
 	ENDSTATE
 }
 
+var POS_DUKE0
+var POS_DUKE1
+
 var player_list = []
 var current_player
 
 var board = []
 
 var current_state:GAMESTATE
+var cached_state:GAMESTATE
+
+var current_chess_pos
+var current_action
+
+var is_waiting_menu_selection
+
+func _init():
+	POS_DUKE0 = Global.rc_to_n(5, 2)
+	POS_DUKE1 = Global.rc_to_n(0, 3)
 
 func game_start():
 	# init player
@@ -44,24 +57,23 @@ func game_start():
 	var duke0 = ChessInst.new("Duke", player_list[0])
 	var duke1 = ChessInst.new("Duke", player_list[1])
 	
-	board[Global.rc_to_n(5, 2)] = duke0
-	board[Global.rc_to_n(0, 3)] = duke1
+	board[POS_DUKE0] = duke0 # TODO: magic numbers
+	board[POS_DUKE1] = duke1
 	
 	player_list[0].remove_chess("Duke")
 	player_list[1].remove_chess("Duke")
 	
-	# TODO: this.waitingMenu = false; - may not need anymore
+	is_waiting_menu_selection = false
 	
 	current_state += 1
 	
 	# signal
-	add_chess.emit(Global.rc_to_n(5, 2), duke0)
-	add_chess.emit(Global.rc_to_n(0, 3), duke1)
+	add_chess.emit(POS_DUKE0, duke0)
+	add_chess.emit(POS_DUKE1, duke1)
 	
-	emit_cover_effects(null, true, false)
-	emit_message(true)
+	emit_cover_effects(POS_DUKE0, false)
+	emit_message()
 	
-
 func get_chess_back(r, c):
 	if board[Global.rc_to_n(r, c)] == null:
 		return null
@@ -69,26 +81,117 @@ func get_chess_back(r, c):
 		var chess = board[Global.rc_to_n(r, c)]
 		return [chess.name, !board[Global.rc_to_n(r, c)].is_front]
 
-func convert_pos_for_player(pos, is_first_player):
-	return pos if is_first_player else (Global.MAXR * Global.MAXC - 1 - pos)
-
-func emit_cover_effects(pos, is_first_player, is_for_hover):
-	if (pos != null):
-		pos = convert_pos_for_player(pos, is_first_player)
+# return if the user_op is valid or not
+func perform_op(user_op):
+	# in Local mode, no need to convert user_op based on player
 	
+	cached_state = current_state # TODO: why?
+	
+	match current_state:
+		GAMESTATE.INITSUMMONPLAYERONEFOOTMANONE, GAMESTATE.INITSUMMONPLAYERONEFOOTMANTWO:
+			if board[POS_DUKE0].get_available_destinations(board, POS_DUKE0, ChessModel.ACTION_TYPE.SUMMON).has(user_op):
+				perform_action(board, board[POS_DUKE0], ChessModel.ACTION_TYPE.SUMMON, [user_op], "Footman", player_list[0])
+				
+				if (current_state == GAMESTATE.INITSUMMONPLAYERONEFOOTMANTWO):
+					current_player = player_list[1]
+				
+				current_state += 1
+				
+				emit_cover_effects(POS_DUKE1, false)
+				emit_message()
+				
+				return true
+			else:
+				return false
+		GAMESTATE.INITSUMMONPLAYERTWOFOOTMANONE, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANTWO:
+			if board[POS_DUKE1].get_available_destinations(board, POS_DUKE1, ChessModel.ACTION_TYPE.SUMMON).has(user_op):
+				perform_action(board, board[POS_DUKE1], ChessModel.ACTION_TYPE.SUMMON, [user_op], "Footman", player_list[1])
+				
+				if (current_state == GAMESTATE.INITSUMMONPLAYERTWOFOOTMANTWO):
+					current_player = player_list[0]
+				
+				current_state += 1
+				
+				emit_cover_effects(POS_DUKE1, false)
+				emit_message()
+				
+				return true
+			else:
+				return false
+		GAMESTATE.CHOOSECHESS:
+			if board[user_op] == null:
+				return false
+			
+			if board[user_op].player != current_player:
+				return false
+
+			current_chess_pos = user_op
+
+			var actions = board[current_chess_pos].get_available_actions(board)
+
+			# no action means invalid chess selection
+			if (len(actions) == 0):
+				return false
+			
+			if (len(actions) == 1 and actions[0] != ChessModel.ACTION_TYPE.SUMMON):
+				# if there is only one possible action, use it
+				current_action = actions[0]
+				
+				# no need to pop up a menu
+				is_waiting_menu_selection = false
+				
+				# skip CHOOSEACTION stage
+				current_state = GAMESTATE.CHOOSEDESTONE
+			else:
+				is_waiting_menu_selection = true
+				current_state += 1
+				
+			return true
+				
+func perform_action(board, src_chess:ChessInst, action, dest_arr, target_chess_name, player):
+	match action:
+		ChessModel.ACTION_TYPE.SUMMON:
+			var chess = ChessInst.new(target_chess_name, player)
+			board[dest_arr[0]] = chess
+			player.remove_chess(target_chess_name)
+			
+			# signal
+			add_chess.emit(dest_arr[0], chess)
+
+		ChessModel.ACTION_TYPE.MOVE:
+			if (src_chess.get_available_movements(board, dest_arr[0], action).get(dest_arr[1]) == MovementManager.MOVEMENT_TYPE.STRIKE):
+				board[dest_arr[1]] = null
+				
+				# TODO: signal remove_chess
+			else:
+				board[dest_arr[1]] = board[dest_arr[0]]
+				board[dest_arr[0]] = null
+				
+				src_chess.is_front = !src_chess.is_front
+				
+				# TODO: singal move_chess
+				# TODO: singal flip_chess
+		
+		ChessModel.ACTION_TYPE.COMMAND:
+			board[dest_arr[1]] = board[dest_arr[0]]
+			board[dest_arr[0]] = null
+			
+			src_chess.is_front = !src_chess.is_front
+			
+			# TODO: singal move_chess
+			# TODO: singal flip_chess
+
+# in Local mode, there is no need to convert pos by player
+func emit_cover_effects(pos, is_for_hover):
 	var cover_effect_dict = {}
 	
 	match current_state:
 		GAMESTATE.INITSUMMONPLAYERONEFOOTMANONE, GAMESTATE.INITSUMMONPLAYERONEFOOTMANTWO:
-			for d in board[Global.rc_to_n(5, 2)].get_available_movements(board, Global.rc_to_n(5, 2), ChessModel.ACTION_TYPE.SUMMON):
-				cover_effect_dict[convert_pos_for_player(d, is_first_player)] = Color.YELLOW
-		#case GameState.INITSUMMONPLAYERTWOFOOTMANONE:
-		#case GameState.INITSUMMONPLAYERTWOFOOTMANTWO:
-			#for (var [i, m] of this.field.fieldMap[33].getAvailableMovements(this.field, 33, ActionType.SUMMON)) {
-				#tPos = playerOne? i: (this.field.maxRow * this.field.maxCol - 1 - i);
-				#ret.set(tPos, "yellow");
-			#}
-			#break;
+			for d in board[POS_DUKE0].get_available_movements(board, POS_DUKE0, ChessModel.ACTION_TYPE.SUMMON):
+				cover_effect_dict[d] = Color.YELLOW
+		GAMESTATE.INITSUMMONPLAYERTWOFOOTMANONE, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANTWO:
+			for d in board[POS_DUKE1].get_available_movements(board, POS_DUKE1, ChessModel.ACTION_TYPE.SUMMON):
+				cover_effect_dict[d] = Color.YELLOW
 		#case GameState.CHOOSECHESS:
 			#for(var i = 0; i < this.field.maxRow * this.field.maxCol; i++) {
 				#if (this.field.fieldMap[i] != null) {
@@ -178,22 +281,22 @@ func emit_cover_effects(pos, is_first_player, is_for_hover):
 	else:
 		return cover_effect_dict
 
-func emit_message(is_first_player):
+func add_message_prefix_for_player(msg):
+	return "[Player " + ("1] " if current_player == player_list[0] else "2] ")
+
+# in Local mode, show all information for both players, instead of just one/main player
+func emit_message():
 	var msg
 	
 	match (current_state):
 		GAMESTATE.INITIALIZATION:
 			msg = "Game started."
-		GAMESTATE.INITSUMMONPLAYERONEFOOTMANONE:
-			msg = "Please summon your first footman." if is_first_player else "Waiting another player to summon footmen."
-		GAMESTATE.INITSUMMONPLAYERONEFOOTMANTWO:
-			msg = "Please summon your second footman." if is_first_player else "Waiting another player to summon footmen."
-		GAMESTATE.INITSUMMONPLAYERTWOFOOTMANONE:
-			msg = "Please summon your first footman." if not is_first_player else "Waiting another player to summon footmen."
-		GAMESTATE.INITSUMMONPLAYERTWOFOOTMANTWO:
-			msg = "Please summon your second footman." if not is_first_player else "Waiting another player to summon footmen."
-		#GameState.CHOOSECHESS:
-			#ret = (playerOne == (this.currentPlayer == this.playerList[0]))? "Please choose a chess to perform action." : "Waiting another player to perform action.";
+		GAMESTATE.INITSUMMONPLAYERONEFOOTMANONE, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANONE:
+			msg = add_message_prefix_for_player("Please SUMMON your first Footman.")
+		GAMESTATE.INITSUMMONPLAYERONEFOOTMANTWO, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANTWO:
+			msg = add_message_prefix_for_player("Please SUMMON your second Footman.")
+		GAMESTATE.CHOOSECHESS:
+			msg =  add_message_prefix_for_player("Please choose a chess to perform action.")
 			#break;
 		#GameState.CHOOSEACTION:
 			#ret = (playerOne == (this.currentPlayer == this.playerList[0]))? "Please choose an action." : "Waiting another player to perform action.";
