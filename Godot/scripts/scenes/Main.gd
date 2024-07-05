@@ -7,18 +7,34 @@ const _CHESSTILEOFFSET = -2.5
 
 var _cover_effect_dict = {}
 
+# variables for logic
+var game = Game.new()
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	# init board GUI
 	_init_board()
 	
-	# DEBUG: temporarily create a chess
-	var chess = ChessInst.new("LongBowman")
+	# init game
+	game.connect("add_chess", _on_add_chess)
 	
+	game.game_start()
+	
+func _on_add_chess(pos, chess:ChessInst):
 	var node = chess_scene.instantiate()
-	node.rotate_z(deg_to_rad(180)) # show the back
-	$Board.get_node("ChessTile00").add_child(node)
-	node.setup_ui(chess)
 	
+	if not chess.is_front:
+		node.rotate_z(deg_to_rad(180)) # show the back
+	
+	if not chess.player.is_main_player:
+		node.rotate_y(deg_to_rad(180))
+	
+	var r = Global.n_to_rc(pos)[0]
+	var c = Global.n_to_rc(pos)[1]
+	
+	$Board.get_node(_get_tile_name_at_rc(r, c)).add_child(node)
+	node.setup_ui(chess)
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass

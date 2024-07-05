@@ -8,3 +8,12 @@ const WINDOW_TYPE = {
 }
 
 var chess_loader:ChessLoader
+
+func rc_to_n(r, c):
+	return r * Global.MAXC + c
+	
+func n_to_rc(n):
+	var r:int = n / Global.MAXC
+	var c:int = n % Global.MAXC
+	
+	return [r, c]
