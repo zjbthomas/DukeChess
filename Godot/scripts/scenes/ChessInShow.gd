@@ -3,10 +3,12 @@ extends AspectRatioContainer
 @onready var front_container = $VBoxContainer/ChessInfoContainer/Front/AspectRatioContainer
 @onready var front_name_label = $VBoxContainer/ChessInfoContainer/Front/AspectRatioContainer/Name/NameLabel
 @onready var front_side_image = $VBoxContainer/ChessInfoContainer/Front/AspectRatioContainer/SideImage
+@onready var front_center = $VBoxContainer/ChessInfoContainer/Front/AspectRatioContainer/Center
 
 @onready var back_container = $VBoxContainer/ChessInfoContainer/Back/AspectRatioContainer
 @onready var back_name_label = $VBoxContainer/ChessInfoContainer/Back/AspectRatioContainer/Name/NameLabel
 @onready var back_side_image = $VBoxContainer/ChessInfoContainer/Back/AspectRatioContainer/SideImage
+@onready var back_center = $VBoxContainer/ChessInfoContainer/Back/AspectRatioContainer/Center
 
 @onready var name_label = $VBoxContainer/HBoxContainer/NameLabel
 
@@ -27,12 +29,22 @@ func _process(delta):
 
 # TODO: this is similar to the one in Chess.gd, can we combine into one function?
 func setup_ui():
-	# set movements
-	var chess_model = Global.chess_loader.chessmodel_dict[chess]
+	var chess_model:ChessModel = Global.chess_loader.chessmodel_dict[chess]
 	
 	for is_front in [true, false]:
-		var movements_dict = chess_model.front_dict if is_front else chess_model.back_dict
+		# move center if necessary
+		if (is_front):
+			if (chess_model.front_center_offset_x != 0 or chess_model.front_center_offset_y != 0):
+				front_center.position.x = CENTER_X + chess_model.front_center_offset_x * OFFSET
+				front_center.position.y = CENTER_Y + chess_model.front_center_offset_y * OFFSET
+		else:
+			if (chess_model.back_center_offset_x != 0 or chess_model.back_center_offset_y != 0):
+				back_center.position.x = CENTER_X + chess_model.back_center_offset_x * OFFSET
+				back_center.position.y = CENTER_Y + chess_model.back_center_offset_y * OFFSET
 		
+		# set movements
+		var movements_dict = chess_model.front_dict if is_front else chess_model.back_dict
+			
 		for a in movements_dict:
 			if (a == ChessModel.ACTION_TYPE.MOVE or a == ChessModel.ACTION_TYPE.COMMAND):
 				var movements = movements_dict[a]
@@ -49,8 +61,11 @@ func setup_ui():
 					node.set_texture(Global.chess_loader.type_to_texture(type, offset_x, offset_y))
 							
 					# set node position and scale
-					node.position.x = CENTER_X + offset_x * OFFSET
-					node.position.y = CENTER_Y + offset_y * OFFSET
+					var center_offset_x = chess_model.front_center_offset_x if is_front else chess_model.back_center_offset_x
+					var center_offset_y = chess_model.front_center_offset_y if is_front else chess_model.back_center_offset_y
+					
+					node.position.x = CENTER_X + (center_offset_x + offset_x) * OFFSET
+					node.position.y = CENTER_Y + (center_offset_y + offset_y) * OFFSET
 
 					node.scale = Vector2(0.55, 0.55)
 

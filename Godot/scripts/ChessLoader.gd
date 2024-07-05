@@ -132,6 +132,21 @@ func _load_chess_files():
 		chess.name = name
 		chess.version = version
 		
+		# center offsets
+		if (xml_root.front.get('center') != null):
+			var front_center_offset_x = ChessModel.dest_to_offsets_for_chess(xml_root.front.center.content)[0]
+			var front_center_offset_y = ChessModel.dest_to_offsets_for_chess(xml_root.front.center.content)[1]
+			
+			chess.front_center_offset_x = front_center_offset_x
+			chess.front_center_offset_y = front_center_offset_y
+			
+		if (xml_root.back.get('center') != null):
+			var back_center_offset_x = ChessModel.dest_to_offsets_for_chess(xml_root.back.center.content)[0]
+			var back_center_offset_y = ChessModel.dest_to_offsets_for_chess(xml_root.back.center.content)[1]
+			
+			chess.back_center_offset_x = back_center_offset_x
+			chess.back_center_offset_y = back_center_offset_y
+		
 		# front actions and movements
 		for xml_movement in xml_root.front.movements.children:
 			var ret = _parse_xml_root(xml_path, xml_movement)

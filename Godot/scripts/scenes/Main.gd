@@ -12,14 +12,12 @@ func _ready():
 	_init_board()
 	
 	# DEBUG: temporarily create a chess
-	var chess = ChessInst.new(Global.chess_loader.chess_name_list[1])
+	var chess = ChessInst.new("LongBowman")
 	
 	var node = chess_scene.instantiate()
-	node.setup_ui(chess)
-	
-	node.rotate_z(deg_to_rad(180))
-	
+	node.rotate_z(deg_to_rad(180)) # show the back
 	$Board.get_node("ChessTile00").add_child(node)
+	node.setup_ui(chess)
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

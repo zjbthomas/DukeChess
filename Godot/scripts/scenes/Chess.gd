@@ -1,5 +1,8 @@
 extends StaticBody3D
 
+@onready var front_center = $Front/Center
+@onready var back_center = $Back/Center
+
 const CENTER_X = -0.54
 const CENTER_Y = 0.55
 const OFFSET = -0.54
@@ -13,10 +16,21 @@ func _process(delta):
 	pass
 
 func setup_ui(chess):
-	# set movements
+	
 	var chess_model = Global.chess_loader.chessmodel_dict[chess.name]
 	
 	for is_front in [true, false]:
+		# move center if necessary
+		if (is_front):
+			if (chess_model.front_center_offset_x != 0 or chess_model.front_center_offset_y != 0):
+				front_center.position.x = CENTER_X - chess_model.front_center_offset_x * OFFSET
+				front_center.position.y = CENTER_Y + chess_model.front_center_offset_y * OFFSET
+		else:
+			if (chess_model.back_center_offset_x != 0 or chess_model.back_center_offset_y != 0):
+				back_center.position.x = CENTER_X - chess_model.back_center_offset_x * OFFSET
+				back_center.position.y = CENTER_Y + chess_model.back_center_offset_y * OFFSET
+		
+		# set movements
 		var movements_dict = chess_model.front_dict if is_front else chess_model.back_dict
 		
 		for a in movements_dict:
@@ -35,8 +49,11 @@ func setup_ui(chess):
 					node.set_texture(Global.chess_loader.type_to_texture(type, offset_x, offset_y))
 							
 					# set node position
-					node.position.x = CENTER_X - offset_x * OFFSET
-					node.position.y = CENTER_Y + offset_y * OFFSET
+					var center_offset_x = chess_model.front_center_offset_x if is_front else chess_model.back_center_offset_x
+					var center_offset_y = chess_model.front_center_offset_y if is_front else chess_model.back_center_offset_y
+					
+					node.position.x = CENTER_X - (center_offset_x + offset_x) * OFFSET
+					node.position.y = CENTER_Y + (center_offset_y + offset_y) * OFFSET
 
 					if (is_front):
 						$Front.add_child(node)

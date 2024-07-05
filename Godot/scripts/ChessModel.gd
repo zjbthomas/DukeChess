@@ -6,6 +6,11 @@ enum MOVEMENT_TYPE {MOVE, JUMP, SLIDE, JUMPSLIDE, STRIKE, COMMAND, SUMMON}
 var name = ""
 var version = 1
 
+var front_center_offset_x = 0
+var front_center_offset_y = 0
+var back_center_offset_x = 0
+var back_center_offset_y = 0
+
 var front_dict = {}
 var back_dict = {}
 
