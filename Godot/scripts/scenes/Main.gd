@@ -145,6 +145,7 @@ func _on_tile_mouse_exited(r, c):
 	if (cover_effects != null):
 		for ce in cover_effects:
 			ce.queue_free()
+		_hover_cover_effect_dict.erase(_get_tile_name_at_rc(r,c))
 		
 func _on_tile_mouse_pressed(r, c):
 	# TODO: perform game op
@@ -152,3 +153,4 @@ func _on_tile_mouse_pressed(r, c):
 	# remove cover effects for state if op can be performed
 	for ce in _state_cover_effects:
 		ce.queue_free()
+	_state_cover_effects = []
