@@ -4,6 +4,8 @@ extends StaticBody3D
 @export var meterial2:StandardMaterial3D
 
 signal on_mouse_entered(r, c)
+signal on_mouse_exited(r, c)
+signal on_mouse_pressed(r, c)
 
 var r
 var c
@@ -29,3 +31,12 @@ func _on_mouse_entered():
 
 func _on_mouse_exited():
 	$Selector.visible = false
+	
+	on_mouse_exited.emit(r, c)
+
+
+func _on_input_event(camera, event, position, normal, shape_idx):
+	if (event is InputEventMouseButton):
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				on_mouse_pressed.emit(r, c)
