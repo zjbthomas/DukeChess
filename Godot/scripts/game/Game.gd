@@ -80,16 +80,8 @@ func emit_cover_effects(pos, is_first_player, is_for_hover):
 	
 	match current_state:
 		GAMESTATE.INITSUMMONPLAYERONEFOOTMANONE, GAMESTATE.INITSUMMONPLAYERONEFOOTMANTWO:
-			# DEBUG
-			cover_effect_dict[Global.rc_to_n(5, 1)] = Color.YELLOW
-			cover_effect_dict[Global.rc_to_n(5, 3)] = Color.YELLOW
-			cover_effect_dict[Global.rc_to_n(4, 2)] = Color.YELLOW
-			
-			#for (var [i, m] of this.field.fieldMap[2].getAvailableMovements(this.field, 2, ActionType.SUMMON)) {
-				#tPos = playerOne? i: (this.field.maxRow * this.field.maxCol - 1 - i);
-				#ret.set(tPos, "yellow");
-			#}
-			#break;
+			for d in board[Global.rc_to_n(5, 2)].get_available_movements(board, Global.rc_to_n(5, 2), ChessModel.ACTION_TYPE.SUMMON):
+				cover_effect_dict[convert_pos_for_player(d, is_first_player)] = Color.YELLOW
 		#case GameState.INITSUMMONPLAYERTWOFOOTMANONE:
 		#case GameState.INITSUMMONPLAYERTWOFOOTMANTWO:
 			#for (var [i, m] of this.field.fieldMap[33].getAvailableMovements(this.field, 33, ActionType.SUMMON)) {

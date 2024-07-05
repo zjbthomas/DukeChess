@@ -54,13 +54,13 @@ func load_chess_textures():
 
 func type_to_texture(type, offset_x, offset_y):
 	match type:
-		ChessModel.MOVEMENT_TYPE.MOVE:
+		MovementManager.MOVEMENT_TYPE.MOVE:
 			return chess_textures["Move"]
 			
-		ChessModel.MOVEMENT_TYPE.JUMP:
+		MovementManager.MOVEMENT_TYPE.JUMP:
 			return chess_textures["Jump"]
 			
-		ChessModel.MOVEMENT_TYPE.SLIDE:
+		MovementManager.MOVEMENT_TYPE.SLIDE:
 			if (offset_x == -1 and offset_y == -1):
 				return chess_textures["SlideUL"]
 			elif (offset_x == 0 and offset_y == -1):
@@ -78,7 +78,7 @@ func type_to_texture(type, offset_x, offset_y):
 			elif (offset_x == 1 and offset_y == 1):
 				return chess_textures["SlideDR"]
 				
-		ChessModel.MOVEMENT_TYPE.JUMPSLIDE:
+		MovementManager.MOVEMENT_TYPE.JUMPSLIDE:
 			if (offset_x == -2 and offset_y == -2):
 				return chess_textures["JumpSlideUULL"]
 			elif (offset_x == 0 and offset_y == -2):
@@ -96,10 +96,10 @@ func type_to_texture(type, offset_x, offset_y):
 			elif (offset_x == 2 and offset_y == 2):
 				return chess_textures["JumpSlideDDRR"]
 		
-		ChessModel.MOVEMENT_TYPE.STRIKE:
+		MovementManager.MOVEMENT_TYPE.STRIKE:
 			return chess_textures["Strike"]
 			
-		ChessModel.MOVEMENT_TYPE.COMMAND:
+		MovementManager.MOVEMENT_TYPE.COMMAND:
 				return chess_textures["Command"]
 
 func _load_chess_files():
@@ -134,15 +134,15 @@ func _load_chess_files():
 		
 		# center offsets
 		if (xml_root.front.get('center') != null):
-			var front_center_offset_x = ChessModel.dest_to_offsets_for_chess(xml_root.front.center.content)[0]
-			var front_center_offset_y = ChessModel.dest_to_offsets_for_chess(xml_root.front.center.content)[1]
+			var front_center_offset_x = Global.dest_to_offsets_for_chess(xml_root.front.center.content)[0]
+			var front_center_offset_y = Global.dest_to_offsets_for_chess(xml_root.front.center.content)[1]
 			
 			chess.front_center_offset_x = front_center_offset_x
 			chess.front_center_offset_y = front_center_offset_y
 			
 		if (xml_root.back.get('center') != null):
-			var back_center_offset_x = ChessModel.dest_to_offsets_for_chess(xml_root.back.center.content)[0]
-			var back_center_offset_y = ChessModel.dest_to_offsets_for_chess(xml_root.back.center.content)[1]
+			var back_center_offset_x = Global.dest_to_offsets_for_chess(xml_root.back.center.content)[0]
+			var back_center_offset_y = Global.dest_to_offsets_for_chess(xml_root.back.center.content)[1]
 			
 			chess.back_center_offset_x = back_center_offset_x
 			chess.back_center_offset_y = back_center_offset_y
@@ -215,7 +215,7 @@ func _parse_xml_root(xml_path, xml_movement):
 			error_message.emit('ERROR: invald type %s or destination %s in XML %s.' % [type, destination, xml_path])
 			return null
 		
-		targets[destination] = ChessModel.MOVEMENT_TYPE[type.to_upper()]
+		targets[destination] = MovementManager.MOVEMENT_TYPE[type.to_upper()]
 		
 	var action = xml_movement.action.content
 	if (not validate_action(action)):
@@ -251,12 +251,12 @@ func validate_action(a):
 	return false
 
 func validate_type(t, d):
-	for vt in ChessModel.MOVEMENT_TYPE.keys():
+	for vt in MovementManager.MOVEMENT_TYPE.keys():
 		if (t.to_upper() == str(vt)):
 			return true
 
-	var offset_x = ChessModel.dest_to_offsets_for_chess(d)[0]
-	var offset_y = ChessModel.dest_to_offsets_for_chess(d)[1]
+	var offset_x = Global.dest_to_offsets_for_chess(d)[0]
+	var offset_y = Global.dest_to_offsets_for_chess(d)[1]
 
 	# check for Jump
 	if (t.to_upper() == "JUMP"):
