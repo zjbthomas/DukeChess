@@ -5,6 +5,7 @@ class_name Game
 signal add_chess(pos, chess)
 
 signal state_cover_effect(dict)
+signal hover_cover_effect(pos, dict)
 signal game_message(msg)
 signal show_menu(pos, items)
 
@@ -281,25 +282,20 @@ func emit_cover_effects(pos, is_for_hover):
 				#}
 			#}
 		#}
-#
-		#if (hover && this.field.fieldMap[pos] != null) {
-			#tPos = playerOne? pos: (this.field.maxRow * this.field.maxCol - 1 - pos);
-			#var color = (playerOne == (this.field.fieldMap[pos].player == this.playerList[0]))? "blue": "red";
-			#
-			#if (!Array.from(ret.keys()).includes(tPos)) {
-				#ret.set(tPos, color);
-			#}
-			#
-			#for (var d of this.field.fieldMap[pos].getControlArea(this.field, pos)) {
-				#tPos = playerOne? d: (this.field.maxRow * this.field.maxCol - 1 - d);
-				#ret.set(tPos, color);
-			#}
-		#}
-	
+
+	if (is_for_hover and board[pos] != null):
+		var color = Color.BLUE if board[pos].player == current_player else Color.RED
+		
+		if cover_effect_dict.keys().has(pos):
+			cover_effect_dict[pos] = color
+		
+		for d in board[pos].get_control_area(board, pos):
+			cover_effect_dict[d] = color
+
 	if (not is_for_hover):
 		state_cover_effect.emit(cover_effect_dict)
 	else:
-		return cover_effect_dict
+		hover_cover_effect.emit(pos, cover_effect_dict)
 
 func emit_show_menu(pos):
 	var items = []
@@ -334,34 +330,24 @@ func emit_message():
 			msg = add_message_prefix_for_player("Please SUMMON your second Footman.")
 		GAMESTATE.CHOOSECHESS:
 			msg =  add_message_prefix_for_player("Please choose a chess to perform action.")
-			#break;
-		#GameState.CHOOSEACTION:
-			#ret = (playerOne == (this.currentPlayer == this.playerList[0]))? "Please choose an action." : "Waiting another player to perform action.";
-			#break;
-		#GameState.CHOOSEDESTONE:
-			#switch (this.currentAction) {
-			#case ActionType.SUMMON:
-				#ret = (playerOne == (this.currentPlayer == this.playerList[0]))? ("You are now summoning " + this.summonChess + ".") : "Waiting another player to perform action.";
-				#break;
-			#case ActionType.MOVE:
-				#ret = (playerOne == (this.currentPlayer == this.playerList[0]))? "Please choose a place to perform move action." : "Waiting another player to perform action.";
-				#break;
-			#case ActionType.COMMAND:
-				#ret = (playerOne == (this.currentPlayer == this.playerList[0]))? "Please choose a chess to command." : "Waiting another player to perform action.";
-				#break;
-			#}
-			#break;
-		#GameState.CHOOSEDESTTWO:
-			#switch (this.currentAction) {
-			#case ActionType.SUMMON:
-				#ret = (playerOne == (this.currentPlayer == this.playerList[0]))? "Please comfirm your summon action." : "Waiting another player to perform action.";
-				#break;
-			#case ActionType.COMMAND:
-				#ret = (playerOne == (this.currentPlayer == this.playerList[0]))? "Please choose a destination for command action." : "Waiting another player to perform action.";
-				#break;
-			#}
-			#break;
-		#GameState.ENDSTATE:
+		GAMESTATE.CHOOSEACTION:
+			msg = add_message_prefix_for_player("Please choose an action.")
+		GAMESTATE.CHOOSEDESTONE:
+			match (current_action):
+				ChessModel.ACTION_TYPE.SUMMON:
+					msg = add_message_prefix_for_player("You are now SUMMONing " + summon_chess + ".")
+				ChessModel.ACTION_TYPE.MOVE:
+					msg = add_message_prefix_for_player("Please choose a place to perform MOVE action.")
+				ChessModel.ACTION_TYPE.COMMAND:
+					msg = add_message_prefix_for_player("Please choose a chess to COMMAND.")
+		GAMESTATE.CHOOSEDESTTWO:
+			match (current_action):
+				ChessModel.ACTION_TYPE.SUMMON:
+					msg = add_message_prefix_for_player("Please comfirm your SUMMON action.")
+				ChessModel.ACTION_TYPE.COMMAND:
+					msg = add_message_prefix_for_player("Please choose a destination for COMMAND action.")
+		GAMESTATE.ENDSTATE:
+			pass # TODO
 			#ret = this.checkPlayerWin(playerOne)? "You win!": "You lose..."
 			#break;
 		

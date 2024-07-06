@@ -26,15 +26,16 @@ func get_available_actions(board, pos):
 
 func get_all_movements(action):
 	var chess_model:ChessModel = Global.chess_loader.chessmodel_dict[name]
-	return chess_model.front_dict[action] if is_front else chess_model.back_dict[action]
+	return chess_model.front_dict.get(action) if is_front else chess_model.back_dict.get(action)
 
 func get_available_destinations(board, pos, action):
 	var ret = []
 	
 	var all_movements = get_all_movements(action)
-	for possible_d in all_movements:
-		var valid_ds = Global.movement_manager.validate_movement(all_movements[possible_d], board, pos, possible_d, player)
-		ret.append_array(valid_ds)
+	if (all_movements != null):
+		for possible_d in all_movements:
+			var valid_ds = Global.movement_manager.validate_movement(all_movements[possible_d], board, pos, possible_d, player)
+			ret.append_array(valid_ds)
 			
 	return ret
 
@@ -42,9 +43,23 @@ func get_available_movements(board, pos, action):
 	var ret = {}
 	
 	var all_movements = get_all_movements(action)
-	for possible_d in all_movements:
-		var valid_ds = Global.movement_manager.validate_movement(all_movements[possible_d], board, pos, possible_d, player)
-		for valid_d in valid_ds:
-			ret[valid_d] = all_movements[possible_d]
+	if (all_movements != null):
+		for possible_d in all_movements:
+			var valid_ds = Global.movement_manager.validate_movement(all_movements[possible_d], board, pos, possible_d, player)
+			for valid_d in valid_ds:
+				ret[valid_d] = all_movements[possible_d]
 			
+	return ret
+	
+func get_control_area(board, pos):
+	var ret = []
+	
+	for d in get_available_destinations(board, pos, ChessModel.ACTION_TYPE.MOVE):
+		if (not ret.has(d)):
+			ret.append(d)
+			
+	for d in get_available_destinations(board, pos, ChessModel.ACTION_TYPE.COMMAND):
+		if (not ret.has(d)):
+			ret.append(d)
+	
 	return ret

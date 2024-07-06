@@ -5,6 +5,7 @@ class_name MovementManager
 enum MOVEMENT_TYPE {MOVE, JUMP, SLIDE, JUMPSLIDE, STRIKE, COMMAND, SUMMON}
 
 var movement_insts = {
+	MOVEMENT_TYPE.MOVE: Move.new(),
 	MOVEMENT_TYPE.SLIDE: Slide.new(),
 	MOVEMENT_TYPE.SUMMON: Summon.new()
 }

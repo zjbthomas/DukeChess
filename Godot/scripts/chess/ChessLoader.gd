@@ -221,7 +221,7 @@ func _parse_xml_root(xml_path, xml_movement):
 	if (not validate_action(action)):
 		error_message.emit('ERROR: invald action %s in XML %s.' % [action, xml_path])
 		return null
-	
+
 	return [ChessModel.ACTION_TYPE[action.to_upper()], targets]
 	
 # https://www.reddit.com/r/godot/comments/19f0mf2/is_there_a_way_to_copy_folders_from_res_to_user/

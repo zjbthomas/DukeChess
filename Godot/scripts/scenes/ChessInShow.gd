@@ -52,8 +52,8 @@ func setup_ui():
 				for dest in movements:
 					var type = movements[dest]
 					
-					var offset_x = ChessModel.dest_to_offsets_for_chess(dest)[0]
-					var offset_y = ChessModel.dest_to_offsets_for_chess(dest)[1]
+					var offset_x = Global.dest_to_offsets_for_chess(dest)[0]
+					var offset_y = Global.dest_to_offsets_for_chess(dest)[1]
 					
 					var node = Sprite2D.new()
 					

@@ -18,6 +18,7 @@ func _ready():
 	# init game
 	game.connect("add_chess", _on_add_chess)
 	game.connect("state_cover_effect", _on_game_state_cover_effect)
+	game.connect("hover_cover_effect", _on_game_hover_cover_effect)
 	game.connect("show_menu", _on_game_show_menu)
 	game.connect("game_message", _on_game_message)
 	
@@ -50,6 +51,19 @@ func _on_game_state_cover_effect(cover_effect_dict):
 		$Board.get_node(_get_tile_name_at_rc(r, c)).add_child(node)
 			
 		node.add_to_group("state_cover_effects")
+		
+func _on_game_hover_cover_effect(pos, cover_effect_dict):
+	var ori_r = Global.n_to_rc(pos)[0]
+	var ori_c = Global.n_to_rc(pos)[1]
+	
+	for n in cover_effect_dict:
+		var node = _get_cover_effect_node(cover_effect_dict[n])
+		
+		var r = Global.n_to_rc(n)[0]
+		var c = Global.n_to_rc(n)[1]
+		$Board.get_node(_get_tile_name_at_rc(r, c)).add_child(node)
+			
+		node.add_to_group(_get_hover_cover_effect_group_name_at_rc(ori_r, ori_c))
 
 func _get_cover_effect_node(color):
 	var material = StandardMaterial3D.new()
@@ -128,47 +142,8 @@ func _on_tile_mouse_entered(r, c):
 		$MainGUI.setup_chess_back(chess_back[0], chess_back[1])
 		$MainGUI/CardBack.visible = true
 	
-	# DEBUG
-	#var cover_effects = []
-	#
-	#for ir in range(Global.MAXR):
-		#if (ir != r):
-			#var material = StandardMaterial3D.new()
-			#material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-			#material.albedo_color = Color(Color.YELLOW, 0.5)
-			#
-			#var mesh = PlaneMesh.new()
-			#mesh.size = Vector2(1, 1)
-			#mesh.set_material(material)
-			#
-			#var node = MeshInstance3D.new()
-			#node.set_mesh(mesh)
-			#node.position.y = 0.16
-			#
-			#$Board.get_node(_get_tile_name_at_rc(ir, c)).add_child(node)
-			#
-			#cover_effects.append(node)
-			#
-	#for ic in range(Global.MAXC):
-		#if (ic != c):
-			#var material = StandardMaterial3D.new()
-			#material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-			#material.albedo_color = Color(Color.YELLOW, 0.5)
-			#
-			#var mesh = PlaneMesh.new()
-			#mesh.size = Vector2(1, 1)
-			#mesh.set_material(material)
-			#
-			#var node = MeshInstance3D.new()
-			#node.set_mesh(mesh)
-			#node.position.y = 0.16
-			#
-			#$Board.get_node(_get_tile_name_at_rc(r, ic)).add_child(node)
-			#
-			#cover_effects.append(node)
-			#
-	#_hover_cover_effect_dict[_get_tile_name_at_rc(r,c)] = cover_effects
-
+	game.emit_cover_effects(Global.rc_to_n(r, c), true)
+	
 func _on_tile_mouse_exited(r, c):
 	$MainGUI/CardBack.visible = false
 	
