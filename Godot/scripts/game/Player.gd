@@ -17,3 +17,12 @@ func index_to_direction():
 func remove_chess(chess):
 	# TODO: guard when the amount is no more than 1
 	chess_amount_dict[chess] -= 1
+
+func get_random_summon_chess():
+	var chess_list = []
+	
+	for chess in chess_amount_dict:
+		for i in chess_amount_dict[chess]:
+			chess_list.append(chess)
+			
+	return chess_list.pick_random()

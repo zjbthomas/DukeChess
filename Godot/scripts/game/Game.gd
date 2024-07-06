@@ -6,6 +6,7 @@ signal add_chess(pos, chess)
 
 signal state_cover_effect(dict)
 signal game_message(msg)
+signal show_menu(pos, items)
 
 enum GAMESTATE {
 	INITIALIZATION,
@@ -24,7 +25,7 @@ var POS_DUKE0
 var POS_DUKE1
 
 var player_list = []
-var current_player
+var current_player:Player
 
 var board = []
 
@@ -34,7 +35,7 @@ var cached_state:GAMESTATE
 var current_chess_pos
 var current_action
 
-var is_waiting_menu_selection
+var summon_chess
 
 func _init():
 	POS_DUKE0 = Global.rc_to_n(5, 2)
@@ -63,8 +64,6 @@ func game_start():
 	player_list[0].remove_chess("Duke")
 	player_list[1].remove_chess("Duke")
 	
-	is_waiting_menu_selection = false
-	
 	current_state += 1
 	
 	# signal
@@ -82,7 +81,7 @@ func get_chess_back(r, c):
 		return [chess.name, !board[Global.rc_to_n(r, c)].is_front]
 
 # return if the user_op is valid or not
-func perform_op(user_op):
+func perform_op(user_op, is_from_menu):
 	# in Local mode, no need to convert user_op based on player
 	
 	cached_state = current_state # TODO: why?
@@ -127,7 +126,7 @@ func perform_op(user_op):
 
 			current_chess_pos = user_op
 
-			var actions = board[current_chess_pos].get_available_actions(board)
+			var actions = board[current_chess_pos].get_available_actions(board, current_chess_pos)
 
 			# no action means invalid chess selection
 			if (len(actions) == 0):
@@ -137,16 +136,37 @@ func perform_op(user_op):
 				# if there is only one possible action, use it
 				current_action = actions[0]
 				
-				# no need to pop up a menu
-				is_waiting_menu_selection = false
-				
 				# skip CHOOSEACTION stage
 				current_state = GAMESTATE.CHOOSEDESTONE
 			else:
-				is_waiting_menu_selection = true
 				current_state += 1
 				
+				emit_show_menu(current_chess_pos)
+				
 			return true
+		GAMESTATE.CHOOSEACTION:
+			if (not is_from_menu):
+				return false
+				
+			match user_op:
+				"CANCEL":
+					current_state = GAMESTATE.CHOOSECHESS
+					return true
+				"SUMMON":
+					current_action = ChessModel.ACTION_TYPE.SUMMON
+					summon_chess = current_player.get_random_summon_chess()
+				"MOVE":
+					current_action = ChessModel.ACTION_TYPE.MOVE
+				"COMMAND":
+					current_action = ChessModel.ACTION_TYPE.COMMAND
+				_:
+					return false
+				
+			if (board[current_chess_pos].get_available_actions(board, current_chess_pos).has(current_action)):
+				current_state += 1
+				return true
+			else:
+				return false
 				
 func perform_action(board, src_chess:ChessInst, action, dest_arr, target_chess_name, player):
 	match action:
@@ -281,8 +301,25 @@ func emit_cover_effects(pos, is_for_hover):
 	else:
 		return cover_effect_dict
 
+func emit_show_menu(pos):
+	var items = []
+	
+	match current_state:
+		GAMESTATE.CHOOSEACTION:
+			var actions = board[current_chess_pos].get_available_actions(board, current_chess_pos)
+			for a in actions:
+				items.append(ChessModel.ACTION_TYPE.keys()[a])
+			
+			items.append("CANCEL")
+		GAMESTATE.CHOOSEDESTTWO:
+			if (current_action == ChessModel.ACTION_TYPE.SUMMON):
+				items.append("CONFIRM")
+				items.append("CANCEL")
+				
+	show_menu.emit(pos, items)
+	
 func add_message_prefix_for_player(msg):
-	return "[Player " + ("1] " if current_player == player_list[0] else "2] ")
+	return "[Player " + ("1] " if current_player == player_list[0] else "2] ") + msg
 
 # in Local mode, show all information for both players, instead of just one/main player
 func emit_message():

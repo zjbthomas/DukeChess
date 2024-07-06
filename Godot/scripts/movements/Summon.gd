@@ -21,4 +21,4 @@ func validate_movement(board, pos, dest, player):
 
 	ret.append(MovementManager.pos_with_offsets(pos, offset_x, offset_y))
 	
-	return ret;
+	return ret

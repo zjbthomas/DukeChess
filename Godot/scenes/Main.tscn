@@ -1,7 +1,8 @@
-[gd_scene load_steps=10 format=3 uid="uid://cfd8jcleybuec"]
+[gd_scene load_steps=11 format=3 uid="uid://cfd8jcleybuec"]
 
 [ext_resource type="PackedScene" uid="uid://blvbnngqi673u" path="res://scenes/ChessTile.tscn" id="1_h0u3b"]
 [ext_resource type="Script" path="res://scripts/scenes/Main.gd" id="1_h17yc"]
+[ext_resource type="PackedScene" uid="uid://c8y6pj2u8hsgr" path="res://scenes/Menu.tscn" id="4_ptmm8"]
 [ext_resource type="PackedScene" uid="uid://cqwayhgnllvvv" path="res://scenes/Chess.tscn" id="5_pfq4i"]
 [ext_resource type="PackedScene" uid="uid://bweec6jbyouee" path="res://scenes/MainGUI.tscn" id="6_g86v1"]
 
@@ -26,6 +27,7 @@ size = Vector3(6, 0.1, 6)
 script = ExtResource("1_h17yc")
 chess_tile_scene = ExtResource("1_h0u3b")
 chess_scene = ExtResource("5_pfq4i")
+menu_scene = ExtResource("4_ptmm8")
 
 [node name="Ground" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00970078, -1, 0.054203)
@@ -56,4 +58,3 @@ current = true
 size = 8.0
 
 [node name="MainGUI" parent="." instance=ExtResource("6_g86v1")]
-mouse_filter = 1

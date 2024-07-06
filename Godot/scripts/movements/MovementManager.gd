@@ -5,6 +5,7 @@ class_name MovementManager
 enum MOVEMENT_TYPE {MOVE, JUMP, SLIDE, JUMPSLIDE, STRIKE, COMMAND, SUMMON}
 
 var movement_insts = {
+	MOVEMENT_TYPE.SLIDE: Slide.new(),
 	MOVEMENT_TYPE.SUMMON: Summon.new()
 }
 
@@ -23,3 +24,27 @@ static func is_inside_board(board, pos, offset_x, offset_y):
 			
 static func has_any_chess(board, pos, offset_x, offset_y):
 	return board[pos_with_offsets(pos, offset_x, offset_y)] != null
+
+static func has_friend_chess(board, pos, offset_x, offset_y, player):
+	return has_any_chess(board, pos, offset_x, offset_y) and \
+			(board[pos_with_offsets(pos, offset_x, offset_y)].player == player)
+
+static func has_enemy_chess(board, pos, offset_x, offset_y, player):
+	return has_any_chess(board, pos, offset_x, offset_y) and \
+			(not has_friend_chess(board, pos, offset_x, offset_y, player))
+
+static func get_step(offset_x, offset_y):
+	var step_x = 0
+	var step_y = 0
+	
+	if (offset_x > 0):
+		step_x = 1
+	elif (offset_x < 0):
+		step_x = -1
+	
+	if (offset_y > 0):
+		step_y = 1
+	elif (offset_y < 0):
+		step_y = -1
+	
+	return [step_x, step_y]

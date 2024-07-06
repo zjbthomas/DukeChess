@@ -3,10 +3,9 @@ extends Node
 @export var chess_tile_scene:PackedScene
 @export var chess_scene:PackedScene
 
-const _CHESSTILEOFFSET = -2.5
+@export var menu_scene:PackedScene
 
-var _state_cover_effects = []
-var _hover_cover_effect_dict = {}
+const _CHESSTILEOFFSET = -2.5
 
 # variables for logic
 var game = Game.new()
@@ -19,6 +18,7 @@ func _ready():
 	# init game
 	game.connect("add_chess", _on_add_chess)
 	game.connect("state_cover_effect", _on_game_state_cover_effect)
+	game.connect("show_menu", _on_game_show_menu)
 	game.connect("game_message", _on_game_message)
 	
 	game.game_start()
@@ -40,9 +40,7 @@ func _on_add_chess(pos, chess:ChessInst):
 
 func _on_game_state_cover_effect(cover_effect_dict):
 	# first, remove previous cover effects
-	for ce in _state_cover_effects:
-		ce.queue_free()
-	_state_cover_effects = []
+	get_tree().call_group("state_cover_effects", "queue_free")
 	
 	for n in cover_effect_dict:
 		var node = _get_cover_effect_node(cover_effect_dict[n])
@@ -51,7 +49,7 @@ func _on_game_state_cover_effect(cover_effect_dict):
 		var c = Global.n_to_rc(n)[1]
 		$Board.get_node(_get_tile_name_at_rc(r, c)).add_child(node)
 			
-		_state_cover_effects.append(node)
+		node.add_to_group("state_cover_effects")
 
 func _get_cover_effect_node(color):
 	var material = StandardMaterial3D.new()
@@ -68,6 +66,30 @@ func _get_cover_effect_node(color):
 	
 	return node
 
+func _on_game_show_menu(pos, items):
+	# DEBUG
+	var r = Global.n_to_rc(pos)[0]
+	var c = Global.n_to_rc(pos)[1]
+	
+	var center = get_viewport().get_camera_3d().unproject_position($Board.get_node(_get_tile_name_at_rc(r, c)).global_position)
+	
+	var menu = menu_scene.instantiate()
+	menu.position = center
+	
+	menu.connect("on_button_pressed", _on_menu_button_pressed)
+	
+	$MainGUI.add_child(menu)
+	
+	menu.add_to_group("menu")
+	
+	menu.setup_buttons(items)
+
+func _on_menu_button_pressed(item):
+	var valid_op = game.perform_op(item, true)
+	
+	if (valid_op):
+		get_tree().call_group("menu", "queue_free")
+	
 func _on_game_message(msg):
 	if msg != null:
 		$MainGUI/MarginContainer/Panel/MarginContainer/MessageLabel.text = msg
@@ -96,6 +118,9 @@ func _init_board():
 
 func _get_tile_name_at_rc(r, c):
 	return "ChessTile" + str(r) + str(c)
+
+func _get_hover_cover_effect_group_name_at_rc(r, c):
+	return "hover_cover_effects" + str(r) + str(c)
 
 func _on_tile_mouse_entered(r, c):
 	var chess_back = game.get_chess_back(r, c)
@@ -147,11 +172,7 @@ func _on_tile_mouse_entered(r, c):
 func _on_tile_mouse_exited(r, c):
 	$MainGUI/CardBack.visible = false
 	
-	var cover_effects = _hover_cover_effect_dict.get(_get_tile_name_at_rc(r,c))
-	if (cover_effects != null):
-		for ce in cover_effects:
-			ce.queue_free()
-		_hover_cover_effect_dict.erase(_get_tile_name_at_rc(r,c))
+	get_tree().call_group(_get_hover_cover_effect_group_name_at_rc(r, c), "queue_free")
 		
 func _on_tile_mouse_pressed(r, c):
-	var valid_op = game.perform_op(Global.rc_to_n(r, c))
+	var valid_op = game.perform_op(Global.rc_to_n(r, c), false)

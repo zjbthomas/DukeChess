@@ -21,6 +21,9 @@ func _on_collection_button_pressed():
 
 # TODO: this is similar to the one in ChessInShow.gd, can we combine into one function?
 func setup_chess_back(chess, is_front):
+	# remove all previous nodes in group "movements"
+	get_tree().call_group("movements", "queue_free")
+	
 	var chess_model:ChessModel = Global.chess_loader.chessmodel_dict[chess]
 	
 	# move center if necessary
@@ -54,8 +57,10 @@ func setup_chess_back(chess, is_front):
 
 				node.scale = Vector2(0.55, 0.55)
 
+				node.add_to_group("movements")
+
 				$CardBack.add_child(node)
-	
+					
 	# set name
 	$CardBack/Name/NameLabel.text = chess
 	
