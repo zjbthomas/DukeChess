@@ -51,7 +51,6 @@ layout_mode = 2
 size_flags_horizontal = 8
 texture = ExtResource("2_ay8l5")
 expand_mode = 1
-stretch_mode = 5
 
 [node name="Center" type="Sprite2D" parent="VBoxContainer/ChessInfoContainer/Front/AspectRatioContainer"]
 position = Vector2(72, 72)
@@ -109,7 +108,6 @@ layout_mode = 2
 size_flags_horizontal = 8
 texture = ExtResource("2_ay8l5")
 expand_mode = 1
-stretch_mode = 5
 
 [node name="Center" type="Sprite2D" parent="VBoxContainer/ChessInfoContainer/Back/AspectRatioContainer"]
 position = Vector2(72, 72)
