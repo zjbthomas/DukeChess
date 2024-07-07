@@ -17,10 +17,12 @@ material = SubResource("StandardMaterial3D_juqg0")
 size = Vector3(0.8, 0.2, 0.8)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_00r3o"]
+resource_local_to_scene = true
 transparency = 1
 albedo_texture = ExtResource("4_smjb7")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_nnvhr"]
+resource_local_to_scene = true
 material = SubResource("StandardMaterial3D_00r3o")
 size = Vector2(1, 3.5)
 

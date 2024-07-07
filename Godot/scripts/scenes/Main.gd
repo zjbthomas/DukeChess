@@ -279,7 +279,7 @@ func _on_tile_mouse_entered(r, c):
 			$MainGUI.setup_chess_back(chess_back[0], chess_back[1])
 			$MainGUI/CardBack.visible = true
 		
-		game.emit_cover_effects(Global.rc_to_n(r, c), true)
+		game.emit_cover_effects(Global.rc_to_n(r, c))
 	
 func _on_tile_mouse_exited(r, c):
 	$MainGUI/CardBack.visible = false

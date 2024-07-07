@@ -21,6 +21,6 @@ func setup_buttons(items):
 		node.connect("pressed", _on_button_pressed.bind(node))
 		
 		container.add_child(node)
-
+	
 func _on_button_pressed(node):
 	on_button_pressed.emit(node.text)

@@ -83,7 +83,7 @@ func game_start():
 	add_chess.emit(POS_DUKE0, duke0, true)
 	add_chess.emit(POS_DUKE1, duke1, true)
 	
-	emit_cover_effects(POS_DUKE0, false)
+	emit_cover_effects(null)
 	emit_message()
 	
 func get_chess_back(r, c):
@@ -109,7 +109,7 @@ func perform_op(user_op, is_from_menu):
 				
 				current_state += 1
 				
-				emit_cover_effects(POS_DUKE1, false)
+				emit_cover_effects(null)
 				emit_message()
 				
 				return true
@@ -125,7 +125,7 @@ func perform_op(user_op, is_from_menu):
 				
 				current_state += 1
 				
-				emit_cover_effects(POS_DUKE1, false)
+				emit_cover_effects(null)
 				emit_message()
 				
 				return true
@@ -154,12 +154,15 @@ func perform_op(user_op, is_from_menu):
 				# skip CHOOSEACTION stage
 				current_state = GAMESTATE.CHOOSEDESTONE
 				
-				emit_cover_effects(user_op, false)
+				emit_cover_effects(null)
 				emit_message()
 			else:
 				current_state += 1
 				
 				emit_show_menu(current_chess_pos)
+				
+				emit_cover_effects(null)
+				emit_message()
 				
 			return true
 			
@@ -184,7 +187,7 @@ func perform_op(user_op, is_from_menu):
 			if (board[current_chess_pos].get_available_actions(board, current_chess_pos).has(current_action)):
 				current_state += 1
 				
-				emit_cover_effects(current_chess_pos, false)
+				emit_cover_effects(null)
 				emit_message()
 				
 				return true
@@ -196,7 +199,7 @@ func perform_op(user_op, is_from_menu):
 			if (current_action != ChessModel.ACTION_TYPE.SUMMON and user_op == current_chess_pos):
 				current_state = GAMESTATE.CHOOSECHESS
 				
-				emit_cover_effects(null, false)
+				emit_cover_effects(null)
 				emit_message()
 				
 				return true
@@ -218,6 +221,9 @@ func perform_op(user_op, is_from_menu):
 						
 						emit_show_menu(user_op)
 						
+						emit_cover_effects(null)
+						emit_message()
+						
 						return true
 			
 					ChessModel.ACTION_TYPE.MOVE:
@@ -237,11 +243,19 @@ func perform_op(user_op, is_from_menu):
 							command_pos = user_op
 							
 							current_state = GAMESTATE.CHOOSEDESTTWO
+							
+							emit_cover_effects(null)
+							emit_message()
+							
 							return true
 						else:
 							return false
 					_:
 						current_state = GAMESTATE.CHOOSECHESS
+						
+						emit_cover_effects(null)
+						emit_message()
+						
 						return true
 			else:
 				return false
@@ -261,6 +275,9 @@ func perform_op(user_op, is_from_menu):
 						ChessModel.ACTION_TYPE.COMMAND:
 							current_state = GAMESTATE.CHOOSECHESS
 					
+					emit_cover_effects(null)
+					emit_message()
+					
 					return true
 
 			match (current_action):
@@ -269,6 +286,9 @@ func perform_op(user_op, is_from_menu):
 						# chess is already add, so no action needed
 				
 						next_turn()
+						
+						emit_cover_effects(null)
+						emit_message()
 						
 						return true
 					else:
@@ -286,6 +306,8 @@ func perform_op(user_op, is_from_menu):
 						current_state = GAMESTATE.ENDSTATE
 					else:
 						next_turn()
+						
+						# emit will be done after move animation, see emit_after_move_animation()
 					
 					return true
 
@@ -340,7 +362,7 @@ func check_player_loss(is_main_player):
 	return true
 
 # in Local mode, there is no need to convert pos by player
-func emit_cover_effects(pos, is_for_hover):
+func emit_cover_effects(hover_pos):
 	var cover_effect_dict = {}
 	
 	match current_state:
@@ -399,19 +421,19 @@ func emit_cover_effects(pos, is_for_hover):
 							((board[d] != null and board[d].player != current_player) or board[d] == null)):
 								cover_effect_dict[d] = Color.YELLOW
 			
-	if (is_for_hover and board[pos] != null):
-		var color = Color.BLUE if board[pos].player == current_player else Color.RED
+	if (hover_pos != null and board[hover_pos] != null):
+		var color = Color.BLUE if board[hover_pos].player == current_player else Color.RED
 		
-		if cover_effect_dict.keys().has(pos):
-			cover_effect_dict[pos] = color
+		if cover_effect_dict.keys().has(hover_pos):
+			cover_effect_dict[hover_pos] = color
 		
-		for d in board[pos].get_control_area(board, pos):
+		for d in board[hover_pos].get_control_area(board, hover_pos):
 			cover_effect_dict[d] = color
 
-	if (not is_for_hover):
+	if (hover_pos == null):
 		state_cover_effect.emit(cover_effect_dict)
 	else:
-		hover_cover_effect.emit(pos, cover_effect_dict)
+		hover_cover_effect.emit(hover_pos, cover_effect_dict)
 
 func emit_show_menu(pos):
 	var items = []
@@ -472,5 +494,5 @@ func emit_after_move_animation():
 		emit_message()
 		game_over.emit()
 	else:
-		emit_cover_effects(null, false)
+		emit_cover_effects(null)
 		emit_message()

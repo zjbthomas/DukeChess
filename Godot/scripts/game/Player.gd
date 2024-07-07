@@ -30,3 +30,10 @@ func get_random_summon_chess():
 			chess_list.append(chess)
 			
 	return chess_list.pick_random()
+
+func is_summon_available():
+	for chess in chess_amount_dict:
+		if (chess_amount_dict[chess] > 0):
+			return true
+			
+	return false

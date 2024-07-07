@@ -16,6 +16,10 @@ func get_available_actions(board, pos):
 	var ret = []
 	
 	for a in all_actions:
+		if a == ChessModel.ACTION_TYPE.SUMMON:
+			if (not player.is_summon_available()):
+				continue
+		
 		var dests = get_available_destinations(board, pos, a)
 		if (len(dests) == 0):
 			continue
