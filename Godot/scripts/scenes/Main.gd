@@ -38,7 +38,23 @@ func _on_add_chess(pos, chess:ChessInst):
 	
 	$Board.get_node(_get_tile_name_at_rc(r, c)).add_child(node)
 	node.setup_ui(chess)
+	
+	# add chess also means player list of chess update
+	$MainGUI/PanelContainer/SummonInfo/Player1RemainLabel.text = _get_remaining_chess_text(game.player_list[0])
+	$MainGUI/PanelContainer/SummonInfo/Player2RemainLabel.text = _get_remaining_chess_text(game.player_list[1])
 
+func _get_remaining_chess_text(player):
+	var chess_amount_dict = player.chess_amount_dict
+	var remaining_chess_text = ""
+	for ix in chess_amount_dict.size():
+		var chess_name = chess_amount_dict.keys()[ix]
+		var amount = chess_amount_dict[chess_name]
+		
+		if (amount > 0):
+			remaining_chess_text += chess_name + ": " + str(chess_amount_dict[chess_name]) + '\t'
+
+	return remaining_chess_text
+			
 func _on_game_state_cover_effect(cover_effect_dict):
 	# first, remove previous cover effects
 	get_tree().call_group("state_cover_effects", "queue_free")
@@ -68,7 +84,7 @@ func _on_game_hover_cover_effect(pos, cover_effect_dict):
 func _get_cover_effect_node(color):
 	var material = StandardMaterial3D.new()
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	material.albedo_color = Color(color, 0.5)
+	material.albedo_color = Color(color, 0.3)
 	
 	var mesh = PlaneMesh.new()
 	mesh.size = Vector2(1, 1)
@@ -106,7 +122,7 @@ func _on_menu_button_pressed(item):
 	
 func _on_game_message(msg):
 	if msg != null:
-		$MainGUI/MarginContainer/Panel/MarginContainer/MessageLabel.text = msg
+		$MainGUI/MarginContainer/Panel/MessageLabel.text = msg
 
 func _init_board():
 	for ir in range(Global.MAXR):

@@ -3,6 +3,8 @@ extends Node
 class_name Game
 
 signal add_chess(pos, chess)
+signal remove_chess(pos)
+signal move_chess(src, dest, is_flip_during_move)
 
 signal state_cover_effect(dict)
 signal hover_cover_effect(pos, dict)
@@ -36,7 +38,10 @@ var cached_state:GAMESTATE
 var current_chess_pos
 var current_action
 
+var summon_pos
 var summon_chess
+
+var command_pos
 
 func _init():
 	POS_DUKE0 = Global.rc_to_n(5, 2)
@@ -103,6 +108,7 @@ func perform_op(user_op, is_from_menu):
 				return true
 			else:
 				return false
+				
 		GAMESTATE.INITSUMMONPLAYERTWOFOOTMANONE, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANTWO:
 			if board[POS_DUKE1].get_available_destinations(board, POS_DUKE1, ChessModel.ACTION_TYPE.SUMMON).has(user_op):
 				perform_action(board, board[POS_DUKE1], ChessModel.ACTION_TYPE.SUMMON, [user_op], "Footman", player_list[1])
@@ -118,6 +124,7 @@ func perform_op(user_op, is_from_menu):
 				return true
 			else:
 				return false
+				
 		GAMESTATE.CHOOSECHESS:
 			if board[user_op] == null:
 				return false
@@ -139,12 +146,16 @@ func perform_op(user_op, is_from_menu):
 				
 				# skip CHOOSEACTION stage
 				current_state = GAMESTATE.CHOOSEDESTONE
+				
+				emit_cover_effects(user_op, false)
+				emit_message()
 			else:
 				current_state += 1
 				
 				emit_show_menu(current_chess_pos)
 				
 			return true
+			
 		GAMESTATE.CHOOSEACTION:
 			if (not is_from_menu):
 				return false
@@ -169,6 +180,94 @@ func perform_op(user_op, is_from_menu):
 			else:
 				return false
 				
+		GAMESTATE.CHOOSEDESTONE:
+			# if clicking on the selected chess, then cancel action
+			if (current_action != ChessModel.ACTION_TYPE.SUMMON and user_op == current_chess_pos):
+				current_state = GAMESTATE.CHOOSECHESS
+				return true
+			
+			if board[current_chess_pos].get_available_destinations(board, current_chess_pos, current_action).has(user_op):
+				match current_action:
+					ChessModel.ACTION_TYPE.SUMMON:
+						# temporarily add a chees to board and wait for user confirmation
+						var chess = ChessInst.new(summon_chess, current_player)
+						add_chess.emit(user_op, chess)
+						
+						summon_pos = user_op
+						
+						current_state = GAMESTATE.CHOOSEDESTTWO
+						
+						emit_show_menu(current_chess_pos)
+						
+						return true
+			
+					ChessModel.ACTION_TYPE.MOVE:
+						perform_action(board, board[current_chess_pos], current_action, [current_chess_pos, user_op], null, null)
+
+						if (check_player_win(true) or check_player_win(false)):
+							current_state = GAMESTATE.ENDSTATE
+						else:
+							next_turn()
+							
+						return true
+						
+					ChessModel.ACTION_TYPE.COMMAND:
+						if (board[user_op] != null and board[user_op].player == current_player):
+							command_pos = user_op
+							
+							current_state = GAMESTATE.CHOOSEDESTTWO
+							return true
+						else:
+							return false
+					_:
+						current_state = GAMESTATE.CHOOSECHESS
+						return true
+			else:
+				return false
+
+		GAMESTATE.CHOOSEDESTTWO:
+			if ((is_from_menu and user_op == "CANCEL") or
+				(not is_from_menu and user_op == current_chess_pos)):
+					match current_action:
+						ChessModel.ACTION_TYPE.SUMMON:
+							remove_chess.emit(user_op)
+							
+							current_state = GAMESTATE.CHOOSEDESTONE
+						ChessModel.ACTION_TYPE.COMMAND:
+							current_state = GAMESTATE.CHOOSECHESS
+					
+					return true
+
+			match (current_action):
+				ChessModel.ACTION_TYPE.SUMMON:
+					if (is_from_menu and user_op == "CONFIRM"):
+						perform_action(board, board[current_chess_pos], ChessModel.ACTION_TYPE.SUMMON, [summon_pos], summon_chess, current_player)
+				
+						next_turn()
+						
+						return true
+					else:
+						return false
+			
+				ChessModel.ACTION_TYPE.COMMAND:
+					if (user_op != command_pos and
+						board[current_chess_pos].get_available_destinations(board, current_chess_pos, ChessModel.ACTION_TYPE.COMMAND).has(user_op) and
+						(board[user_op] == null or board[user_op].player != current_player)):
+							perform_action(board, board[current_chess_pos], ChessModel.ACTION_TYPE.COMMAND, [command_pos, user_op], null, null)
+					else:
+						return false
+
+					if (check_player_win(true) or check_player_win(false)):
+						current_state = GAMESTATE.ENDSTATE
+					else:
+						next_turn()
+					
+					return true
+
+			return false
+			
+	return false
+				
 func perform_action(board, src_chess:ChessInst, action, dest_arr, target_chess_name, player):
 	match action:
 		ChessModel.ACTION_TYPE.SUMMON:
@@ -183,15 +282,14 @@ func perform_action(board, src_chess:ChessInst, action, dest_arr, target_chess_n
 			if (src_chess.get_available_movements(board, dest_arr[0], action).get(dest_arr[1]) == MovementManager.MOVEMENT_TYPE.STRIKE):
 				board[dest_arr[1]] = null
 				
-				# TODO: signal remove_chess
+				remove_chess.emit(dest_arr[1])
 			else:
 				board[dest_arr[1]] = board[dest_arr[0]]
 				board[dest_arr[0]] = null
 				
 				src_chess.is_front = !src_chess.is_front
 				
-				# TODO: singal move_chess
-				# TODO: singal flip_chess
+				move_chess.emit(dest_arr[0], dest_arr[1], true) # move and flip
 		
 		ChessModel.ACTION_TYPE.COMMAND:
 			board[dest_arr[1]] = board[dest_arr[0]]
@@ -199,8 +297,22 @@ func perform_action(board, src_chess:ChessInst, action, dest_arr, target_chess_n
 			
 			src_chess.is_front = !src_chess.is_front
 			
-			# TODO: singal move_chess
-			# TODO: singal flip_chess
+			move_chess.emit(dest_arr[0], dest_arr[1], false)
+			move_chess.emit(src_chess, src_chess, true) # same location flip
+
+func next_turn():
+	current_player = player_list[0] if (current_player == player_list[0]) else player_list[1]
+	
+	current_state = GAMESTATE.CHOOSECHESS
+
+func check_player_win(is_main_player):
+	for n in range(Global.MAXR * Global.MAXC):
+		if (board[n] != null and
+			board[n].name == "Duke" and 
+			board[n].player == player_list[0 if is_main_player else 1]):
+			return false
+	
+	return true
 
 # in Local mode, there is no need to convert pos by player
 func emit_cover_effects(pos, is_for_hover):
@@ -210,79 +322,58 @@ func emit_cover_effects(pos, is_for_hover):
 		GAMESTATE.INITSUMMONPLAYERONEFOOTMANONE, GAMESTATE.INITSUMMONPLAYERONEFOOTMANTWO:
 			for d in board[POS_DUKE0].get_available_movements(board, POS_DUKE0, ChessModel.ACTION_TYPE.SUMMON):
 				cover_effect_dict[d] = Color.YELLOW
+				
 		GAMESTATE.INITSUMMONPLAYERTWOFOOTMANONE, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANTWO:
 			for d in board[POS_DUKE1].get_available_movements(board, POS_DUKE1, ChessModel.ACTION_TYPE.SUMMON):
 				cover_effect_dict[d] = Color.YELLOW
-		#case GameState.CHOOSECHESS:
-			#for(var i = 0; i < this.field.maxRow * this.field.maxCol; i++) {
-				#if (this.field.fieldMap[i] != null) {
-					#if (this.field.fieldMap[i].player == this.currentPlayer) {
-						#tPos = playerOne? i: (this.field.maxRow * this.field.maxCol - 1 - i);
-						#ret.set(tPos, "yellow");
-					#}
-				#}
-			#}
-			#break;
-		#case GameState.CHOOSEACTION:
-			#tPos = playerOne? this.currentChessPos: (this.field.maxRow * this.field.maxCol - 1 - this.currentChessPos);
-			#ret.set(tPos, "yellow");
-			#break;
-		#case GameState.CHOOSEDESTONE:
-			#tPos = playerOne? this.currentChessPos: (this.field.maxRow * this.field.maxCol - 1 - this.currentChessPos);
-			#ret.set(tPos, "yellow");
-			#
-			#switch (this.currentAction) {
-			#case ActionType.SUMMON:
-				#for (var [i, m] of this.field.fieldMap[this.currentChessPos].getAvailableMovements(this.field, this.currentChessPos, ActionType.SUMMON)) {
-					#tPos = playerOne? i: (this.field.maxRow * this.field.maxCol - 1 - i);
-					#ret.set(tPos, "yellow");
-				#}
-				#break;
-			#case ActionType.MOVE:
-				#for (var [i, m] of this.field.fieldMap[this.currentChessPos].getAvailableMovements(this.field, this.currentChessPos, ActionType.MOVE)) {
-					#tPos = playerOne? i: (this.field.maxRow * this.field.maxCol - 1 - i);
-					#switch (m) {
-					#case MovementType.STRIKE: ret.set(tPos, "red"); break;
-					#default: ret.set(tPos, "green"); break;
-					#}
-					#
-				#}
-				#break;
-			#case ActionType.COMMAND:
-				#for (var [i, m] of this.field.fieldMap[this.currentChessPos].getAvailableMovements(this.field, this.currentChessPos, ActionType.COMMAND)) {
-					#if (this.field.fieldMap[i] != null && this.field.fieldMap[i].player == this.currentPlayer) {
-						#tPos = playerOne? i: (this.field.maxRow * this.field.maxCol - 1 - i);
-						#ret.set(tPos, "yellow");
-					#}
-				#}
-				#break;
-			#}
-			#break;
-		#case GameState.CHOOSEDESTTWO:
-			#switch (this.currentAction) {
-			#case ActionType.SUMMON:
-				#tPos = playerOne? this.summonPos: (this.field.maxRow * this.field.maxCol - 1 - this.summonPos);
-				#ret.set(tPos, "yellow");
-				#
-				#for (var d of this.field.fieldMap[this.summonPos].getControlArea(this.field, this.summonPos)) {
-					#tPos = playerOne? d: (this.field.maxRow * this.field.maxCol - 1 - d);
-					#ret.set(tPos, "yellow");
-				#}
-				#break;
-			#case ActionType.COMMAND:
-				#tPos = playerOne? this.commandPos: (this.field.maxRow * this.field.maxCol - 1 - this.commandPos);
-				#ret.set(tPos, "blue");
-				#
-				#for (var d of this.field.fieldMap[this.currentChessPos].getAvailableDests(this.field, this.currentChessPos, ActionType.COMMAND)) {
-					#if (d != this.commandPos &&
-						#((this.field.fieldMap[d] != null && this.field.fieldMap[d].player !=this.currentPlayer) || this.field.fieldMap[d] == null)) {
-						#tPos = playerOne? d: (this.field.maxRow * this.field.maxCol - 1 - d);
-						#ret.set(tPos, "yellow");
-					#}
-				#}
-			#}
-		#}
+				
+		GAMESTATE.CHOOSECHESS:
+			for n in range(Global.MAXR * Global.MAXC):
+				if (board[n] != null):
+					if (board[n].player == current_player):
+						cover_effect_dict[n] = Color.YELLOW
+						
+		GAMESTATE.CHOOSEACTION:
+			cover_effect_dict[current_chess_pos] = Color.YELLOW
 
+		GAMESTATE.CHOOSEDESTONE:
+			cover_effect_dict[current_chess_pos] = Color.YELLOW
+			
+			match current_action:
+				ChessModel.ACTION_TYPE.SUMMON:
+					for d in board[current_chess_pos].get_available_movements(board, current_chess_pos, ChessModel.ACTION_TYPE.SUMMON):
+						cover_effect_dict[d] = Color.YELLOW
+			
+				ChessModel.ACTION_TYPE.MOVE:
+					var movements = board[current_chess_pos].get_available_movements(board, current_chess_pos, ChessModel.ACTION_TYPE.MOVE)
+					for d in movements:
+						match movements[d]:
+							MovementManager.MOVEMENT_TYPE.STRIKE:
+								cover_effect_dict[d] = Color.RED
+							_:
+								cover_effect_dict[d] = Color.BLUE
+
+				ChessModel.ACTION_TYPE.COMMAND:
+					for d in board[current_chess_pos].get_available_movements(board, current_chess_pos, ChessModel.ACTION_TYPE.COMMAND):
+						if (board[d] != null and board[d].player == current_player):
+							cover_effect_dict[d] = Color.YELLOW
+
+		GAMESTATE.CHOOSEDESTTWO:
+			match current_action:
+				ChessModel.ACTION_TYPE.SUMMON:
+					cover_effect_dict[summon_pos] = Color.YELLOW
+					
+					for d in board[summon_pos].get_control_area(board, summon_pos):
+						cover_effect_dict[d] = Color.YELLOW
+						
+				ChessModel.ACTION_TYPE.COMMAND:
+					cover_effect_dict[command_pos] = Color.BLUE
+					
+					for d in board[current_chess_pos].get_available_destinations(board, current_chess_pos, ChessModel.ACTION_TYPE.COMMAND):
+						if (d != command_pos and
+							((board[d] != null and board[d].player != current_player) or board[d] == null)):
+								cover_effect_dict[d] = Color.YELLOW
+			
 	if (is_for_hover and board[pos] != null):
 		var color = Color.BLUE if board[pos].player == current_player else Color.RED
 		
@@ -347,8 +438,6 @@ func emit_message():
 				ChessModel.ACTION_TYPE.COMMAND:
 					msg = add_message_prefix_for_player("Please choose a destination for COMMAND action.")
 		GAMESTATE.ENDSTATE:
-			pass # TODO
-			#ret = this.checkPlayerWin(playerOne)? "You win!": "You lose..."
-			#break;
+			msg = "Player 1 wins!" if check_player_win(true) else "Player 2 wins!"
 		
 	game_message.emit(msg)

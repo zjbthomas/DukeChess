@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://bweec6jbyouee"]
+[gd_scene load_steps=10 format=3 uid="uid://bweec6jbyouee"]
 
 [ext_resource type="Script" path="res://scripts/scenes/MainGUI.gd" id="1_u4eab"]
 [ext_resource type="PackedScene" uid="uid://crcpfgmiooaa4" path="res://scenes/BlurContainer.tscn" id="2_tp78g"]
@@ -7,6 +7,10 @@
 [ext_resource type="Texture2D" uid="uid://c68ffyj3xoun4" path="res://images/chess/center_front.png" id="5_0ac7k"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h3ilx"]
+content_margin_left = 50.0
+content_margin_top = 10.0
+content_margin_right = 50.0
+content_margin_bottom = 10.0
 bg_color = Color(0, 0, 0, 0.25098)
 border_width_left = 5
 border_width_top = 5
@@ -17,6 +21,28 @@ corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y4jch"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0, 0, 0, 0.25098)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fxyta"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l23d6"]
+bg_color = Color(0, 0, 0, 1)
 
 [node name="MainGUI" type="ColorRect"]
 anchors_preset = 15
@@ -47,10 +73,10 @@ grow_vertical = 1
 
 [node name="CardBack" type="AspectRatioContainer" parent="."]
 layout_mode = 0
-offset_left = 1485.0
-offset_top = 302.0
-offset_right = 1685.0
-offset_bottom = 502.0
+offset_left = 1484.0
+offset_top = 277.0
+offset_right = 1684.0
+offset_bottom = 477.0
 scale = Vector2(0.7, 0.7)
 
 [node name="Background" type="ColorRect" parent="CardBack"]
@@ -118,21 +144,55 @@ custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_h3ilx")
 
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 50
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 50
-theme_override_constants/margin_bottom = 10
-
-[node name="MessageLabel" type="RichTextLabel" parent="MarginContainer/Panel/MarginContainer"]
+[node name="MessageLabel" type="RichTextLabel" parent="MarginContainer/Panel"]
 layout_mode = 2
+offset_left = 50.0
+offset_top = 10.0
+offset_right = 1830.0
+offset_bottom = 90.0
 theme_override_font_sizes/normal_font_size = 24
 text = "DukeChess"
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 2
+offset_left = 1215.0
+offset_top = 503.0
+offset_right = 1855.0
+offset_bottom = 881.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_y4jch")
+
+[node name="SummonInfo" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="PanelContainer/SummonInfo"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 36
+text = "Remaining Chess"
+
+[node name="Player1Label" type="Label" parent="PanelContainer/SummonInfo"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 24
+text = "[Player 1]"
+
+[node name="Player1RemainLabel" type="RichTextLabel" parent="PanelContainer/SummonInfo"]
+custom_minimum_size = Vector2(600, 100)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_fxyta")
+bbcode_enabled = true
+
+[node name="Player2Label" type="Label" parent="PanelContainer/SummonInfo"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 24
+text = "[Player 2]"
+
+[node name="Player2RemainLabel" type="RichTextLabel" parent="PanelContainer/SummonInfo"]
+custom_minimum_size = Vector2(600, 100)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_l23d6")
+bbcode_enabled = true
 
 [connection signal="pressed" from="CollectionButton" to="." method="_on_collection_button_pressed"]
