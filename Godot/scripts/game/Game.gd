@@ -2,7 +2,7 @@ extends Node
 
 class_name Game
 
-signal add_chess(pos, chess)
+signal add_chess(pos, chess, is_no_effect)
 signal remove_chess(pos)
 signal move_chess(src, dest, is_flip_during_move)
 
@@ -10,6 +10,8 @@ signal state_cover_effect(dict)
 signal hover_cover_effect(pos, dict)
 signal game_message(msg)
 signal show_menu(pos, items)
+
+signal game_over
 
 enum GAMESTATE {
 	INITIALIZATION,
@@ -43,9 +45,14 @@ var summon_chess
 
 var command_pos
 
+var winner
+
 func _init():
 	POS_DUKE0 = Global.rc_to_n(5, 2)
 	POS_DUKE1 = Global.rc_to_n(0, 3)
+	
+	board.resize(Global.MAXR * Global.MAXC)
+	board.fill(null)
 
 func game_start():
 	# init player
@@ -73,8 +80,8 @@ func game_start():
 	current_state += 1
 	
 	# signal
-	add_chess.emit(POS_DUKE0, duke0)
-	add_chess.emit(POS_DUKE1, duke1)
+	add_chess.emit(POS_DUKE0, duke0, true)
+	add_chess.emit(POS_DUKE1, duke1, true)
 	
 	emit_cover_effects(POS_DUKE0, false)
 	emit_message()
@@ -176,6 +183,10 @@ func perform_op(user_op, is_from_menu):
 				
 			if (board[current_chess_pos].get_available_actions(board, current_chess_pos).has(current_action)):
 				current_state += 1
+				
+				emit_cover_effects(current_chess_pos, false)
+				emit_message()
+				
 				return true
 			else:
 				return false
@@ -184,6 +195,10 @@ func perform_op(user_op, is_from_menu):
 			# if clicking on the selected chess, then cancel action
 			if (current_action != ChessModel.ACTION_TYPE.SUMMON and user_op == current_chess_pos):
 				current_state = GAMESTATE.CHOOSECHESS
+				
+				emit_cover_effects(null, false)
+				emit_message()
+				
 				return true
 			
 			if board[current_chess_pos].get_available_destinations(board, current_chess_pos, current_action).has(user_op):
@@ -191,24 +206,30 @@ func perform_op(user_op, is_from_menu):
 					ChessModel.ACTION_TYPE.SUMMON:
 						# temporarily add a chees to board and wait for user confirmation
 						var chess = ChessInst.new(summon_chess, current_player)
-						add_chess.emit(user_op, chess)
+						board[user_op] = chess
+						
+						current_player.remove_chess(summon_chess)
+						
+						add_chess.emit(user_op, chess, false)
 						
 						summon_pos = user_op
 						
 						current_state = GAMESTATE.CHOOSEDESTTWO
 						
-						emit_show_menu(current_chess_pos)
+						emit_show_menu(user_op)
 						
 						return true
 			
 					ChessModel.ACTION_TYPE.MOVE:
 						perform_action(board, board[current_chess_pos], current_action, [current_chess_pos, user_op], null, null)
 
-						if (check_player_win(true) or check_player_win(false)):
+						if (check_player_loss(true) or check_player_loss(false)):
 							current_state = GAMESTATE.ENDSTATE
 						else:
 							next_turn()
 							
+						# emit will be done after move animation, see emit_after_move_animation()
+						
 						return true
 						
 					ChessModel.ACTION_TYPE.COMMAND:
@@ -230,7 +251,11 @@ func perform_op(user_op, is_from_menu):
 				(not is_from_menu and user_op == current_chess_pos)):
 					match current_action:
 						ChessModel.ACTION_TYPE.SUMMON:
-							remove_chess.emit(user_op)
+							board[summon_pos] = null
+							
+							current_player.add_chess(summon_chess)
+							
+							remove_chess.emit(summon_pos)
 							
 							current_state = GAMESTATE.CHOOSEDESTONE
 						ChessModel.ACTION_TYPE.COMMAND:
@@ -241,7 +266,7 @@ func perform_op(user_op, is_from_menu):
 			match (current_action):
 				ChessModel.ACTION_TYPE.SUMMON:
 					if (is_from_menu and user_op == "CONFIRM"):
-						perform_action(board, board[current_chess_pos], ChessModel.ACTION_TYPE.SUMMON, [summon_pos], summon_chess, current_player)
+						# chess is already add, so no action needed
 				
 						next_turn()
 						
@@ -257,7 +282,7 @@ func perform_op(user_op, is_from_menu):
 					else:
 						return false
 
-					if (check_player_win(true) or check_player_win(false)):
+					if (check_player_loss(true) or check_player_loss(false)):
 						current_state = GAMESTATE.ENDSTATE
 					else:
 						next_turn()
@@ -270,14 +295,14 @@ func perform_op(user_op, is_from_menu):
 				
 func perform_action(board, src_chess:ChessInst, action, dest_arr, target_chess_name, player):
 	match action:
-		ChessModel.ACTION_TYPE.SUMMON:
+		ChessModel.ACTION_TYPE.SUMMON: # this is just for summoning the first 2*2 Footmans
 			var chess = ChessInst.new(target_chess_name, player)
 			board[dest_arr[0]] = chess
 			player.remove_chess(target_chess_name)
 			
 			# signal
-			add_chess.emit(dest_arr[0], chess)
-
+			add_chess.emit(dest_arr[0], chess, false)
+			
 		ChessModel.ACTION_TYPE.MOVE:
 			if (src_chess.get_available_movements(board, dest_arr[0], action).get(dest_arr[1]) == MovementManager.MOVEMENT_TYPE.STRIKE):
 				board[dest_arr[1]] = null
@@ -301,11 +326,11 @@ func perform_action(board, src_chess:ChessInst, action, dest_arr, target_chess_n
 			move_chess.emit(src_chess, src_chess, true) # same location flip
 
 func next_turn():
-	current_player = player_list[0] if (current_player == player_list[0]) else player_list[1]
+	current_player = player_list[1] if (current_player == player_list[0]) else player_list[0]
 	
 	current_state = GAMESTATE.CHOOSECHESS
 
-func check_player_win(is_main_player):
+func check_player_loss(is_main_player):
 	for n in range(Global.MAXR * Global.MAXC):
 		if (board[n] != null and
 			board[n].name == "Duke" and 
@@ -438,6 +463,14 @@ func emit_message():
 				ChessModel.ACTION_TYPE.COMMAND:
 					msg = add_message_prefix_for_player("Please choose a destination for COMMAND action.")
 		GAMESTATE.ENDSTATE:
-			msg = "Player 1 wins!" if check_player_win(true) else "Player 2 wins!"
-		
+			msg = "Player 1 wins!" if not check_player_loss(true) else "Player 2 wins!"
+
 	game_message.emit(msg)
+
+func emit_after_move_animation():
+	if (current_state == GAMESTATE.ENDSTATE):
+		emit_message()
+		game_over.emit()
+	else:
+		emit_cover_effects(null, false)
+		emit_message()

@@ -56,12 +56,21 @@ script = ExtResource("1_u4eab")
 
 [node name="CollectionButton" type="Button" parent="."]
 layout_mode = 0
-offset_left = 1330.0
-offset_top = 98.0
-offset_right = 1788.0
-offset_bottom = 189.0
+offset_left = 1321.0
+offset_top = 68.0
+offset_right = 1779.0
+offset_bottom = 159.0
 theme_override_font_sizes/font_size = 60
 text = "Check All Chess"
+
+[node name="StartButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1308.0
+offset_top = 174.0
+offset_right = 1792.0
+offset_bottom = 265.0
+theme_override_font_sizes/font_size = 60
+text = "Start New Game"
 
 [node name="BlurContainer" parent="." instance=ExtResource("2_tp78g")]
 layout_mode = 0
@@ -73,10 +82,10 @@ grow_vertical = 1
 
 [node name="CardBack" type="AspectRatioContainer" parent="."]
 layout_mode = 0
-offset_left = 1484.0
-offset_top = 277.0
-offset_right = 1684.0
-offset_bottom = 477.0
+offset_left = 1483.0
+offset_top = 311.0
+offset_right = 1683.0
+offset_bottom = 511.0
 scale = Vector2(0.7, 0.7)
 
 [node name="Background" type="ColorRect" parent="CardBack"]

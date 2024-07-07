@@ -1,8 +1,9 @@
-[gd_scene load_steps=11 format=3 uid="uid://cfd8jcleybuec"]
+[gd_scene load_steps=20 format=3 uid="uid://cfd8jcleybuec"]
 
 [ext_resource type="PackedScene" uid="uid://blvbnngqi673u" path="res://scenes/ChessTile.tscn" id="1_h0u3b"]
 [ext_resource type="Script" path="res://scripts/scenes/Main.gd" id="1_h17yc"]
 [ext_resource type="PackedScene" uid="uid://c8y6pj2u8hsgr" path="res://scenes/Menu.tscn" id="4_ptmm8"]
+[ext_resource type="Texture2D" uid="uid://dlfm5njoa1def" path="res://images/textures/Flare00.PNG" id="5_cpke4"]
 [ext_resource type="PackedScene" uid="uid://cqwayhgnllvvv" path="res://scenes/Chess.tscn" id="5_pfq4i"]
 [ext_resource type="PackedScene" uid="uid://bweec6jbyouee" path="res://scenes/MainGUI.tscn" id="6_g86v1"]
 
@@ -23,6 +24,60 @@ albedo_color = Color(0.0627451, 0.0627451, 0.0627451, 1)
 material = SubResource("StandardMaterial3D_m2inq")
 size = Vector3(6, 0.1, 6)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2u3oy"]
+transparency = 1
+cull_mode = 2
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("5_cpke4")
+
+[sub_resource type="Curve" id="Curve_agqm2"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_lsff2"]
+max_value = 5.0
+_data = [Vector2(0, 5), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_3xw32"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_jeium"]
+curve_x = SubResource("Curve_agqm2")
+curve_y = SubResource("Curve_lsff2")
+curve_z = SubResource("Curve_3xw32")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_la0id"]
+resource_local_to_scene = true
+particle_flag_align_y = true
+emission_shape = 1
+emission_sphere_radius = 0.2
+spread = 180.0
+initial_velocity_min = 20.0
+initial_velocity_max = 25.0
+gravity = Vector3(0, -20, 0)
+scale_min = 0.2
+scale_max = 0.5
+scale_curve = SubResource("CurveXYZTexture_jeium")
+color = Color(0.784314, 0.196078, 0.196078, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_k70n8"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_prn2n"]
+resource_local_to_scene = true
+particle_flag_align_y = true
+emission_shape = 1
+emission_sphere_radius = 0.2
+spread = 180.0
+initial_velocity_min = 20.0
+initial_velocity_max = 25.0
+gravity = Vector3(0, -20, 0)
+scale_min = 0.3
+scale_max = 0.3
+color = Color(0.392157, 0.666667, 0.392157, 1)
+
 [node name="Main" type="Node"]
 script = ExtResource("1_h17yc")
 chess_tile_scene = ExtResource("1_h0u3b")
@@ -40,10 +95,35 @@ mesh = SubResource("BoxMesh_alcxu")
 skeleton = NodePath("../..")
 
 [node name="Board" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.392, -0.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.05, -0.5)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Board"]
 mesh = SubResource("BoxMesh_av6kj")
+
+[node name="Particles" type="Node" parent="."]
+
+[node name="DeadParticles" type="GPUParticles3D" parent="Particles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.28539, 0)
+material_override = SubResource("StandardMaterial3D_2u3oy")
+emitting = false
+amount = 30
+one_shot = true
+explosiveness = 1.0
+fixed_fps = 64
+process_material = SubResource("ParticleProcessMaterial_la0id")
+draw_pass_1 = SubResource("QuadMesh_k70n8")
+
+[node name="LiveParticles" type="GPUParticles3D" parent="Particles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.28539, 0)
+material_override = SubResource("StandardMaterial3D_2u3oy")
+emitting = false
+amount = 30
+lifetime = 0.3
+one_shot = true
+explosiveness = 1.0
+fixed_fps = 64
+process_material = SubResource("ParticleProcessMaterial_prn2n")
+draw_pass_1 = SubResource("QuadMesh_k70n8")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 20, 0)

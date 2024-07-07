@@ -1,31 +1,56 @@
 extends Node
 
+@export_category("Packed Scenes")
 @export var chess_tile_scene:PackedScene
 @export var chess_scene:PackedScene
-
 @export var menu_scene:PackedScene
 
-const _CHESSTILEOFFSET = -2.5
+@export_category("Variables")
+@export var _chess_up_dist = 1.5
+@export var _chess_up_down_time = 0.1
+@export var _chess_move_time = 0.8
+@export var _chess_flip_time = 0.5
+@export var _chess_remove_time = 0.2
+
+const _CHESS_TILE_OFFSET = -2.5
 
 # variables for logic
 var game = Game.new()
+
+var _is_in_animation = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	# init board GUI
 	_init_board()
 	
+	# connect start button
+	$MainGUI/StartButton.connect("pressed", _on_start_button_pressed)
+	
 	# init game
 	game.connect("add_chess", _on_add_chess)
+	game.connect("remove_chess", _on_remove_chess)
+	game.connect("move_chess", _on_move_chess)
+	
 	game.connect("state_cover_effect", _on_game_state_cover_effect)
 	game.connect("hover_cover_effect", _on_game_hover_cover_effect)
 	game.connect("show_menu", _on_game_show_menu)
 	game.connect("game_message", _on_game_message)
+	game.connect("game_over", _on_game_over)
+	
+func _on_start_button_pressed():
+	# remove all chess
+	get_tree().call_group("chess", "queue_free")
+	
+	$MainGUI/StartButton.visible = false
 	
 	game.game_start()
-	
-func _on_add_chess(pos, chess:ChessInst):
+
+func _on_add_chess(pos, chess:ChessInst, is_no_effect):
 	var node = chess_scene.instantiate()
+	node.name = _get_chess_name_at_n(pos)
+	
+	node.connect("chess_collide", _on_chess_collide)
 	
 	if not chess.is_front:
 		node.rotate_z(deg_to_rad(180)) # show the back
@@ -39,10 +64,98 @@ func _on_add_chess(pos, chess:ChessInst):
 	$Board.get_node(_get_tile_name_at_rc(r, c)).add_child(node)
 	node.setup_ui(chess)
 	
+	node.add_to_group("chess")
+	
+	if (not is_no_effect):
+		$Particles/LiveParticles.global_position = node.global_position
+		$Particles/LiveParticles.restart()
+	
 	# add chess also means player list of chess update
 	$MainGUI/PanelContainer/SummonInfo/Player1RemainLabel.text = _get_remaining_chess_text(game.player_list[0])
 	$MainGUI/PanelContainer/SummonInfo/Player2RemainLabel.text = _get_remaining_chess_text(game.player_list[1])
 
+func _on_chess_collide(node):
+	$Particles/DeadParticles.global_position = node.global_position
+	$Particles/DeadParticles.restart()
+	
+	node.queue_free()
+
+func _on_remove_chess(pos):
+	_is_in_animation = true
+	
+	var r = Global.n_to_rc(pos)[0]
+	var c = Global.n_to_rc(pos)[1]
+	var chess = $Board.get_node(_get_tile_name_at_rc(r, c)).get_node(_get_chess_name_at_n(pos))
+	
+	$Particles/DeadParticles.global_position = chess.global_position
+	$Particles/DeadParticles.restart()
+	
+	var tween = get_tree().create_tween()
+	tween.tween_property(chess, "scale", Vector3.ZERO, _chess_remove_time)
+	tween.tween_callback(func():
+		chess.queue_free()
+		
+		# remove chess may also update player list of chess
+		$MainGUI/PanelContainer/SummonInfo/Player1RemainLabel.text = _get_remaining_chess_text(game.player_list[0])
+		$MainGUI/PanelContainer/SummonInfo/Player2RemainLabel.text = _get_remaining_chess_text(game.player_list[1])
+		
+		_is_in_animation = false
+	)
+	
+func _on_move_chess(src, dst, is_flip_during_move):
+	_is_in_animation = true
+	
+	# first, remove all cover effects
+	get_tree().call_group("all_hover_cover_effects", "queue_free")
+	get_tree().call_group("state_cover_effects", "queue_free")
+	
+	var src_r = Global.n_to_rc(src)[0]
+	var src_c = Global.n_to_rc(src)[1]
+	var src_tile = $Board.get_node(_get_tile_name_at_rc(src_r, src_c))
+	var src_chess = src_tile.get_node(_get_chess_name_at_n(src))
+	
+	# turn src_chess's monitoring to off
+	src_chess.monitoring = false
+	
+	var ori_position_y = src_chess.position.y
+	
+	var dst_r = Global.n_to_rc(dst)[0]
+	var dst_c = Global.n_to_rc(dst)[1]
+	var dst_tile = $Board.get_node(_get_tile_name_at_rc(dst_r, dst_c))
+	
+	var tween = get_tree().create_tween()
+	# 1: raise the chess
+	tween.tween_property(src_chess, "position:y", ori_position_y + _chess_up_dist, _chess_up_down_time).set_trans(Tween.TRANS_QUART)
+	
+	# 2: move the chess
+	tween.tween_property(src_chess, "global_position:x", dst_tile.global_position.x, _chess_move_time).set_trans(Tween.TRANS_QUART)
+	tween.parallel().tween_property(src_chess, "global_position:z", dst_tile.global_position.z, _chess_move_time).set_trans(Tween.TRANS_QUART)
+
+	# 3: flip the chess if needed
+	if (is_flip_during_move):
+		tween.tween_property(src_chess, "rotation:z", deg_to_rad(180), _chess_flip_time).set_trans(Tween.TRANS_QUART)
+		
+	# 4: put down the chess
+	tween.tween_property(src_chess, "position:y", ori_position_y, _chess_up_down_time).set_trans(Tween.TRANS_QUART)
+	
+	tween.tween_callback(func():
+		# move src_chess to final tile
+		src_tile.remove_child(src_chess)
+		dst_tile.add_child(src_chess)
+		src_chess.name = _get_chess_name_at_n(dst)
+		
+		# set local position to the one corresponding to the final tile
+		src_chess.position.x = 0
+		src_chess.position.z = 0
+		
+		# turn src_chess's monitoring back to on
+		src_chess.monitoring = true
+		
+		_is_in_animation = false
+		
+		game.emit_after_move_animation()
+	)
+	
 func _get_remaining_chess_text(player):
 	var chess_amount_dict = player.chess_amount_dict
 	var remaining_chess_text = ""
@@ -80,6 +193,7 @@ func _on_game_hover_cover_effect(pos, cover_effect_dict):
 		$Board.get_node(_get_tile_name_at_rc(r, c)).add_child(node)
 			
 		node.add_to_group(_get_hover_cover_effect_group_name_at_rc(ori_r, ori_c))
+		node.add_to_group("all_hover_cover_effects")
 
 func _get_cover_effect_node(color):
 	var material = StandardMaterial3D.new()
@@ -124,6 +238,9 @@ func _on_game_message(msg):
 	if msg != null:
 		$MainGUI/MarginContainer/Panel/MessageLabel.text = msg
 
+func _on_game_over():
+	$MainGUI/StartButton.visible = true
+
 func _init_board():
 	for ir in range(Global.MAXR):
 		for ic in range(Global.MAXC):
@@ -137,8 +254,8 @@ func _init_board():
 			node.update_material(false)
 
 			# set position, (0, 0) is the top-left corner
-			node.position.x = _CHESSTILEOFFSET + ic
-			node.position.z = _CHESSTILEOFFSET + ir
+			node.position.x = _CHESS_TILE_OFFSET + ic
+			node.position.z = _CHESS_TILE_OFFSET + ir
 			
 			node.connect("on_mouse_entered", _on_tile_mouse_entered)
 			node.connect("on_mouse_exited", _on_tile_mouse_exited)
@@ -148,17 +265,21 @@ func _init_board():
 
 func _get_tile_name_at_rc(r, c):
 	return "ChessTile" + str(r) + str(c)
+	
+func _get_chess_name_at_n(n):
+	return "Chess" + str(n)
 
 func _get_hover_cover_effect_group_name_at_rc(r, c):
 	return "hover_cover_effects" + str(r) + str(c)
 
 func _on_tile_mouse_entered(r, c):
-	var chess_back = game.get_chess_back(r, c)
-	if (chess_back != null):
-		$MainGUI.setup_chess_back(chess_back[0], chess_back[1])
-		$MainGUI/CardBack.visible = true
-	
-	game.emit_cover_effects(Global.rc_to_n(r, c), true)
+	if (not _is_in_animation):
+		var chess_back = game.get_chess_back(r, c)
+		if (chess_back != null):
+			$MainGUI.setup_chess_back(chess_back[0], chess_back[1])
+			$MainGUI/CardBack.visible = true
+		
+		game.emit_cover_effects(Global.rc_to_n(r, c), true)
 	
 func _on_tile_mouse_exited(r, c):
 	$MainGUI/CardBack.visible = false
@@ -166,4 +287,5 @@ func _on_tile_mouse_exited(r, c):
 	get_tree().call_group(_get_hover_cover_effect_group_name_at_rc(r, c), "queue_free")
 		
 func _on_tile_mouse_pressed(r, c):
-	var valid_op = game.perform_op(Global.rc_to_n(r, c), false)
+	if (not _is_in_animation):
+		var valid_op = game.perform_op(Global.rc_to_n(r, c), false)

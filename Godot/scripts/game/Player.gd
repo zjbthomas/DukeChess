@@ -14,6 +14,10 @@ func _init(is_main_player):
 func index_to_direction():
 	return 1 if is_main_player else -1
 	
+func add_chess(chess):
+	# TODO: guard when the amount is more than allowed maximum
+	chess_amount_dict[chess] += 1	
+
 func remove_chess(chess):
 	# TODO: guard when the amount is no more than 1
 	chess_amount_dict[chess] -= 1

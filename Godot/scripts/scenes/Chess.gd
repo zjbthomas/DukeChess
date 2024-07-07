@@ -1,7 +1,9 @@
-extends StaticBody3D
+extends Area3D
 
 @onready var front_center = $Front/Center
 @onready var back_center = $Back/Center
+
+signal chess_collide(node)
 
 const CENTER_X = -0.54
 const CENTER_Y = 0.55
@@ -67,3 +69,6 @@ func setup_ui(chess):
 	# set image
 	$Front/SideImage.get_mesh().get_material().albedo_texture = ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null
 	$Back/SideImage.get_mesh().get_material().albedo_texture = ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null
+
+func _on_area_entered(area):
+	chess_collide.emit(self)
