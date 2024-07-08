@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://bx37xxgvwv7d"]
+[gd_scene load_steps=6 format=3 uid="uid://bx37xxgvwv7d"]
 
 [ext_resource type="Script" path="res://scripts/scenes/ModeSelectScreen.gd" id="1_8llta"]
 [ext_resource type="PackedScene" uid="uid://cfd8jcleybuec" path="res://scenes/Main.tscn" id="2_uyqhj"]
@@ -17,6 +17,18 @@ corner_radius_bottom_left = 10
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j21eo"]
 bg_color = Color(0.25098, 0.25098, 0.25098, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_24xia"]
+bg_color = Color(0, 0, 0, 1)
 border_width_left = 5
 border_width_top = 5
 border_width_right = 5
@@ -61,6 +73,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 48
 theme_override_styles/normal = SubResource("StyleBoxFlat_lw36n")
 theme_override_styles/hover = SubResource("StyleBoxFlat_j21eo")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_24xia")
 text = "Local"
 
 [node name="ServerModeButton" type="Button" parent="VBoxContainer"]
@@ -68,6 +81,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 48
 theme_override_styles/normal = SubResource("StyleBoxFlat_lw36n")
 theme_override_styles/hover = SubResource("StyleBoxFlat_j21eo")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_24xia")
 text = "Online Server"
 
 [connection signal="pressed" from="VBoxContainer/LocalModeButton" to="." method="_on_local_mode_button_pressed"]

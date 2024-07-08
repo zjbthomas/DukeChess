@@ -4,7 +4,9 @@ class_name ServerGame
 
 signal client_disconnected
 
-const WEBSOCKET_URL = "http://localhost/socket.io/"
+const _IS_DEBUG:bool = true
+
+const WEBSOCKET_URL = "http://" + ("localhost" if _IS_DEBUG else "175.178.11.87:4115") + "/socket.io/"
 const NAMESPACE = "/dukechess" # NO / AT THE END!!!
 
 var _client
@@ -29,8 +31,8 @@ func _on_socket_ready(_sid: String):
 
 func _on_socket_event(event_name: String, payload: Variant, _name_space):
 	if (_name_space == NAMESPACE):
-		# DEBUG
-		print("Received ", event_name, " ", payload)
+		if (_IS_DEBUG):
+			print(event_name, " ", payload)
 		
 		match event_name:
 			"game":

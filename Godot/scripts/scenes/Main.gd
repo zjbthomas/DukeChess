@@ -116,8 +116,8 @@ func _on_remove_chess(pos):
 		chess.queue_free()
 		
 		# remove chess may also update player list of chess
-		$MainGUI/PanelContainer/SummonInfo/Player1RemainLabel.text = _get_remaining_chess_text(game.player_list[0])
-		$MainGUI/PanelContainer/SummonInfo/Player2RemainLabel.text = _get_remaining_chess_text(game.player_list[1])
+		$MainGUI/AspectRatioContainer/PanelContainer/SummonInfo/Player1RemainLabel.text = _get_remaining_chess_text(game.player_list[0])
+		$MainGUI/AspectRatioContainer/PanelContainer/SummonInfo/Player1RemainLabel.text = _get_remaining_chess_text(game.player_list[1])
 		
 		_is_in_animation = false
 	)
