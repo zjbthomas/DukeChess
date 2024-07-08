@@ -133,7 +133,8 @@ func _on_move_chess(src, dst, is_flip_during_move):
 
 	# 3: flip the chess if needed
 	if (is_flip_during_move):
-		tween.tween_property(src_chess, "rotation:z", deg_to_rad(180), _chess_flip_time).set_trans(Tween.TRANS_QUART)
+		var rotation_z = deg_to_rad(0) if src_chess.rotation.z > 3 else deg_to_rad(180) # a rough estimiation
+		tween.tween_property(src_chess, "rotation:z", rotation_z, _chess_flip_time).set_trans(Tween.TRANS_QUART)
 		
 	# 4: put down the chess
 	tween.tween_property(src_chess, "position:y", ori_position_y, _chess_up_down_time).set_trans(Tween.TRANS_QUART)

@@ -12,6 +12,8 @@ extends AspectRatioContainer
 
 @onready var name_label = $VBoxContainer/HBoxContainer/NameLabel
 
+signal chess_pressed(node)
+
 const CENTER_X = 71
 const CENTER_Y = 71
 const OFFSET = 28
@@ -83,16 +85,9 @@ func setup_ui():
 	front_side_image.set_texture(ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null)
 	back_side_image.set_texture(ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null)
 
-	# set amount value
-	$VBoxContainer/HBoxContainer/SpinBox.set_value_no_signal(Global.chess_loader.chess_max_amount_dict[chess])
-	
-	# some special rules
-	if (chess == "Duke"):
-		$VBoxContainer/HBoxContainer/SpinBox.editable = false
-		
-	if (chess == "Footman"):
-		$VBoxContainer/HBoxContainer/SpinBox.min_value = 2
 
-# TODO: do we need to add special rules here to filter value?
-func _on_spin_box_value_changed(value):
-	Global.chess_loader.chess_max_amount_dict[chess] = int(value)
+func _on_gui_input(event):
+	if (event is InputEventMouseButton):
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				chess_pressed.emit(self)
