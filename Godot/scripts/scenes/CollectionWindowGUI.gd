@@ -49,6 +49,9 @@ func _ready():
 			used_chess_container.add_child(node)
 
 func _on_chess_pressed(node):
+	if (not Global.is_local):
+		return
+	
 	if (_is_in_animation):
 		return
 	
@@ -122,6 +125,9 @@ func _add_used_chess(chess_name):
 	return node
 
 func _on_used_chess_pressed(node):
+	if (not Global.is_local):
+		return
+	
 	node.queue_free()
 	
 	Global.chess_loader.chess_max_amount_dict[node.text] -= 1

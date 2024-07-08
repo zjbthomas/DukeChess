@@ -13,15 +13,16 @@ var chessmodel_dict = {}
 var chess_textures = {}
 
 func load_chess():
-	# create "chess" folder under user:// if not exists
-	if not DirAccess.dir_exists_absolute(USERCHESSDIR):
-		var error_code = DirAccess.make_dir_recursive_absolute(USERCHESSDIR)
-		if error_code != OK:
-			error_message.emit('ERROR: create directory with error code %s.' % [error_code])
-			return
+	if (Global.is_local):
+		# create "chess" folder under user:// if not exists
+		if not DirAccess.dir_exists_absolute(USERCHESSDIR):
+			var error_code = DirAccess.make_dir_recursive_absolute(USERCHESSDIR)
+			if error_code != OK:
+				error_message.emit('ERROR: create directory with error code %s.' % [error_code])
+				return
 
-	# copy preset chess to user chess folder
-	_copy_dir_recursively(RESCHESSDIR, USERCHESSDIR)
+		# copy preset chess to user chess folder
+		_copy_dir_recursively(RESCHESSDIR, USERCHESSDIR)
 	
 	# load chess from files
 	_load_chess_files()
@@ -103,11 +104,13 @@ func type_to_texture(type, offset_x, offset_y):
 				return chess_textures["Command"]
 
 func _load_chess_files():
-	var chess_dir = DirAccess.open(USERCHESSDIR)
+	var used_dir = USERCHESSDIR if Global.is_local else RESCHESSDIR
+	
+	var chess_dir = DirAccess.open(used_dir)
 	
 	for chess_name in chess_dir.get_directories():
 		# load XML
-		var xml_path = USERCHESSDIR + "/" + chess_name + "/" + chess_name + ".xml" # XML has the same name as the folder
+		var xml_path = used_dir + "/" + chess_name + "/" + chess_name + ".xml" # XML has the same name as the folder
 		if not FileAccess.file_exists(xml_path):
 			error_message.emit('ERROR: %s not exists.' % [xml_path])
 			return
@@ -164,7 +167,7 @@ func _load_chess_files():
 			chess.back_dict[ret[0]] = ret[1]
 			
 		# load image
-		var image_path = USERCHESSDIR + "/" + chess_name + "/" + chess_name + ".png" # TODO: only PNG is allowed; it has the same name as the folder
+		var image_path = used_dir + "/" + chess_name + "/" + chess_name + ".png" # TODO: only PNG is allowed; it has the same name as the folder
 		if FileAccess.file_exists(image_path):
 			chess.image = image_path
 		else:
@@ -175,17 +178,17 @@ func _load_chess_files():
 		chessmodel_dict[chess_name] = chess
 		
 	# set default chess num from JSON
-	var json_as_text = FileAccess.get_file_as_string(USERCHESSDIR + "/" + CHESSAMOUNTJSON)
+	var json_as_text = FileAccess.get_file_as_string(used_dir + "/" + CHESSAMOUNTJSON)
 	var json_as_dict = JSON.parse_string(json_as_text)
 	if not json_as_dict:
-		error_message.emit('ERROR: cannot parse JSON %s.' % [USERCHESSDIR + "/" + CHESSAMOUNTJSON])
+		error_message.emit('ERROR: cannot parse JSON %s.' % [used_dir + "/" + CHESSAMOUNTJSON])
 		return
 			
 	for chess_name in chess_name_list:
 		var amount_str = json_as_dict.get(chess_name)
 		
 		if not amount_str:
-			error_message.emit('ERROR: amount for %s cannot be load from %s.' % [chess_name, USERCHESSDIR + "/" + CHESSAMOUNTJSON])
+			error_message.emit('ERROR: amount for %s cannot be load from %s.' % [chess_name, used_dir + "/" + CHESSAMOUNTJSON])
 			return
 		
 		var amount = int(amount_str)
@@ -193,12 +196,12 @@ func _load_chess_files():
 		# some special rules
 		if (chess_name == "Duke"):
 			if (amount != 1):
-				error_message.emit('ERROR: incorrect amount %s for Duke in %s.' % [amount, USERCHESSDIR + "/" + CHESSAMOUNTJSON])
+				error_message.emit('ERROR: incorrect amount %s for Duke in %s.' % [amount, used_dir + "/" + CHESSAMOUNTJSON])
 				return
 				
 		if (chess_name == "Footman"):
 			if (amount < 2):
-				error_message.emit('ERROR: there should at least 2 (now only %s) Footman in %s.' % [amount, USERCHESSDIR + "/" + CHESSAMOUNTJSON])
+				error_message.emit('ERROR: there should at least 2 (now only %s) Footman in %s.' % [amount, used_dir + "/" + CHESSAMOUNTJSON])
 				return
 		
 		chess_max_amount_dict[chess_name] = amount

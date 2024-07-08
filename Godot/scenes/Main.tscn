@@ -80,6 +80,7 @@ color = Color(0.392157, 0.666667, 0.392157, 1)
 
 [node name="Main" type="Node"]
 script = ExtResource("1_h17yc")
+mode_select_scene = "res://scenes/ModeSelectScreen.tscn"
 chess_tile_scene = ExtResource("1_h0u3b")
 chess_scene = ExtResource("5_pfq4i")
 menu_scene = ExtResource("4_ptmm8")

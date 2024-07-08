@@ -1,6 +1,6 @@
 extends ColorRect
 
-@export var main_scene: PackedScene
+@export var mode_select_scene: PackedScene
 
 var _is_loading_smooth = true
 
@@ -9,7 +9,7 @@ func _ready():
 	_load_game_resources()
 	
 	if (_is_loading_smooth):
-		get_tree().change_scene_to_packed.bind(main_scene).call_deferred()
+		get_tree().change_scene_to_packed.bind(mode_select_scene).call_deferred()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

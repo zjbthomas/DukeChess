@@ -18,7 +18,7 @@ You can get the full rules from [here](https://www.catalystgamelabs.com/download
 
 - Clone the project.
 - Make sure you have [`npm`](https://www.npmjs.com/) and `node` ([Node.js](https://nodejs.org/en/)) installed.
-- Go to the root directory of the project, and run `npm install` in command point to install all dependencies.
+- Go to the root directory of the project, and run `npm install` in command prompt to install all dependencies.
 - (Optional) Modify ["/index.js"](./index.js) and ["/dukechess/index.html"](./dukechess/index.html) for port and path.
 - (Optional) This project is originally designed on **Windows**. For **Linux**, please modify paths to the following files:
   - Path to ["Chess.xml"](./dukechess/resources/Chess.xml) in ["/dukechess/js-backend/chess/ChessFactory.js"](./dukechess/js-backend/chess/ChessFactory.js);

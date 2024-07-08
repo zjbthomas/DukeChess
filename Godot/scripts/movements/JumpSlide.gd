@@ -33,10 +33,10 @@ func validate_movement(board, pos, dest, player):
 		if (MovementManager.has_friend_chess(board, start_pos, temp_x, temp_y, player)):
 			return ret
 		elif (MovementManager.has_enemy_chess(board, start_pos, temp_x, temp_y, player)):
-			ret.append(MovementManager.pos_with_offsets(pos, temp_x, temp_y))
+			ret.append(MovementManager.pos_with_offsets(start_pos, temp_x, temp_y))
 			return ret
 		else:
-			ret.append(MovementManager.pos_with_offsets(pos, temp_x, temp_y))
+			ret.append(MovementManager.pos_with_offsets(start_pos, temp_x, temp_y))
 			
 		temp_x += step_x
 		temp_y += step_y

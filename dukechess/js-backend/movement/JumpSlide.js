@@ -31,12 +31,12 @@ class JumpSlide extends MovementImpl {
 			}
 			else if(this.hasNotMyChess(field, startPos, temp, p))
 			{
-				ret = ret.concat(this.offset2Dest(field, pos, temp));
+				ret = ret.concat(this.offset2Dest(field, startPos, temp));
 				return ret;
 			}
 			else 
 			{
-				ret = ret.concat(this.offset2Dest(field, pos, temp));
+				ret = ret.concat(this.offset2Dest(field, startPos, temp));
 			}
 			
 			temp[0] += moveStep[0];

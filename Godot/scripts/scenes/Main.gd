@@ -1,6 +1,7 @@
 extends Node
 
 @export_category("Packed Scenes")
+@export_file var mode_select_scene # TODO: to avoid cyclic dependency
 @export var chess_tile_scene:PackedScene
 @export var chess_scene:PackedScene
 @export var menu_scene:PackedScene
@@ -15,7 +16,7 @@ extends Node
 const _CHESS_TILE_OFFSET = -2.5
 
 # variables for logic
-var game = Game.new()
+var game = LocalGame.new() if Global.is_local else ServerGame.new(self)
 
 var _is_in_animation = false
 
@@ -24,9 +25,15 @@ func _ready():
 	# init board GUI
 	_init_board()
 	
-	# connect start button
-	$MainGUI/StartButton.connect("pressed", _on_start_button_pressed)
+	# init MainGUI
+	$MainGUI/GridContainer/Label.text = "Mode: " + ("Local" if Global.is_local else "Online Server")
 	
+	$MainGUI/GridContainer/StartButton.disabled = false
+	
+	# connect buttons
+	$MainGUI/GridContainer/BackButton.connect("pressed", _on_back_button_pressed)
+	$MainGUI/GridContainer/StartButton.connect("pressed", _on_start_button_pressed)
+
 	# init game
 	game.connect("add_chess", _on_add_chess)
 	game.connect("remove_chess", _on_remove_chess)
@@ -38,13 +45,26 @@ func _ready():
 	game.connect("game_message", _on_game_message)
 	game.connect("game_over", _on_game_over)
 	
+	if (not Global.is_local):
+		game.connect("client_disconnected", _on_client_disconnected)
+
+func _on_client_disconnected():
+	$MainGUI/GridContainer/StartButton.disabled = false
+
 func _on_start_button_pressed():
 	# remove all chess
 	get_tree().call_group("chess", "queue_free")
 	
-	$MainGUI/StartButton.visible = false
-	
-	game.game_start()
+	if (Global.is_local):
+		game.game_start()
+	else:
+		var smooth_connection = game.websocket_connect()
+		
+		if (smooth_connection):
+			$MainGUI/GridContainer/StartButton.disabled = true
+
+func _on_back_button_pressed():
+	get_tree().change_scene_to_file.bind(mode_select_scene).call_deferred()
 
 func _on_add_chess(pos, chess:ChessInst, is_no_effect):
 	var node = chess_scene.instantiate()
@@ -71,8 +91,8 @@ func _on_add_chess(pos, chess:ChessInst, is_no_effect):
 		$Particles/LiveParticles.restart()
 	
 	# add chess also means player list of chess update
-	$MainGUI/PanelContainer/SummonInfo/Player1RemainLabel.text = _get_remaining_chess_text(game.player_list[0])
-	$MainGUI/PanelContainer/SummonInfo/Player2RemainLabel.text = _get_remaining_chess_text(game.player_list[1])
+	$MainGUI/AspectRatioContainer/PanelContainer/SummonInfo/Player1RemainLabel.text = _get_remaining_chess_text(game.player_list[0])
+	$MainGUI/AspectRatioContainer/PanelContainer/SummonInfo/Player2RemainLabel.text = _get_remaining_chess_text(game.player_list[1])
 
 func _on_chess_collide(node):
 	$Particles/DeadParticles.global_position = node.global_position
@@ -237,10 +257,10 @@ func _on_menu_button_pressed(item):
 	
 func _on_game_message(msg):
 	if msg != null:
-		$MainGUI/MarginContainer/Panel/MessageLabel.text = msg
+		$MainGUI/MessageContainer/Panel/MessageLabel.text = msg
 
 func _on_game_over():
-	$MainGUI/StartButton.visible = true
+	$MainGUI/GridContainer/StartButton.disabled = false
 
 func _init_board():
 	for ir in range(Global.MAXR):

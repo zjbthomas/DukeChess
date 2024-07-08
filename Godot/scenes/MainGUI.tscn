@@ -54,23 +54,35 @@ mouse_filter = 1
 color = Color(1, 1, 1, 0)
 script = ExtResource("1_u4eab")
 
-[node name="CollectionButton" type="Button" parent="."]
+[node name="GridContainer" type="VBoxContainer" parent="."]
 layout_mode = 0
-offset_left = 1321.0
-offset_top = 68.0
-offset_right = 1779.0
-offset_bottom = 159.0
-theme_override_font_sizes/font_size = 60
-text = "Check All Chess"
+offset_left = 1345.0
+offset_top = 109.0
+offset_right = 1797.0
+offset_bottom = 373.0
+theme_override_constants/separation = 10
 
-[node name="StartButton" type="Button" parent="."]
-layout_mode = 0
-offset_left = 1308.0
-offset_top = 174.0
-offset_right = 1792.0
-offset_bottom = 265.0
-theme_override_font_sizes/font_size = 60
-text = "Start New Game"
+[node name="Label" type="Label" parent="GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Current mode: N/A"
+horizontal_alignment = 1
+
+[node name="BackButton" type="Button" parent="GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Back to mode selection
+"
+
+[node name="StartButton" type="Button" parent="GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Start a new game"
+
+[node name="CollectionButton" type="Button" parent="GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Chess settings"
 
 [node name="BlurContainer" parent="." instance=ExtResource("2_tp78g")]
 layout_mode = 0
@@ -82,10 +94,10 @@ grow_vertical = 1
 
 [node name="CardBack" type="AspectRatioContainer" parent="."]
 layout_mode = 0
-offset_left = 1483.0
-offset_top = 311.0
-offset_right = 1683.0
-offset_bottom = 511.0
+offset_left = 48.0
+offset_top = 390.0
+offset_right = 248.0
+offset_bottom = 590.0
 scale = Vector2(0.7, 0.7)
 
 [node name="Background" type="ColorRect" parent="CardBack"]
@@ -134,7 +146,7 @@ text = "LongBowman"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="MessageContainer" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
@@ -148,12 +160,12 @@ theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="Panel" type="Panel" parent="MarginContainer"]
+[node name="Panel" type="Panel" parent="MessageContainer"]
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_h3ilx")
 
-[node name="MessageLabel" type="RichTextLabel" parent="MarginContainer/Panel"]
+[node name="MessageLabel" type="RichTextLabel" parent="MessageContainer/Panel"]
 layout_mode = 2
 offset_left = 50.0
 offset_top = 10.0
@@ -162,46 +174,51 @@ offset_bottom = 90.0
 theme_override_font_sizes/normal_font_size = 24
 text = "Please start a new game."
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
-layout_mode = 2
-offset_left = 1215.0
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="."]
+layout_mode = 0
+offset_left = 1255.0
 offset_top = 503.0
-offset_right = 1855.0
+offset_right = 1895.0
 offset_bottom = 881.0
+
+[node name="PanelContainer" type="PanelContainer" parent="AspectRatioContainer"]
+layout_mode = 2
+size_flags_vertical = 8
 theme_override_styles/panel = SubResource("StyleBoxFlat_y4jch")
 
-[node name="SummonInfo" type="VBoxContainer" parent="PanelContainer"]
+[node name="SummonInfo" type="VBoxContainer" parent="AspectRatioContainer/PanelContainer"]
 layout_mode = 2
+size_flags_vertical = 8
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="PanelContainer/SummonInfo"]
+[node name="Label" type="Label" parent="AspectRatioContainer/PanelContainer/SummonInfo"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 36
 text = "Remaining Chess"
 
-[node name="Player1Label" type="Label" parent="PanelContainer/SummonInfo"]
+[node name="Player1Label" type="Label" parent="AspectRatioContainer/PanelContainer/SummonInfo"]
 layout_mode = 2
 size_flags_horizontal = 0
 theme_override_font_sizes/font_size = 24
 text = "[Player 1]"
 
-[node name="Player1RemainLabel" type="RichTextLabel" parent="PanelContainer/SummonInfo"]
+[node name="Player1RemainLabel" type="RichTextLabel" parent="AspectRatioContainer/PanelContainer/SummonInfo"]
 custom_minimum_size = Vector2(600, 100)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_fxyta")
 bbcode_enabled = true
 
-[node name="Player2Label" type="Label" parent="PanelContainer/SummonInfo"]
+[node name="Player2Label" type="Label" parent="AspectRatioContainer/PanelContainer/SummonInfo"]
 layout_mode = 2
 size_flags_horizontal = 0
 theme_override_font_sizes/font_size = 24
 text = "[Player 2]"
 
-[node name="Player2RemainLabel" type="RichTextLabel" parent="PanelContainer/SummonInfo"]
+[node name="Player2RemainLabel" type="RichTextLabel" parent="AspectRatioContainer/PanelContainer/SummonInfo"]
 custom_minimum_size = Vector2(600, 100)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_l23d6")
 bbcode_enabled = true
 
-[connection signal="pressed" from="CollectionButton" to="." method="_on_collection_button_pressed"]
+[connection signal="pressed" from="GridContainer/CollectionButton" to="." method="_on_collection_button_pressed"]

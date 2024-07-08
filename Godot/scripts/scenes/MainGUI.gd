@@ -9,6 +9,11 @@ const OFFSET = 28
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	$CardBack.visible = false
+	
+	# set remaining chess area
+	$AspectRatioContainer/PanelContainer/SummonInfo/Player1Label.visible = Global.is_local
+	$AspectRatioContainer/PanelContainer/SummonInfo/Player2Label.visible = Global.is_local
+	$AspectRatioContainer/PanelContainer/SummonInfo/Player2RemainLabel.visible = Global.is_local
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

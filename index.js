@@ -3,7 +3,7 @@ const express = require("express");
 // For webpages
 const app = express();
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var io = require('socket.io')(http, {pingTimeout: 20000});
 
 // Controllers
 const DukeChessController = require("./dukechess/js-backend/flow/Controller");

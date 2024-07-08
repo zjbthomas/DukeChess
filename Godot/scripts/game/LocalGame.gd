@@ -1,6 +1,6 @@
 extends Node
 
-class_name Game
+class_name LocalGame
 
 signal add_chess(pos, chess, is_no_effect)
 signal remove_chess(pos)
@@ -48,13 +48,14 @@ var command_pos
 var winner
 
 func _init():
-	POS_DUKE0 = Global.rc_to_n(5, 2)
-	POS_DUKE1 = Global.rc_to_n(0, 3)
-	
 	board.resize(Global.MAXR * Global.MAXC)
 	board.fill(null)
 
 func game_start():
+	# init Duke pos
+	POS_DUKE0 = Global.rc_to_n(5, 2)
+	POS_DUKE1 = Global.rc_to_n(0, 3)
+	
 	# init player
 	player_list.append(Player.new(true))
 	player_list.append(Player.new(false))
@@ -87,7 +88,7 @@ func game_start():
 	emit_message()
 	
 func get_chess_back(r, c):
-	if board[Global.rc_to_n(r, c)] == null:
+	if len(board) == 0 or board[Global.rc_to_n(r, c)] == null:
 		return null
 	else:
 		var chess = board[Global.rc_to_n(r, c)]
@@ -398,7 +399,7 @@ func emit_cover_effects(hover_pos):
 							MovementManager.MOVEMENT_TYPE.STRIKE:
 								cover_effect_dict[d] = Color.RED
 							_:
-								cover_effect_dict[d] = Color.BLUE
+								cover_effect_dict[d] = Color.GREEN
 
 				ChessModel.ACTION_TYPE.COMMAND:
 					for d in board[current_chess_pos].get_available_movements(board, current_chess_pos, ChessModel.ACTION_TYPE.COMMAND):
