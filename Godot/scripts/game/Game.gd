@@ -345,7 +345,7 @@ func perform_action(board, src_chess:ChessInst, action, dest_arr, target_chess_n
 			src_chess.is_front = !src_chess.is_front
 			
 			move_chess.emit(dest_arr[0], dest_arr[1], false)
-			move_chess.emit(src_chess, src_chess, true) # same location flip
+			move_chess.emit(current_chess_pos, current_chess_pos, true) # same location flip
 
 func next_turn():
 	current_player = player_list[1] if (current_player == player_list[0]) else player_list[0]
