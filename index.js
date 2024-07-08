@@ -20,6 +20,7 @@ http.listen(80, function(){
 
 // Connection pool
 var pool = new Map();
+var id_to_game_types = new Map();
 var platforms = new Map();
 
 function getController(name, id, firstPointPlatform, session, secondPointPlatform, socket) {
@@ -33,7 +34,7 @@ function getController(name, id, firstPointPlatform, session, secondPointPlatfor
 
 function match(name, id, socket) {
     for (var [session, peer] of pool) {
-        if (session != id && null == peer) {
+        if (session != id && null == peer && id_to_game_types.get(session) == id_to_game_types.get(id)) {
             console.log('Match ' + id + ' and ' + session);
 
             firstPointPlatform = platforms.get(id)
@@ -80,6 +81,7 @@ function handleSocket(socket, name) {
     socket.on('platform', function(platform) {
         console.log('Platform received from ' + socket.id + ': ' + platform);
         platforms.set(socket.id, platform);
+        id_to_game_types.set(socket.id, name);
 
         if (!match(name, socket.id, socket)) {
             socket.emit("game", {
@@ -95,6 +97,7 @@ function handleSocket(socket, name) {
         peers = pool.get(socket.id);
         pool.delete(socket.id);
         platforms.delete(socket.id);
+        id_to_game_types.delete(socket.id);
 
         if (null != peers) {
             session = (peers.firstPoint == socket.id)? peers.secondPoint: peers.firstPoint;
