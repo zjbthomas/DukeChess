@@ -42,8 +42,16 @@ size_flags_vertical = 4
 texture = ExtResource("1_iqpdg")
 expand_mode = 1
 
-[node name="SideImage" type="TextureRect" parent="VBoxContainer/ChessInfoContainer/Front/AspectRatioContainer"]
-custom_minimum_size = Vector2(60, 0)
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/ChessInfoContainer/Front/AspectRatioContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="SideImage" type="TextureRect" parent="VBoxContainer/ChessInfoContainer/Front/AspectRatioContainer/MarginContainer"]
+custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 8
 texture = ExtResource("2_ay8l5")
@@ -99,8 +107,16 @@ size_flags_vertical = 4
 texture = ExtResource("1_iqpdg")
 expand_mode = 1
 
-[node name="SideImage" type="TextureRect" parent="VBoxContainer/ChessInfoContainer/Back/AspectRatioContainer"]
-custom_minimum_size = Vector2(60, 0)
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/ChessInfoContainer/Back/AspectRatioContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="SideImage" type="TextureRect" parent="VBoxContainer/ChessInfoContainer/Back/AspectRatioContainer/MarginContainer"]
+custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 8
 texture = ExtResource("2_ay8l5")

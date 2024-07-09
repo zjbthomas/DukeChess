@@ -23,6 +23,7 @@ func _setup_ui_localization():
 	$GridContainer/BackButton.text = tr("MAIN_BUTTON_BACK")
 	$GridContainer/StartButton.text = tr("MAIN_BUTTON_START")
 	$GridContainer/CollectionButton.text = tr("MAIN_BUTTON_CHESS")
+	$GridContainer/ExitButton.text = tr("MAIN_BUTTON_EXIT")
 	
 	$MessageContainer/Panel/MessageLabel.text = tr("MAIN_MSG_DEFAULT")
 	
@@ -86,3 +87,7 @@ func setup_chess_back(chess, is_front):
 	
 	# set image
 	$CardBack/SideImage.set_texture(ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null)
+
+
+func _on_exit_button_pressed():
+	get_tree().quit()

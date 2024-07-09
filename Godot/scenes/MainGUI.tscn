@@ -57,10 +57,11 @@ script = ExtResource("1_u4eab")
 [node name="GridContainer" type="VBoxContainer" parent="."]
 layout_mode = 0
 offset_left = 1345.0
-offset_top = 109.0
+offset_top = 85.0
 offset_right = 1797.0
-offset_bottom = 373.0
+offset_bottom = 422.0
 theme_override_constants/separation = 10
+metadata/_edit_group_ = true
 
 [node name="Label" type="Label" parent="GridContainer"]
 layout_mode = 2
@@ -82,6 +83,11 @@ text = "Start a new game"
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "Chess settings"
+
+[node name="ExitButton" type="Button" parent="GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Exit"
 
 [node name="BlurContainer" parent="." instance=ExtResource("2_tp78g")]
 layout_mode = 0
@@ -221,3 +227,4 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_l23d6")
 bbcode_enabled = true
 
 [connection signal="pressed" from="GridContainer/CollectionButton" to="." method="_on_collection_button_pressed"]
+[connection signal="pressed" from="GridContainer/ExitButton" to="." method="_on_exit_button_pressed"]

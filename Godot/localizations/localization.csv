@@ -17,6 +17,7 @@ MAIN_MODE,Mode:,游戏模式：
 MAIN_BUTTON_BACK,Back to mode selection,重选游戏模式
 MAIN_BUTTON_START,Start a new game,开始新游戏
 MAIN_BUTTON_CHESS,Chess settings,棋子设置
+MAIN_BUTTON_EXIT,Exit,退出游戏
 MAIN_RAMINING_CHESS,Remaining Chess,剩余可召唤棋子
 MAIN_PLAYER1,[Player 1],【玩家1】
 MAIN_PLAYER2,[Player 2],【玩家2】

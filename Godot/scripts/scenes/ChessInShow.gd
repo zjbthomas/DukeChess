@@ -2,12 +2,12 @@ extends AspectRatioContainer
 
 @onready var front_container = $VBoxContainer/ChessInfoContainer/Front/AspectRatioContainer
 @onready var front_name_label = $VBoxContainer/ChessInfoContainer/Front/AspectRatioContainer/Name/NameLabel
-@onready var front_side_image = $VBoxContainer/ChessInfoContainer/Front/AspectRatioContainer/SideImage
+@onready var front_side_image = $VBoxContainer/ChessInfoContainer/Front/AspectRatioContainer/MarginContainer/SideImage
 @onready var front_center = $VBoxContainer/ChessInfoContainer/Front/AspectRatioContainer/Center
 
 @onready var back_container = $VBoxContainer/ChessInfoContainer/Back/AspectRatioContainer
 @onready var back_name_label = $VBoxContainer/ChessInfoContainer/Back/AspectRatioContainer/Name/NameLabel
-@onready var back_side_image = $VBoxContainer/ChessInfoContainer/Back/AspectRatioContainer/SideImage
+@onready var back_side_image = $VBoxContainer/ChessInfoContainer/Back/AspectRatioContainer/MarginContainer/SideImage
 @onready var back_center = $VBoxContainer/ChessInfoContainer/Back/AspectRatioContainer/Center
 
 @onready var name_label = $VBoxContainer/HBoxContainer/NameLabel
