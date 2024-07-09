@@ -198,6 +198,10 @@ func perform_op(user_op, is_from_menu):
 			
 			if (user_op in ["MAIN_MENU_CANCEL", tr("MAIN_MENU_CANCEL")]):
 				current_state = GAMESTATE.CHOOSECHESS
+				
+				emit_cover_effects(null)
+				emit_message()
+				
 				return true
 			elif (user_op in ["MAIN_MENU_SUMMON", tr("MAIN_MENU_SUMMON")]):
 				current_action = ChessModel.ACTION_TYPE.SUMMON
