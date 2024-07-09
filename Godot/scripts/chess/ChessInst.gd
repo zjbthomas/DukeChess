@@ -58,12 +58,26 @@ func get_available_movements(board, pos, action):
 func get_control_area(board, pos):
 	var ret = []
 	
-	for d in get_available_destinations(board, pos, ChessModel.ACTION_TYPE.MOVE):
-		if (not ret.has(d)):
-			ret.append(d)
+	var all_move_movements = get_all_movements(ChessModel.ACTION_TYPE.MOVE)
+	if (all_move_movements != null):
+		for possible_d in all_move_movements:
+			var valid_ds = Global.movement_manager.validate_control_area(all_move_movements[possible_d], board, pos, possible_d, player)
+			ret.append_array(valid_ds)
+	
+	var has_commandable_chess = false
+	var all_command_movements = get_all_movements(ChessModel.ACTION_TYPE.COMMAND)
+	if (all_command_movements != null):
+		for possible_d in all_command_movements:
+			var offset_x = Global.dest_to_offsets_with_player(possible_d, player)[0]
+			var offset_y = Global.dest_to_offsets_with_player(possible_d, player)[1]
 			
-	for d in get_available_destinations(board, pos, ChessModel.ACTION_TYPE.COMMAND):
-		if (not ret.has(d)):
-			ret.append(d)
+			if (Global.movement_manager.has_friend_chess(board, pos, offset_x, offset_y, player)):
+				has_commandable_chess = true
+				break
+		
+		if (has_commandable_chess):
+			for possible_d in all_command_movements:
+				var valid_ds = Global.movement_manager.validate_control_area(all_command_movements[possible_d], board, pos, possible_d, player)
+				ret.append_array(valid_ds)
 	
 	return ret

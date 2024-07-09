@@ -57,6 +57,8 @@ func game_start():
 	POS_DUKE1 = Global.rc_to_n(0, 3)
 	
 	# init player
+	player_list = []
+	
 	player_list.append(Player.new(true))
 	player_list.append(Player.new(false))
 	

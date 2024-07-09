@@ -17,6 +17,9 @@ var movement_insts = {
 func validate_movement(type, board, pos, dest, player):
 	return movement_insts[type].validate_movement(board, pos, dest, player)
 
+func validate_control_area(type, board, pos, dest, player):
+	return movement_insts[type].validate_control_area(board, pos, dest, player)
+
 static func pos_with_offsets(pos, offset_x, offset_y):
 	return pos + offset_y * Global.MAXC + offset_x
 

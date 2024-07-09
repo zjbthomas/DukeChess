@@ -42,3 +42,6 @@ func validate_movement(board, pos, dest, player):
 		temp_y += step_y
 
 	return ret
+
+func validate_control_area(board, pos, dest, player):
+	return validate_movement(board, pos, dest, player)
