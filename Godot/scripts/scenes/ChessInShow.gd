@@ -22,8 +22,11 @@ var chess
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass # Replace with function body.
+	_setup_ui_localization()
 
+func _setup_ui_localization():
+	$VBoxContainer/ChessInfoContainer/Front/FrontLabel.text = tr("CHESS_SHOW_FRONT")
+	$VBoxContainer/ChessInfoContainer/Back/BackLabel.text = tr("CHESS_SHOW_BACK")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

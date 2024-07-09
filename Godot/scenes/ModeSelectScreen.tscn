@@ -84,5 +84,35 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_j21eo")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_24xia")
 text = "Online Server"
 
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="LanguageContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/LanguageContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Language:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/LanguageContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_font_sizes/font_size = 40
+icon_alignment = 1
+item_count = 2
+selected = 0
+popup/item_0/text = "English"
+popup/item_0/id = 0
+popup/item_1/text = "简体中文"
+popup/item_1/id = 1
+
 [connection signal="pressed" from="VBoxContainer/LocalModeButton" to="." method="_on_local_mode_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/ServerModeButton" to="." method="_on_server_mode_button_pressed"]
+[connection signal="item_selected" from="MarginContainer/LanguageContainer/OptionButton" to="." method="_on_option_button_item_selected"]

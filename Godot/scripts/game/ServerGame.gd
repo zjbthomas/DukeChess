@@ -37,7 +37,7 @@ func _on_socket_event(event_name: String, payload: Variant, _name_space):
 		match event_name:
 			"game":
 				if (payload["connection"] == "false"):
-					game_message.emit("Wait for another player to join.")
+					game_message.emit(tr("MAIN_MSG_JOIN_WAIT"))
 				else:
 					var type = payload.get("type")
 					if (type != null):
@@ -59,7 +59,7 @@ func _on_socket_event(event_name: String, payload: Variant, _name_space):
 
 func _on_socket_disconnect(name_space: String):
 	# TODO
-	game_message.emit("Disconnected from server.")
+	game_message.emit(tr("MAIN_MSG_DISCONNECT"))
 	client_disconnected.emit()
 
 func _exit_tree():
@@ -71,7 +71,7 @@ func websocket_connect():
 		_client.socketio_connect(NAMESPACE)
 		return true
 	else:
-		game_message.emit("Server not ready, please retry.")
+		game_message.emit(tr("MAIN_MSG_NOT_READY"))
 		return false
 
 func convert_n_from_server(n):
@@ -101,30 +101,23 @@ func send_to_server(user_op, is_from_menu):
 		var out = {}
 		out["type"] = "menu_click"
 		
-		match user_op:
-			"CANCEL":
-				perform_op_for_server(0)
-				out["value"] = "Cancel"
-			"SUMMON":
-				out["value"] = "Summon"
-			"MOVE":
-				out["value"] = "Move"
-			"COMMAND":
-				out["value"] = "Command"
-			"CONFIRM":
-				out["value"] = "Confirm"
-			_:
-				return false
+		if (user_op in ["MAIN_MENU_CANCEL", tr("MAIN_MENU_CANCEL")]):
+			perform_op_for_server(0)
+			out["value"] = "Cancel"
+		elif (user_op in ["MAIN_MENU_SUMMON", tr("MAIN_MENU_SUMMON")]):
+			out["value"] = "Summon"
+		elif (user_op in ["MAIN_MENU_MOVE", tr("MAIN_MENU_MOVE")]):
+			out["value"] = "Move"
+		elif (user_op in ["MAIN_MENU_COMMAND", tr("MAIN_MENU_COMMAND")]):
+			out["value"] = "Command"
+		elif (user_op in ["MAIN_MENU_CONFIRM", tr("MAIN_MENU_CONFIRM")]):
+			out["value"] = "Confirm"
+		else:
+			return false
 				
 		_client.socketio_send("game", out, NAMESPACE)
 		
 		return true
-		
-func sent_to_server():
-	var out = {}
-	
-	out["connection"] = "true"
-	out[""]
 
 func perform_op_for_server(user_op, summon_chess_from_server = null):
 	user_op = convert_n_from_server(user_op)
@@ -194,20 +187,19 @@ func perform_op_for_server(user_op, summon_chess_from_server = null):
 			
 		GAMESTATE.CHOOSEACTION:
 			# TODO: magic numbers
-			match user_op:
-				"CANCEL", 30: # convert_n_from_server(0)
-					current_state = GAMESTATE.CHOOSECHESS
-					return true
-				"SUMMON", 31: # convert_n_from_server(1)
-					current_action = ChessModel.ACTION_TYPE.SUMMON
-					summon_chess = summon_chess_from_server
-					current_player.remove_chess(summon_chess_from_server)
-				"MOVE", 32: # convert_n_from_server(2)
-					current_action = ChessModel.ACTION_TYPE.MOVE
-				"COMMAND", 33: # convert_n_from_server(3)
-					current_action = ChessModel.ACTION_TYPE.COMMAND
-				_:
-					return false
+			if (user_op in ["MAIN_MENU_CANCEL", tr("MAIN_MENU_CANCEL"), convert_n_from_server(0)]):
+				current_state = GAMESTATE.CHOOSECHESS
+				return true
+			elif (user_op in ["MAIN_MENU_SUMMON", tr("MAIN_MENU_SUMMON"), convert_n_from_server(1)]):
+				current_action = ChessModel.ACTION_TYPE.SUMMON
+				summon_chess = summon_chess_from_server
+				current_player.remove_chess(summon_chess_from_server)
+			elif (user_op in ["MAIN_MENU_MOVE", tr("MAIN_MENU_MOVE"), convert_n_from_server(2)]):
+				current_action = ChessModel.ACTION_TYPE.MOVE
+			elif (user_op in ["MAIN_MENU_COMMAND", tr("MAIN_MENU_COMMAND"), convert_n_from_server(3)]):
+				current_action = ChessModel.ACTION_TYPE.COMMAND
+			else:
+				return false
 				
 			if (board[current_chess_pos].get_available_actions(board, current_chess_pos).has(current_action)):
 				current_state += 1
@@ -272,7 +264,7 @@ func perform_op_for_server(user_op, summon_chess_from_server = null):
 				return false
 
 		GAMESTATE.CHOOSEDESTTWO:
-			if ((user_op == 30) or # CANCEL: convert_n_from_server(0)
+			if ((user_op == convert_n_from_server(0)) or # CANCEL
 				(user_op == current_chess_pos)):
 					match current_action:
 						ChessModel.ACTION_TYPE.SUMMON:
@@ -290,7 +282,7 @@ func perform_op_for_server(user_op, summon_chess_from_server = null):
 
 			match (current_action):
 				ChessModel.ACTION_TYPE.SUMMON:
-					if (user_op == 31): # CONFIRM: convert_n_from_server(1)
+					if (user_op == convert_n_from_server(1)): # CONFIRM
 						# chess is already add, so no action needed
 				
 						next_turn()
@@ -357,29 +349,29 @@ func emit_message():
 	
 	match (current_state):
 		GAMESTATE.INITSUMMONPLAYERONEFOOTMANONE, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANONE:
-			msg = "Please SUMMON your first Footman." if (current_player == player_list[0]) else "Wait for another player to SUMMON Footmen."
+			msg = tr("MAIN_MSG_SUMMON_FIRST_FOOTMAN") if (current_player == player_list[0]) else tr("MAIN_MSG_WAIT_SUMMON_FOOTMANS")
 		GAMESTATE.INITSUMMONPLAYERONEFOOTMANTWO, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANTWO:
-			msg = "Please SUMMON your second Footman." if (current_player == player_list[0]) else "Wait for another player to SUMMON Footmen."
+			msg = tr("MAIN_MSG_SUMMON_SECOND_FOOTMAN") if (current_player == player_list[0]) else tr("MAIN_MSG_WAIT_SUMMON_FOOTMANS")
 		GAMESTATE.CHOOSECHESS:
-			msg =  "Please choose a chess to perform action." if (current_player == player_list[0]) else "Wait for another player to perform action."
+			msg =  tr("MAIN_MSG_CHOOSE_CHESS") if (current_player == player_list[0]) else tr("MAIN_MSG_WAIT_ACTION")
 		GAMESTATE.CHOOSEACTION:
-			msg = "Please choose an action." if (current_player == player_list[0]) else "Wait for another player to perform action."
+			msg = tr("MAIN_MSG_CHOOSE_ACTION") if (current_player == player_list[0]) else tr("MAIN_MSG_WAIT_ACTION")
 		GAMESTATE.CHOOSEDESTONE:
 			match (current_action):
 				ChessModel.ACTION_TYPE.SUMMON:
-					msg = "You are now SUMMONing %s." % [summon_chess] if (current_player == player_list[0]) else "Wait for another player to perform action."
+					msg = tr("MAIN_MSG_SUMMON") % [summon_chess] if (current_player == player_list[0]) else tr("MAIN_MSG_WAIT_ACTION")
 				ChessModel.ACTION_TYPE.MOVE:
-					msg = "Please choose a place to perform MOVE action." if (current_player == player_list[0]) else "Wait for another player to perform action."
+					msg = tr("MAIN_MSG_MOVE") if (current_player == player_list[0]) else tr("MAIN_MSG_WAIT_ACTION")
 				ChessModel.ACTION_TYPE.COMMAND:
-					msg = "Please choose a chess to COMMAND." if (current_player == player_list[0]) else "Wait for another player to perform action."
+					msg = tr("MAIN_MSG_COMMAND") if (current_player == player_list[0]) else tr("MAIN_MSG_WAIT_ACTION")
 		GAMESTATE.CHOOSEDESTTWO:
 			match (current_action):
 				ChessModel.ACTION_TYPE.SUMMON:
-					msg = "Please comfirm your SUMMON action." if (current_player == player_list[0]) else "Wait for another player to perform action."
+					msg = tr("MAIN_MSG_CONFIRM_SUMMON") if (current_player == player_list[0]) else tr("MAIN_MSG_WAIT_ACTION")
 				ChessModel.ACTION_TYPE.COMMAND:
-					msg = "Please choose a destination for COMMAND action." if (current_player == player_list[0]) else "Wait for another player to perform action."
+					msg = tr("MAIN_MSG_CHOOSE_COMMAND") if (current_player == player_list[0]) else tr("MAIN_MSG_WAIT_ACTION")
 		GAMESTATE.ENDSTATE:
-			msg = "You wins!" if not check_player_loss(true) else "You lose..."
+			msg = tr("MAIN_MSG_ONLINE_WIN") if not check_player_loss(true) else tr("MAIN_MSG_ONLINE_LOSE")
 
 	game_message.emit(msg)
 

@@ -8,12 +8,27 @@ const OFFSET = 28
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	_setup_ui_localization()
+	
 	$CardBack.visible = false
 	
 	# set remaining chess area
 	$AspectRatioContainer/PanelContainer/SummonInfo/Player1Label.visible = Global.is_local
 	$AspectRatioContainer/PanelContainer/SummonInfo/Player2Label.visible = Global.is_local
 	$AspectRatioContainer/PanelContainer/SummonInfo/Player2RemainLabel.visible = Global.is_local
+
+func _setup_ui_localization():
+	# $GridContainer/Label is set in Main.gd
+	
+	$GridContainer/BackButton.text = tr("MAIN_BUTTON_BACK")
+	$GridContainer/StartButton.text = tr("MAIN_BUTTON_START")
+	$GridContainer/CollectionButton.text = tr("MAIN_BUTTON_CHESS")
+	
+	$MessageContainer/Panel/MessageLabel.text = tr("MAIN_MSG_DEFAULT")
+	
+	$AspectRatioContainer/PanelContainer/SummonInfo/Label.text = tr("MAIN_RAMINING_CHESS")
+	$AspectRatioContainer/PanelContainer/SummonInfo/Player1Label.text = tr("MAIN_PLAYER1")
+	$AspectRatioContainer/PanelContainer/SummonInfo/Player2Label.text = tr("MAIN_PLAYER2")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

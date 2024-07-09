@@ -22,12 +22,12 @@ var _is_in_animation = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	_setup_ui_localization()
+	
 	# init board GUI
 	_init_board()
 	
 	# init MainGUI
-	$MainGUI/GridContainer/Label.text = "Mode: " + ("Local" if Global.is_local else "Online Server")
-	
 	$MainGUI/GridContainer/StartButton.disabled = false
 	
 	# connect buttons
@@ -47,6 +47,9 @@ func _ready():
 	
 	if (not Global.is_local):
 		game.connect("client_disconnected", _on_client_disconnected)
+
+func _setup_ui_localization():
+	$MainGUI/GridContainer/Label.text = tr("SELECT_MODE") + (tr("SELECT_LOCAL") if Global.is_local else tr("SELECT_ONLINE"))
 
 func _on_client_disconnected():
 	$MainGUI/GridContainer/StartButton.disabled = false

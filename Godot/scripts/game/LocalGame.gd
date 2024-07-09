@@ -170,20 +170,19 @@ func perform_op(user_op, is_from_menu):
 		GAMESTATE.CHOOSEACTION:
 			if (not is_from_menu):
 				return false
-				
-			match user_op:
-				"CANCEL":
-					current_state = GAMESTATE.CHOOSECHESS
-					return true
-				"SUMMON":
-					current_action = ChessModel.ACTION_TYPE.SUMMON
-					summon_chess = current_player.get_random_summon_chess()
-				"MOVE":
-					current_action = ChessModel.ACTION_TYPE.MOVE
-				"COMMAND":
-					current_action = ChessModel.ACTION_TYPE.COMMAND
-				_:
-					return false
+			
+			if (user_op in ["MAIN_MENU_CANCEL", tr("MAIN_MENU_CANCEL")]):
+				current_state = GAMESTATE.CHOOSECHESS
+				return true
+			elif (user_op in ["MAIN_MENU_SUMMON", tr("MAIN_MENU_SUMMON")]):
+				current_action = ChessModel.ACTION_TYPE.SUMMON
+				summon_chess = current_player.get_random_summon_chess()
+			elif (user_op in ["MAIN_MENU_MOVE", tr("MAIN_MENU_MOVE")]):
+				current_action = ChessModel.ACTION_TYPE.MOVE
+			elif (user_op in ["MAIN_MENU_COMMAND", tr("MAIN_MENU_COMMAND")]):
+				current_action = ChessModel.ACTION_TYPE.COMMAND
+			else:
+				return false
 				
 			if (board[current_chess_pos].get_available_actions(board, current_chess_pos).has(current_action)):
 				current_state += 1
@@ -262,7 +261,7 @@ func perform_op(user_op, is_from_menu):
 				return false
 
 		GAMESTATE.CHOOSEDESTTWO:
-			if ((is_from_menu and user_op == "CANCEL") or
+			if ((is_from_menu and user_op in ["MAIN_MENU_CANCEL", tr("MAIN_MENU_CANCEL")]) or
 				(not is_from_menu and user_op == current_chess_pos)):
 					match current_action:
 						ChessModel.ACTION_TYPE.SUMMON:
@@ -283,7 +282,7 @@ func perform_op(user_op, is_from_menu):
 
 			match (current_action):
 				ChessModel.ACTION_TYPE.SUMMON:
-					if (is_from_menu and user_op == "CONFIRM"):
+					if (is_from_menu and user_op in ["MAIN_MENU_CONFIRM", tr("MAIN_MENU_CONFIRM")]):
 						# chess is already add, so no action needed
 				
 						next_turn()
@@ -443,18 +442,18 @@ func emit_show_menu(pos):
 		GAMESTATE.CHOOSEACTION:
 			var actions = board[current_chess_pos].get_available_actions(board, current_chess_pos)
 			for a in actions:
-				items.append(ChessModel.ACTION_TYPE.keys()[a])
+				items.append(tr("MAIN_MENU_%s") % ChessModel.ACTION_TYPE.keys()[a])
 			
-			items.append("CANCEL")
+			items.append(tr("MAIN_MENU_CANCEL"))
 		GAMESTATE.CHOOSEDESTTWO:
 			if (current_action == ChessModel.ACTION_TYPE.SUMMON):
-				items.append("CONFIRM")
-				items.append("CANCEL")
+				items.append(tr("MAIN_MENU_CONFIRM"))
+				items.append(tr("MAIN_MENU_CANCEL"))
 				
 	show_menu.emit(pos, items)
 	
 func add_message_prefix_for_player(msg):
-	return "[Player " + ("1] " if current_player == player_list[0] else "2] ") + msg
+	return tr("MAIN_PLAYER1" if current_player == player_list[0] else "MAIN_PLAYER2") + msg
 
 # in Local mode, show all information for both players, instead of just one/main player
 func emit_message():
@@ -462,29 +461,29 @@ func emit_message():
 	
 	match (current_state):
 		GAMESTATE.INITSUMMONPLAYERONEFOOTMANONE, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANONE:
-			msg = add_message_prefix_for_player("Please SUMMON your first Footman.")
+			msg = add_message_prefix_for_player(tr("MAIN_MSG_SUMMON_FIRST_FOOTMAN"))
 		GAMESTATE.INITSUMMONPLAYERONEFOOTMANTWO, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANTWO:
-			msg = add_message_prefix_for_player("Please SUMMON your second Footman.")
+			msg = add_message_prefix_for_player(tr("MAIN_MSG_SUMMON_SECOND_FOOTMAN"))
 		GAMESTATE.CHOOSECHESS:
-			msg =  add_message_prefix_for_player("Please choose a chess to perform action.")
+			msg =  add_message_prefix_for_player(tr("MAIN_MSG_CHOOSE_CHESS"))
 		GAMESTATE.CHOOSEACTION:
-			msg = add_message_prefix_for_player("Please choose an action.")
+			msg = add_message_prefix_for_player(tr("MAIN_MSG_CHOOSE_ACTION"))
 		GAMESTATE.CHOOSEDESTONE:
 			match (current_action):
 				ChessModel.ACTION_TYPE.SUMMON:
-					msg = add_message_prefix_for_player("You are now SUMMONing %s." % [summon_chess])
+					msg = add_message_prefix_for_player(tr("MAIN_MSG_SUMMON") % [summon_chess])
 				ChessModel.ACTION_TYPE.MOVE:
-					msg = add_message_prefix_for_player("Please choose a place to perform MOVE action.")
+					msg = add_message_prefix_for_player(tr("MAIN_MSG_MOVE"))
 				ChessModel.ACTION_TYPE.COMMAND:
-					msg = add_message_prefix_for_player("Please choose a chess to COMMAND.")
+					msg = add_message_prefix_for_player(tr("MAIN_MSG_COMMAND"))
 		GAMESTATE.CHOOSEDESTTWO:
 			match (current_action):
 				ChessModel.ACTION_TYPE.SUMMON:
-					msg = add_message_prefix_for_player("Please comfirm your SUMMON action.")
+					msg = add_message_prefix_for_player(tr("MAIN_MSG_CONFIRM_SUMMON"))
 				ChessModel.ACTION_TYPE.COMMAND:
-					msg = add_message_prefix_for_player("Please choose a destination for COMMAND action.")
+					msg = add_message_prefix_for_player(tr("MAIN_MSG_CHOOSE_COMMAND"))
 		GAMESTATE.ENDSTATE:
-			msg = "Player 1 wins!" if not check_player_loss(true) else "Player 2 wins!"
+			msg = tr("MAIN_MSG_WIN1") if not check_player_loss(true) else tr("MAIN_MSG_WIN2")
 
 	game_message.emit(msg)
 

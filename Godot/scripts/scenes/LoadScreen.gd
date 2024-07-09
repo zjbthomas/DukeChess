@@ -6,6 +6,8 @@ var _is_loading_smooth = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	_setup_ui_localization()
+	
 	_load_game_resources()
 	
 	if (_is_loading_smooth):
@@ -14,6 +16,9 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass
+
+func _setup_ui_localization():
+	$VBoxContainer/Label.text = tr("LOAD_NOW_LOADING")
 
 func _load_game_resources():
 	$VBoxContainer/ProgressBar.value = 0

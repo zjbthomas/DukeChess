@@ -16,6 +16,8 @@ var _is_in_animation = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	_setup_ui_localization()
+	
 	# add chess to AllChess container
 	for chess in Global.chess_loader.chess_name_list:
 		var node = chess_in_show_scene.instantiate()
@@ -47,6 +49,9 @@ func _ready():
 			node.connect("pressed", _on_used_chess_pressed.bind(node))
 			
 			used_chess_container.add_child(node)
+
+func _setup_ui_localization():
+	$VBoxContainer/OKButton.text = tr("COLLECTION_CLOSE")
 
 func _on_chess_pressed(node):
 	if (not Global.is_local):

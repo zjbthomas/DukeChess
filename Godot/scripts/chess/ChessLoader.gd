@@ -18,7 +18,7 @@ func load_chess():
 		if not DirAccess.dir_exists_absolute(USERCHESSDIR):
 			var error_code = DirAccess.make_dir_recursive_absolute(USERCHESSDIR)
 			if error_code != OK:
-				error_message.emit('ERROR: create directory %s with error code %s.' % [USERCHESSDIR, error_code])
+				error_message.emit(tr("CHESS_LOADER_ERROR_CREATE_DIR") % [USERCHESSDIR, error_code])
 				return
 
 		# copy preset chess to user chess folder
@@ -112,7 +112,7 @@ func _load_chess_files():
 		# load XML
 		var xml_path = used_dir + "/" + chess_name + "/" + chess_name + ".xml" # XML has the same name as the folder
 		if not FileAccess.file_exists(xml_path):
-			error_message.emit('ERROR: %s not exists.' % [xml_path])
+			error_message.emit(tr("CHESS_LOADER_ERROR_XML_NOT_EXISTS") % [xml_path])
 			return
 				
 		var xml_root = XML.parse_file(xml_path).root
@@ -120,12 +120,12 @@ func _load_chess_files():
 		# check name and version
 		var name = xml_root.attributes["name"]
 		if (name != chess_name):
-			error_message.emit('ERROR: dismatch name in XML %s.' % [xml_path])
+			error_message.emit(tr("CHESS_LOADER_ERROR_DISMATCH_NAME") % [xml_path])
 			return
 			
 		# TODO: length of name should not be too long
 		if (name.length() > 10):
-			error_message.emit('ERROR: name %s too long.' % [name])
+			error_message.emit(tr("CHESS_LOADER_ERROR_LONG_NAME") % [name])
 			return
 		
 		var version = int(xml_root.attributes["version"])
@@ -181,14 +181,14 @@ func _load_chess_files():
 	var json_as_text = FileAccess.get_file_as_string(used_dir + "/" + CHESSAMOUNTJSON)
 	var json_as_dict = JSON.parse_string(json_as_text)
 	if not json_as_dict:
-		error_message.emit('ERROR: cannot parse JSON %s.' % [used_dir + "/" + CHESSAMOUNTJSON])
+		error_message.emit(tr("CHESS_LOADER_ERROR_PARSE_JSON") % [used_dir + "/" + CHESSAMOUNTJSON])
 		return
 			
 	for chess_name in chess_name_list:
 		var amount_str = json_as_dict.get(chess_name)
 		
 		if not amount_str:
-			error_message.emit('ERROR: amount for %s cannot be load from %s.' % [chess_name, used_dir + "/" + CHESSAMOUNTJSON])
+			error_message.emit(tr("CHESS_LOADER_ERROR_AMOUNT") % [chess_name, used_dir + "/" + CHESSAMOUNTJSON])
 			return
 		
 		var amount = int(amount_str)
@@ -196,12 +196,12 @@ func _load_chess_files():
 		# some special rules
 		if (chess_name == "Duke"):
 			if (amount != 1):
-				error_message.emit('ERROR: incorrect amount %s for Duke in %s.' % [amount, used_dir + "/" + CHESSAMOUNTJSON])
+				error_message.emit(tr("CHESS_LOADER_ERROR_DUKE_AMOUNT") % [amount, used_dir + "/" + CHESSAMOUNTJSON])
 				return
 				
 		if (chess_name == "Footman"):
 			if (amount < 2):
-				error_message.emit('ERROR: there should at least 2 (now only %s) Footman in %s.' % [amount, used_dir + "/" + CHESSAMOUNTJSON])
+				error_message.emit(tr("CHESS_LOADER_ERROR_FOOTMAN_AMOUNT") % [amount, used_dir + "/" + CHESSAMOUNTJSON])
 				return
 		
 		chess_max_amount_dict[chess_name] = amount
@@ -215,14 +215,14 @@ func _parse_xml_root(xml_path, xml_movement):
 		
 		# validate
 		if (not validate_type(type, destination) or not validate_destination(destination)):
-			error_message.emit('ERROR: invald type %s or destination %s in XML %s.' % [type, destination, xml_path])
+			error_message.emit(tr("CHESS_LOADER_ERROR_INVALID_MOVEMENT") % [type, destination, xml_path])
 			return null
 		
 		targets[destination] = MovementManager.MOVEMENT_TYPE[type.to_upper()]
 		
 	var action = xml_movement.action.content
 	if (not validate_action(action)):
-		error_message.emit('ERROR: invald action %s in XML %s.' % [action, xml_path])
+		error_message.emit(tr("CHESS_LOADER_ERROR_INVALID_ACTION") % [action, xml_path])
 		return null
 
 	return [ChessModel.ACTION_TYPE[action.to_upper()], targets]
