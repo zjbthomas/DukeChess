@@ -391,6 +391,16 @@ func check_player_loss(is_main_player):
 	
 	return true
 
+func check_dukes_being_checkmated():
+	var ret = []
+	
+	for n in range(Global.MAXR * Global.MAXC):
+		if (board[n] != null and board[n].name == "Duke"):
+			if (get_control_area_of_player(player_list[0] if board[n].player == player_list[1] else player_list[1]).has(n)):
+				ret.append(n)
+	
+	return ret
+
 # in Local mode, there is no need to convert pos by player
 func emit_cover_effects(hover_pos):
 	var cover_effect_dict = {}
@@ -455,7 +465,11 @@ func emit_cover_effects(hover_pos):
 						if (d != command_pos and
 							((board[d] != null and board[d].player != current_player) or board[d] == null)):
 								cover_effect_dict[d] = Color.YELLOW
-			
+	
+	# check if any Duke is being checkmated
+	for n in check_dukes_being_checkmated():
+		cover_effect_dict[n] = Color.RED
+	
 	if (hover_pos != null and board[hover_pos] != null):
 		var color = Color.BLUE if board[hover_pos].player == current_player else Color.RED
 		

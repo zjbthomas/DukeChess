@@ -48,3 +48,5 @@ MAIN_MSG_NOT_READY,"Server not ready, please retry.",服务器未响应，请重
 COLLECTION_CLOSE,Close,关闭
 CHESS_SHOW_FRONT,front,正面
 CHESS_SHOW_BACK,back,反面
+MAIN_SHOW_PLAYER1_CONTROL_AREA,Hover to show Player 1's Control Area,显示玩家1的控制范围
+MAIN_SHOW_PLAYER2_CONTROL_AREA,Hover to show Player 2's Control Area,显示玩家2的控制范围

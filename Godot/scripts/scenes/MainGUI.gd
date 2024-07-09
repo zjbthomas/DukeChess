@@ -30,6 +30,9 @@ func _setup_ui_localization():
 	$AspectRatioContainer/PanelContainer/SummonInfo/Label.text = tr("MAIN_RAMINING_CHESS")
 	$AspectRatioContainer/PanelContainer/SummonInfo/Player1Label.text = tr("MAIN_PLAYER1")
 	$AspectRatioContainer/PanelContainer/SummonInfo/Player2Label.text = tr("MAIN_PLAYER2")
+	
+	$ControlAreaControls/Player1ControlArea.text = tr("MAIN_SHOW_PLAYER1_CONTROL_AREA")
+	$ControlAreaControls/Player2ControlArea.text = tr("MAIN_SHOW_PLAYER2_CONTROL_AREA")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

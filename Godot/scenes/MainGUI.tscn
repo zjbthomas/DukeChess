@@ -249,6 +249,7 @@ mouse_filter = 1
 theme_override_font_sizes/font_size = 24
 theme_override_styles/normal = SubResource("StyleBoxFlat_ub28b")
 text = "Hover to show Player 1's Control Area"
+horizontal_alignment = 1
 
 [node name="Player2ControlArea" type="Label" parent="ControlAreaControls"]
 z_index = -1
@@ -260,6 +261,7 @@ mouse_filter = 1
 theme_override_font_sizes/font_size = 24
 theme_override_styles/normal = SubResource("StyleBoxFlat_ub28b")
 text = "Hover to show Player 2's Control Area"
+horizontal_alignment = 1
 
 [connection signal="pressed" from="GridContainer/CollectionButton" to="." method="_on_collection_button_pressed"]
 [connection signal="pressed" from="GridContainer/ExitButton" to="." method="_on_exit_button_pressed"]
