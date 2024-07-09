@@ -8,6 +8,7 @@ signal move_chess(src, dest, is_flip_during_move)
 
 signal state_cover_effect(dict)
 signal hover_cover_effect(pos, dict)
+signal hover_control_area_cover_effect(dict)
 signal game_message(msg)
 signal show_menu(pos, items)
 
@@ -95,6 +96,28 @@ func get_chess_back(r, c):
 	else:
 		var chess = board[Global.rc_to_n(r, c)]
 		return [chess.name, !board[Global.rc_to_n(r, c)].is_front]
+
+func get_control_area_of_player(player):
+	if len(board) == 0:
+		return null
+	
+	var ret = []
+	
+	for n in range(Global.MAXR * Global.MAXC):
+		var chess:ChessInst = board[n]
+		if (chess != null and chess.player == player):
+			var control_area = chess.get_control_area(board, n)
+			for pos in control_area:
+				# Special rule for Duke
+				if (player == current_player):
+					if chess.name == "Duke":
+						if (get_control_area_of_player(player_list[1] if player == player_list[0] else player_list[0]).has(pos)):
+							continue
+				
+				if not ret.has(pos):
+					ret.append(pos)
+					
+	return ret
 
 # return if the user_op is valid or not
 func perform_op(user_op, is_from_menu):
@@ -205,6 +228,11 @@ func perform_op(user_op, is_from_menu):
 				emit_message()
 				
 				return true
+			
+			# Special rule for Duke
+			if board[current_chess_pos].name == "Duke":
+				if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(user_op)):
+					return false
 			
 			if board[current_chess_pos].get_available_destinations(board, current_chess_pos, current_action).has(user_op):
 				match current_action:
@@ -396,6 +424,11 @@ func emit_cover_effects(hover_pos):
 				ChessModel.ACTION_TYPE.MOVE:
 					var movements = board[current_chess_pos].get_available_movements(board, current_chess_pos, ChessModel.ACTION_TYPE.MOVE)
 					for d in movements:
+						# Special rule for Duke
+						if board[current_chess_pos].name == "Duke":
+							if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d)):
+								continue
+						
 						match movements[d]:
 							MovementManager.MOVEMENT_TYPE.STRIKE:
 								cover_effect_dict[d] = Color.RED
@@ -430,12 +463,26 @@ func emit_cover_effects(hover_pos):
 			cover_effect_dict[hover_pos] = color
 		
 		for d in board[hover_pos].get_control_area(board, hover_pos):
+			# Special rule for Duke
+			if board[hover_pos].player == current_player:
+				if board[hover_pos].name == "Duke":
+					if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d)):
+						continue
+			
 			cover_effect_dict[d] = color
 
 	if (hover_pos == null):
 		state_cover_effect.emit(cover_effect_dict)
 	else:
 		hover_cover_effect.emit(hover_pos, cover_effect_dict)
+
+func emit_control_area_cover_effects(player):
+	var cover_effect_dict = {}
+	
+	for d in get_control_area_of_player(player):
+		cover_effect_dict[d] = Color.RED
+		
+	hover_control_area_cover_effect.emit(cover_effect_dict)
 
 func emit_show_menu(pos):
 	var items = []

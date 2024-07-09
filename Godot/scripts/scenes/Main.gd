@@ -29,10 +29,16 @@ func _ready():
 	
 	# init MainGUI
 	$MainGUI/GridContainer/StartButton.disabled = false
-	
-	# connect buttons
+	$MainGUI/ControlAreaControls/Player1ControlArea.visible = false
+	$MainGUI/ControlAreaControls/Player2ControlArea.visible = false
+
 	$MainGUI/GridContainer/BackButton.connect("pressed", _on_back_button_pressed)
 	$MainGUI/GridContainer/StartButton.connect("pressed", _on_start_button_pressed)
+
+	$MainGUI/ControlAreaControls/Player1ControlArea.connect("mouse_entered", _on_control_area_mouse_entered.bind(0))
+	$MainGUI/ControlAreaControls/Player2ControlArea.connect("mouse_entered", _on_control_area_mouse_entered.bind(1))
+	$MainGUI/ControlAreaControls/Player1ControlArea.connect("mouse_exited", _on_control_area_mouse_exited)
+	$MainGUI/ControlAreaControls/Player2ControlArea.connect("mouse_exited", _on_control_area_mouse_exited)
 
 	# init game
 	game.connect("add_chess", _on_add_chess)
@@ -41,6 +47,7 @@ func _ready():
 	
 	game.connect("state_cover_effect", _on_game_state_cover_effect)
 	game.connect("hover_cover_effect", _on_game_hover_cover_effect)
+	game.connect("hover_control_area_cover_effect", _on_game_hover_control_area_cover_effect)
 	game.connect("show_menu", _on_game_show_menu)
 	game.connect("game_message", _on_game_message)
 	game.connect("game_over", _on_game_over)
@@ -65,7 +72,12 @@ func _on_start_button_pressed():
 		
 		if (smooth_connection):
 			$MainGUI/GridContainer/StartButton.disabled = true
-
+		else:
+			return
+			
+	$MainGUI/ControlAreaControls/Player1ControlArea.visible = true
+	$MainGUI/ControlAreaControls/Player2ControlArea.visible = true
+			
 func _on_back_button_pressed():
 	get_tree().change_scene_to_file.bind(mode_select_scene).call_deferred()
 
@@ -315,3 +327,19 @@ func _on_tile_mouse_exited(r, c):
 func _on_tile_mouse_pressed(r, c):
 	if (not _is_in_animation):
 		var valid_op = game.perform_op(Global.rc_to_n(r, c), false)
+
+func _on_game_hover_control_area_cover_effect(cover_effect_dict):
+	for n in cover_effect_dict:
+		var node = _get_cover_effect_node(cover_effect_dict[n])
+		
+		var r = Global.n_to_rc(n)[0]
+		var c = Global.n_to_rc(n)[1]
+		$Board.get_node(_get_tile_name_at_rc(r, c)).add_child(node)
+			
+		node.add_to_group("all_hover_control_area_cover_effects")
+
+func _on_control_area_mouse_entered(player_index):
+	game.emit_control_area_cover_effects(game.player_list[player_index])
+
+func _on_control_area_mouse_exited():
+	get_tree().call_group("all_hover_control_area_cover_effects", "queue_free")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bweec6jbyouee"]
+[gd_scene load_steps=11 format=3 uid="uid://bweec6jbyouee"]
 
 [ext_resource type="Script" path="res://scripts/scenes/MainGUI.gd" id="1_u4eab"]
 [ext_resource type="PackedScene" uid="uid://crcpfgmiooaa4" path="res://scenes/BlurContainer.tscn" id="2_tp78g"]
@@ -43,6 +43,17 @@ bg_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l23d6"]
 bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ub28b"]
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
 
 [node name="MainGUI" type="ColorRect"]
 anchors_preset = 15
@@ -163,7 +174,7 @@ grow_vertical = 0
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 20
+theme_override_constants/margin_bottom = 10
 
 [node name="Panel" type="Panel" parent="MessageContainer"]
 custom_minimum_size = Vector2(0, 100)
@@ -225,6 +236,30 @@ custom_minimum_size = Vector2(600, 100)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_l23d6")
 bbcode_enabled = true
+
+[node name="ControlAreaControls" type="Node" parent="."]
+
+[node name="Player1ControlArea" type="Label" parent="ControlAreaControls"]
+z_index = -1
+offset_left = 465.0
+offset_top = 916.0
+offset_right = 912.0
+offset_bottom = 960.0
+mouse_filter = 1
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_ub28b")
+text = "Hover to show Player 1's Control Area"
+
+[node name="Player2ControlArea" type="Label" parent="ControlAreaControls"]
+z_index = -1
+offset_left = 465.0
+offset_top = 10.0
+offset_right = 912.0
+offset_bottom = 54.0
+mouse_filter = 1
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_ub28b")
+text = "Hover to show Player 2's Control Area"
 
 [connection signal="pressed" from="GridContainer/CollectionButton" to="." method="_on_collection_button_pressed"]
 [connection signal="pressed" from="GridContainer/ExitButton" to="." method="_on_exit_button_pressed"]

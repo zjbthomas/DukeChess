@@ -215,6 +215,12 @@ func perform_op_for_server(user_op, summon_chess_from_server = null):
 				
 				return true
 			
+			# Special rule for Duke
+			if (current_player == player_list[0]): # only has effect for local operation
+				if board[current_chess_pos].name == "Duke":
+					if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(user_op)):
+						return false
+			
 			if board[current_chess_pos].get_available_destinations(board, current_chess_pos, current_action).has(user_op):
 				match current_action:
 					ChessModel.ACTION_TYPE.SUMMON:
@@ -337,6 +343,11 @@ func emit_cover_effects(hover_pos):
 			cover_effect_dict[hover_pos] = color
 		
 		for d in board[hover_pos].get_control_area(board, hover_pos):
+			# Special rule for Duke
+			if board[hover_pos].player == current_player:
+				if board[hover_pos].name == "Duke":
+					if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d)):
+						continue
 			cover_effect_dict[d] = color
 
 	if (hover_pos == null):
