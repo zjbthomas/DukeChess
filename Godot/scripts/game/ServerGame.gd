@@ -2,7 +2,9 @@ extends LocalGame
 
 class_name ServerGame
 
+signal client_connected
 signal client_disconnected
+signal online_game_started
 
 const _IS_DEBUG:bool = false
 
@@ -25,6 +27,8 @@ func _init(main):
 func _on_socket_connect(_payload: Variant, _name_space, error: bool):
 	if (_name_space == NAMESPACE):
 		_client.socketio_send("platform", "unity", NAMESPACE)
+		
+		client_connected.emit()
 
 func _on_socket_ready(_sid: String):
 	_is_client_ready = true
@@ -46,6 +50,8 @@ func _on_socket_event(event_name: String, payload: Variant, _name_space):
 								game_start()
 								
 								current_player = player_list[0] if (payload["firstplayer"] == "true") else player_list[1]
+							
+								online_game_started.emit()
 							
 							"color":
 								emit_cover_effects_from_server(payload)

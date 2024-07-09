@@ -53,10 +53,19 @@ func _ready():
 	game.connect("game_over", _on_game_over)
 	
 	if (not Global.is_local):
+		game.connect("client_connected", _on_client_connected)
 		game.connect("client_disconnected", _on_client_disconnected)
+		game.connect("online_game_started", _on_online_game_started)
 
 func _setup_ui_localization():
 	$MainGUI/GridContainer/Label.text = tr("MAIN_MODE") + " " + (tr("SELECT_LOCAL") if Global.is_local else tr("SELECT_ONLINE"))
+
+func _on_client_connected():
+	$MainGUI/GridContainer/StartButton.disabled = true
+
+func _on_online_game_started():
+	$MainGUI/ControlAreaControls/Player1ControlArea.visible = true
+	$MainGUI/ControlAreaControls/Player2ControlArea.visible = true
 
 func _on_client_disconnected():
 	$MainGUI/GridContainer/StartButton.disabled = false
@@ -67,17 +76,12 @@ func _on_start_button_pressed():
 	
 	if (Global.is_local):
 		game.game_start()
-	else:
-		var smooth_connection = game.websocket_connect()
 		
-		if (smooth_connection):
-			$MainGUI/GridContainer/StartButton.disabled = true
-		else:
-			return
-			
-	$MainGUI/ControlAreaControls/Player1ControlArea.visible = true
-	$MainGUI/ControlAreaControls/Player2ControlArea.visible = true
-			
+		$MainGUI/ControlAreaControls/Player1ControlArea.visible = true
+		$MainGUI/ControlAreaControls/Player2ControlArea.visible = true
+	else:
+		game.websocket_connect()
+
 func _on_back_button_pressed():
 	get_tree().change_scene_to_file.bind(mode_select_scene).call_deferred()
 
