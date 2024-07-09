@@ -13,7 +13,6 @@ CHESS_LOADER_ERROR_INVALID_ACTION,ERROR: invald action %s in XML %s.,加载错�
 SELECT_MODE,Select game mode:,选择游戏模式：
 SELECT_LOCAL,Local,本地
 SELECT_ONLINE,Online Server,在线
-SELECT_LANGUAGE,Language:,语言：
 MAIN_MODE,Mode:,游戏模式：
 MAIN_BUTTON_BACK,Back to mode selection,重选游戏模式
 MAIN_BUTTON_START,Start a new game,开始新游戏

@@ -49,7 +49,7 @@ func _ready():
 		game.connect("client_disconnected", _on_client_disconnected)
 
 func _setup_ui_localization():
-	$MainGUI/GridContainer/Label.text = tr("SELECT_MODE") + (tr("SELECT_LOCAL") if Global.is_local else tr("SELECT_ONLINE"))
+	$MainGUI/GridContainer/Label.text = tr("MAIN_MODE") + " " + (tr("SELECT_LOCAL") if Global.is_local else tr("SELECT_ONLINE"))
 
 func _on_client_disconnected():
 	$MainGUI/GridContainer/StartButton.disabled = false

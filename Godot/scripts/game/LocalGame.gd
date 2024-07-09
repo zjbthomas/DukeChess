@@ -453,7 +453,7 @@ func emit_show_menu(pos):
 	show_menu.emit(pos, items)
 	
 func add_message_prefix_for_player(msg):
-	return tr("MAIN_PLAYER1" if current_player == player_list[0] else "MAIN_PLAYER2") + msg
+	return tr("MAIN_PLAYER1" if current_player == player_list[0] else "MAIN_PLAYER2") + " " + msg
 
 # in Local mode, show all information for both players, instead of just one/main player
 func emit_message():

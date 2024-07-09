@@ -15,7 +15,6 @@ func _setup_ui_localization():
 	$VBoxContainer/Label.text = tr("SELECT_MODE")
 	$VBoxContainer/LocalModeButton.text = tr("SELECT_LOCAL")
 	$VBoxContainer/ServerModeButton.text = tr("SELECT_ONLINE")
-	$MarginContainer/LanguageContainer/Label.text = tr("SELECT_LANGUAGE")
 
 func _on_local_mode_button_pressed():
 	Global.is_local = true
