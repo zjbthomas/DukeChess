@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://bx37xxgvwv7d"]
 
 [ext_resource type="Script" path="res://scripts/scenes/ModeSelectScreen.gd" id="1_8llta"]
-[ext_resource type="PackedScene" uid="uid://cfd8jcleybuec" path="res://scenes/Main.tscn" id="2_uyqhj"]
+[ext_resource type="PackedScene" uid="uid://jrpg2lf2cnoa" path="res://scenes/LoadScreen.tscn" id="2_c8m55"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lw36n"]
 bg_color = Color(0.501961, 0.501961, 0.501961, 1)
@@ -47,7 +47,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 1)
 script = ExtResource("1_8llta")
-main_scene = ExtResource("2_uyqhj")
+load_scene = ExtResource("2_c8m55")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1

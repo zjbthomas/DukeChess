@@ -1,4 +1,7 @@
 <chess name="Pikeman" version="1">
+    <localization>
+		<zh>长枪兵</zh>
+	</localization>
     <front>
         <movements>
             <movement>

@@ -80,9 +80,9 @@ func setup_ui():
 						back_container.add_child(node)
 	
 	# set name
-	front_name_label.text = chess
-	back_name_label.text = chess
-	name_label.text = chess
+	front_name_label.text = chess_model.get_tr_name()
+	back_name_label.text = chess_model.get_tr_name()
+	name_label.text = chess_model.get_tr_name()
 	
 	# set image
 	front_side_image.set_texture(ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null)

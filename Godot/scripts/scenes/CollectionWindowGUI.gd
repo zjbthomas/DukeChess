@@ -12,6 +12,8 @@ signal ok_button_pressed
 @onready var all_chess_container = $VBoxContainer/HBoxContainer/AllChessScrollContainer/GridContainer
 @onready var used_chess_container = $VBoxContainer/HBoxContainer/UsedChessScrollContainer/VBoxContainer
 
+const CHESS_NAME_PREFIX = "chess_name_"
+
 var _is_in_animation = false
 
 # Called when the node enters the scene tree for the first time.
@@ -60,7 +62,7 @@ func _on_chess_pressed(node):
 	if (_is_in_animation):
 		return
 	
-	var chess_name = node.name_label.text
+	var chess_name = node.chess
 	
 	# special rules for Duke
 	if (chess_name == "Duke"):
@@ -106,11 +108,19 @@ func _add_used_chess(chess_name):
 	
 	var pos = 0
 	for ix in used_chess_container.get_child_count():
-		if (used_chess_container_children[ix].is_in_group("locked_used_chess")):
+		var used_chess_node = used_chess_container_children[ix]
+		
+		if (used_chess_node.is_in_group("locked_used_chess")):
 			cnt_locked_used_chess += 1
 			continue
-			
-		if (chess_name < used_chess_container_children[ix].text):
+		
+		var used_chess_name = used_chess_node.text
+		for group in used_chess_node.get_groups():
+			if (CHESS_NAME_PREFIX in group):
+				used_chess_name = group.replace(CHESS_NAME_PREFIX, "")
+				break
+		
+		if (chess_name < used_chess_name):
 			pos = ix
 			break
 	
@@ -135,7 +145,11 @@ func _on_used_chess_pressed(node):
 	
 	node.queue_free()
 	
-	Global.chess_loader.chess_max_amount_dict[node.text] -= 1
+	for group in node.get_groups():
+		if (CHESS_NAME_PREFIX in group):
+			var chess_name = group.replace(CHESS_NAME_PREFIX, "")
+			Global.chess_loader.chess_max_amount_dict[chess_name] -= 1
+			break
 
 func _on_ok_button_pressed():
 	if (_is_in_animation):
@@ -144,8 +158,10 @@ func _on_ok_button_pressed():
 	ok_button_pressed.emit()
 
 func _get_node_used_chess(chess_name, is_locked):
+	var chess_model:ChessModel = Global.chess_loader.chessmodel_dict[chess_name]
+	
 	var node = Button.new()
-	node.text = chess_name
+	node.text = chess_model.get_tr_name()
 	
 	node.disabled = true if is_locked else false
 	
@@ -156,6 +172,8 @@ func _get_node_used_chess(chess_name, is_locked):
 	new_style.bg_color = Color.BLACK
 	new_style.set_corner_radius_all(5)
 	node.add_theme_stylebox_override("normal", new_style)
+	
+	node.add_to_group(CHESS_NAME_PREFIX + chess_name)
 	
 	if (is_locked):
 		node.add_to_group("locked_used_chess")

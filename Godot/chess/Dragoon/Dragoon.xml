@@ -1,4 +1,7 @@
 <chess name="Dragoon" version="1">
+    <localization>
+		<zh>龙骑兵</zh>
+	</localization>
     <front>
         <movements>
             <movement>

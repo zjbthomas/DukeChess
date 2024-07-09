@@ -1,4 +1,7 @@
 <chess name="Wizard" version="1">
+    <localization>
+		<zh>巫师</zh>
+	</localization>
     <front>
         <movements>
             <movement>

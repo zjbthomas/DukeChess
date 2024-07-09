@@ -1,4 +1,7 @@
 <chess name="Knight" version="1">
+    <localization>
+		<zh>骑士</zh>
+	</localization>
     <front>
         <movements>
             <movement>

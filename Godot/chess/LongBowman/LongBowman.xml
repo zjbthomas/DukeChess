@@ -1,4 +1,7 @@
 <chess name="LongBowman" version="1">
+    <localization>
+		<zh>长弓手</zh>
+	</localization>
     <front>
         <movements>
             <movement>

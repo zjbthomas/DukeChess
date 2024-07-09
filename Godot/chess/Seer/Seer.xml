@@ -1,4 +1,7 @@
 <chess name="Seer" version="1">
+    <localization>
+		<zh>先知</zh>
+	</localization>
     <front>
         <movements>
             <movement>

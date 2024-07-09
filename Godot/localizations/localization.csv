@@ -7,7 +7,7 @@ CHESS_LOADER_ERROR_LONG_NAME,ERROR: name %s too long.,加载错误：棋子名�
 CHESS_LOADER_ERROR_PARSE_JSON,ERROR: cannot parse JSON %s.,加载错误：无法正确识别文件%s。
 CHESS_LOADER_ERROR_AMOUNT,ERROR: amount for %s cannot be load from %s.,加载错误：无法正确加载棋子%s的数量。请检查%s。
 CHESS_LOADER_ERROR_DUKE_AMOUNT,ERROR: incorrect amount %s for Duke in %s.,加载错误：公爵棋子的数量%s不合法。请检查%s。
-CHESS_LOADER_ERROR_FOOTMAN_AMOUNT,ERROR: there should at least 2 (now only %s) Footmans in %s.,加载错误：需要设置至少2枚步兵棋子（目前为%s）。请检查%s。
+CHESS_LOADER_ERROR_FOOTMAN_AMOUNT,ERROR: there should at least 2 (now only %s) Footmans in %s.,加载错误：需要设置至少2枚侍卫棋子（目前为%s）。请检查%s。
 CHESS_LOADER_ERROR_INVALID_MOVEMENT,ERROR: invald type %s or destination %s in XML %s.,加载错误：移动类型%s或行动目标%s不合法。请检查%s。
 CHESS_LOADER_ERROR_INVALID_ACTION,ERROR: invald action %s in XML %s.,加载错误：行动类型%s不合法。请检查%s。
 SELECT_MODE,Select game mode:,选择游戏模式：
@@ -26,8 +26,8 @@ MAIN_MENU_SUMMON,SUMMON,召唤
 MAIN_MENU_MOVE,MOVE,移动
 MAIN_MENU_COMMAND,COMMAND,号令
 MAIN_MENU_CONFIRM,CONFIRM,确认
-MAIN_MSG_SUMMON_FIRST_FOOTMAN,Please SUMMON your first Footman.,召唤第1枚初始步兵棋子。
-MAIN_MSG_SUMMON_SECOND_FOOTMAN,Please SUMMON your second Footman.,召唤第2枚初始步兵棋子。
+MAIN_MSG_SUMMON_FIRST_FOOTMAN,Please SUMMON your first Footman.,召唤第1枚初始侍卫棋子。
+MAIN_MSG_SUMMON_SECOND_FOOTMAN,Please SUMMON your second Footman.,召唤第2枚初始侍卫棋子。
 MAIN_MSG_CHOOSE_CHESS,Please choose a chess to perform action.,选择1枚棋子进行行动。
 MAIN_MSG_CHOOSE_ACTION,Please choose an action.,选择1项行动。
 MAIN_MSG_SUMMON,You are now SUMMONing %s.,正在召唤%s…
@@ -37,7 +37,7 @@ MAIN_MSG_CONFIRM_SUMMON,Please confirm your SUMMON action.,召唤行动确认中
 MAIN_MSG_CHOOSE_COMMAND,Please choose a destination for COMMAND action.,选择号令的目标位置。
 MAIN_MSG_WIN1,Player 1 wins!,玩家1获胜！
 MAIN_MSG_WIN2,Player 2 wins!,玩家2获胜！
-MAIN_MSG_WAIT_SUMMON_FOOTMANS,Wait for another player to SUMMON Footmans.,等待对方玩家召唤初始步兵棋子…
+MAIN_MSG_WAIT_SUMMON_FOOTMANS,Wait for another player to SUMMON Footmans.,等待对方玩家召唤初始侍卫棋子…
 MAIN_MSG_WAIT_ACTION,Wait for another player to perform action.,等待对方玩家执行行动…
 MAIN_MSG_ONLINE_WIN,You wins!,恭喜你获得胜利！
 MAIN_MSG_ONLINE_LOSE,You lose...,你输了…

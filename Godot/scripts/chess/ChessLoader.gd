@@ -135,6 +135,15 @@ func _load_chess_files():
 		chess.name = name
 		chess.version = version
 		
+		# locale names
+		for locale in Global.LOCALES:
+			# default locale name
+			chess.tr_name_dict[locale] = chess.name
+			
+			if (xml_root.get("localization") != null):
+				if (xml_root.localization.get(locale) != null):
+					chess.tr_name_dict[locale] = xml_root.localization.get(locale).content
+		
 		# center offsets
 		if (xml_root.front.get('center') != null):
 			var front_center_offset_x = Global.dest_to_offsets_for_chess(xml_root.front.center.content)[0]

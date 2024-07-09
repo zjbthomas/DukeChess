@@ -19,7 +19,7 @@ func _process(delta):
 
 func setup_ui(chess):
 	
-	var chess_model = Global.chess_loader.chessmodel_dict[chess.name]
+	var chess_model:ChessModel = Global.chess_loader.chessmodel_dict[chess.name]
 	
 	for is_front in [true, false]:
 		# move center if necessary
@@ -63,8 +63,8 @@ func setup_ui(chess):
 						$Back.add_child(node)
 	
 	# set name
-	$Front/Name.text = chess.name
-	$Back/Name.text = chess.name
+	$Front/Name.text = chess_model.get_tr_name()
+	$Back/Name.text = chess_model.get_tr_name()
 	
 	# set image
 	$Front/SideImage.get_mesh().get_material().albedo_texture = ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null

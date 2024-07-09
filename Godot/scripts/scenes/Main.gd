@@ -187,8 +187,10 @@ func _get_remaining_chess_text(player):
 		var chess_name = chess_amount_dict.keys()[ix]
 		var amount = chess_amount_dict[chess_name]
 		
+		var chess_model:ChessModel = Global.chess_loader.chessmodel_dict[chess_name]
+		
 		if (amount > 0):
-			remaining_chess_text += chess_name + ": " + str(chess_amount_dict[chess_name]) + '\t'
+			remaining_chess_text += chess_model.get_tr_name() + ":" + str(chess_amount_dict[chess_name]) + ' '
 
 	return remaining_chess_text
 			

@@ -1,4 +1,7 @@
 <chess name="Champion" version="1">
+    <localization>
+		<zh>勇士</zh>
+	</localization>
     <front>
         <movements>
             <movement>

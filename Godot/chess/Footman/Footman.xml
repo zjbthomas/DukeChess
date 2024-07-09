@@ -1,4 +1,7 @@
 <chess name="Footman" version="1">
+    <localization>
+		<zh>侍卫</zh>
+	</localization>
     <front>
         <movements>
             <movement>

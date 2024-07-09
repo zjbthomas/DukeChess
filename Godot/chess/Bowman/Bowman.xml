@@ -1,4 +1,7 @@
 <chess name="Bowman" version="1">
+    <localization>
+		<zh>弓箭手</zh>
+	</localization>
     <front>
         <movements>
             <movement>
