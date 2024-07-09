@@ -65,14 +65,13 @@ theme_override_constants/separation = 10
 [node name="Label" type="Label" parent="GridContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
-text = "Current mode: N/A"
+text = "Mode: N/A"
 horizontal_alignment = 1
 
 [node name="BackButton" type="Button" parent="GridContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
-text = "Back to mode selection
-"
+text = "Back to mode selection"
 
 [node name="StartButton" type="Button" parent="GridContainer"]
 layout_mode = 2

@@ -461,8 +461,6 @@ func emit_message():
 	var msg
 	
 	match (current_state):
-		GAMESTATE.INITIALIZATION:
-			msg = "Game started."
 		GAMESTATE.INITSUMMONPLAYERONEFOOTMANONE, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANONE:
 			msg = add_message_prefix_for_player("Please SUMMON your first Footman.")
 		GAMESTATE.INITSUMMONPLAYERONEFOOTMANTWO, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANTWO:
@@ -474,7 +472,7 @@ func emit_message():
 		GAMESTATE.CHOOSEDESTONE:
 			match (current_action):
 				ChessModel.ACTION_TYPE.SUMMON:
-					msg = add_message_prefix_for_player("You are now SUMMONing " + summon_chess + ".")
+					msg = add_message_prefix_for_player("You are now SUMMONing %s." % [summon_chess])
 				ChessModel.ACTION_TYPE.MOVE:
 					msg = add_message_prefix_for_player("Please choose a place to perform MOVE action.")
 				ChessModel.ACTION_TYPE.COMMAND:

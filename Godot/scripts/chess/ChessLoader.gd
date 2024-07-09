@@ -18,7 +18,7 @@ func load_chess():
 		if not DirAccess.dir_exists_absolute(USERCHESSDIR):
 			var error_code = DirAccess.make_dir_recursive_absolute(USERCHESSDIR)
 			if error_code != OK:
-				error_message.emit('ERROR: create directory with error code %s.' % [error_code])
+				error_message.emit('ERROR: create directory %s with error code %s.' % [USERCHESSDIR, error_code])
 				return
 
 		# copy preset chess to user chess folder

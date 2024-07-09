@@ -4,7 +4,7 @@ class_name ServerGame
 
 signal client_disconnected
 
-const _IS_DEBUG:bool = true
+const _IS_DEBUG:bool = false
 
 const WEBSOCKET_URL = "http://" + ("localhost" if _IS_DEBUG else "175.178.11.87:4115") + "/socket.io/"
 const NAMESPACE = "/dukechess" # NO / AT THE END!!!
@@ -37,7 +37,7 @@ func _on_socket_event(event_name: String, payload: Variant, _name_space):
 		match event_name:
 			"game":
 				if (payload["connection"] == "false"):
-					game_message.emit(payload["message"])
+					game_message.emit("Wait for another player to join.")
 				else:
 					var type = payload.get("type")
 					if (type != null):
@@ -46,14 +46,16 @@ func _on_socket_event(event_name: String, payload: Variant, _name_space):
 								game_start()
 								
 								current_player = player_list[0] if (payload["firstplayer"] == "true") else player_list[1]
+							
 							"color":
-								game_message.emit(payload["message"])
 								emit_cover_effects_from_server(payload)
+								emit_message()
+								
 							"game", "gameover":
 								perform_op_for_server(payload["userop"], payload.get("summon"))
 								
-								game_message.emit(payload["message"])
 								emit_cover_effects_from_server(payload)
+								emit_message()
 
 func _on_socket_disconnect(name_space: String):
 	# TODO
@@ -202,7 +204,7 @@ func perform_op_for_server(user_op, summon_chess_from_server = null):
 					current_player.remove_chess(summon_chess_from_server)
 				"MOVE", 32: # convert_n_from_server(2)
 					current_action = ChessModel.ACTION_TYPE.MOVE
-				"COMMAND":
+				"COMMAND", 33: # convert_n_from_server(3)
 					current_action = ChessModel.ACTION_TYPE.COMMAND
 				_:
 					return false
@@ -349,6 +351,37 @@ func emit_cover_effects(hover_pos):
 		state_cover_effect.emit(cover_effect_dict)
 	else:
 		hover_cover_effect.emit(hover_pos, cover_effect_dict)
+
+func emit_message():
+	var msg
+	
+	match (current_state):
+		GAMESTATE.INITSUMMONPLAYERONEFOOTMANONE, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANONE:
+			msg = "Please SUMMON your first Footman." if (current_player == player_list[0]) else "Wait for another player to SUMMON Footmen."
+		GAMESTATE.INITSUMMONPLAYERONEFOOTMANTWO, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANTWO:
+			msg = "Please SUMMON your second Footman." if (current_player == player_list[0]) else "Wait for another player to SUMMON Footmen."
+		GAMESTATE.CHOOSECHESS:
+			msg =  "Please choose a chess to perform action." if (current_player == player_list[0]) else "Wait for another player to perform action."
+		GAMESTATE.CHOOSEACTION:
+			msg = "Please choose an action." if (current_player == player_list[0]) else "Wait for another player to perform action."
+		GAMESTATE.CHOOSEDESTONE:
+			match (current_action):
+				ChessModel.ACTION_TYPE.SUMMON:
+					msg = "You are now SUMMONing %s." % [summon_chess] if (current_player == player_list[0]) else "Wait for another player to perform action."
+				ChessModel.ACTION_TYPE.MOVE:
+					msg = "Please choose a place to perform MOVE action." if (current_player == player_list[0]) else "Wait for another player to perform action."
+				ChessModel.ACTION_TYPE.COMMAND:
+					msg = "Please choose a chess to COMMAND." if (current_player == player_list[0]) else "Wait for another player to perform action."
+		GAMESTATE.CHOOSEDESTTWO:
+			match (current_action):
+				ChessModel.ACTION_TYPE.SUMMON:
+					msg = "Please comfirm your SUMMON action." if (current_player == player_list[0]) else "Wait for another player to perform action."
+				ChessModel.ACTION_TYPE.COMMAND:
+					msg = "Please choose a destination for COMMAND action." if (current_player == player_list[0]) else "Wait for another player to perform action."
+		GAMESTATE.ENDSTATE:
+			msg = "You wins!" if not check_player_loss(true) else "You lose..."
+
+	game_message.emit(msg)
 
 func emit_after_move_animation():
 	if (current_state == GAMESTATE.ENDSTATE):
