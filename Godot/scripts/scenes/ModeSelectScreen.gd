@@ -3,11 +3,13 @@ extends ColorRect
 @export var main_scene: PackedScene
 
 func _ready():
-	match TranslationServer.get_locale():
-		"en":
-			$MarginContainer/LanguageContainer/OptionButton.selected = 0
-		"zh", "zh_CN":
-			$MarginContainer/LanguageContainer/OptionButton.selected = 1
+	# add localization options
+	var system_locale = TranslationServer.get_locale()
+	for ix in Global.LOCALES.size():
+		$MarginContainer/LanguageContainer/OptionButton.add_item(Global.LOCALES[Global.LOCALES.keys()[ix]], ix)
+		
+		if (Global.LOCALES.keys()[ix] in system_locale):
+			$MarginContainer/LanguageContainer/OptionButton.selected = ix
 	
 	_setup_ui_localization()
 	
@@ -26,12 +28,6 @@ func _on_server_mode_button_pressed():
 
 
 func _on_option_button_item_selected(index):
-	match index:
-		0:
-			TranslationServer.set_locale("en")
-		1:
-			TranslationServer.set_locale("zh")
-		_:
-			TranslationServer.set_locale("en")
+	TranslationServer.set_locale(Global.LOCALES.keys()[index])
 			
 	_setup_ui_localization()

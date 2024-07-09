@@ -7,6 +7,11 @@ const WINDOW_TYPE = {
 	"collection": "res://scenes//CollectionWindowGUI.tscn",
 }
 
+const LOCALES = {
+	"en": "English",
+	"zh": "简体中文"
+}
+
 var chess_loader:ChessLoader
 
 var movement_manager:MovementManager = MovementManager.new()
