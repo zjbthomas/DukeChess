@@ -91,7 +91,7 @@ static func has_defended_enemy(board, pos, offset_x, offset_y, player):
 static func is_defended_by_enemy(board, pos, offset_x, offset_y, player):
 	for n in range(Global.MAXR * Global.MAXC):
 		if board[n] != null and board[n].player != player:
-			if (board[n].get_defended_area(board, pos).has(pos_with_offsets(pos, offset_x, offset_y))):
+			if (board[n].get_defended_area(board, n).has(pos_with_offsets(pos, offset_x, offset_y))):
 				return true
 				
 	return false
@@ -107,11 +107,15 @@ static func find_possible_paths(offset_x, offset_y):
 		var temp_x = 0
 		var temp_y = 0
 		
-		while (temp_x < offset_x or temp_y < offset_y):
+		var path = []
+		
+		while (abs(temp_x) < abs(offset_x) or abs(temp_y) < abs(offset_y)):
 			temp_x += d_x
 			temp_y += d_y
 
-			possible_paths.append([temp_x, temp_y])
+			path.append([temp_x, temp_y])
+			
+		possible_paths.append(path)
 	else:
 		find_possible_paths_step(0, 0, d_x, d_y, offset_x, offset_y, [], possible_paths)
 	
