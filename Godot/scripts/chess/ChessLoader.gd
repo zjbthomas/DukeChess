@@ -5,6 +5,7 @@ signal error_message(msg)
 const RESCHESSDIR = "res://chess"
 const USERCHESSDIR = "user://chess"
 const CHESSAMOUNTJSON = "chess_amount.json"
+const CHESSAMOUNTJSONONLINE= "chess_amount_online.json"
 
 var chess_name_list = []
 var chess_max_amount_dict = {}
@@ -52,6 +53,8 @@ func load_chess_textures():
 	chess_textures["Strike"] = load("res://images//chess//movements//Strike.png")
 	
 	chess_textures["Command"] = load("res://images//chess//movements//Command.png")
+	
+	chess_textures["Defense"] = load("res://images//chess//movements//Defense.png")
 
 func type_to_texture(type, offset_x, offset_y):
 	match type:
@@ -101,10 +104,16 @@ func type_to_texture(type, offset_x, offset_y):
 			return chess_textures["Strike"]
 			
 		MovementManager.MOVEMENT_TYPE.COMMAND:
-				return chess_textures["Command"]
+			return chess_textures["Command"]
+				
+func aura_type_to_texture(type, offset_x, offset_y):
+	match type:
+		MovementManager.AURA_TYPE.DEFENSE:
+			return chess_textures["Defense"]			
 
 func _load_chess_files():
 	var used_dir = USERCHESSDIR if Global.is_local else RESCHESSDIR
+	var chess_amount_file = CHESSAMOUNTJSON if Global.is_local else CHESSAMOUNTJSONONLINE
 	
 	var chess_dir = DirAccess.open(used_dir)
 	
@@ -124,7 +133,7 @@ func _load_chess_files():
 			return
 			
 		# TODO: length of name should not be too long
-		if (name.length() > 10):
+		if (name.length() > 12):
 			error_message.emit(tr("CHESS_LOADER_ERROR_LONG_NAME") % [name])
 			return
 		
@@ -174,7 +183,15 @@ func _load_chess_files():
 				return
 		
 			chess.back_dict[ret[0]] = ret[1]
-			
+		
+		# front auras
+		if xml_root.front.get("auras") and xml_root.front.auras.get("aura"):
+			chess.front_aura_dict = _parse_xml_auras(xml_path, xml_root.front.auras.aura)
+		
+		# back auras
+		if xml_root.back.get("auras") and xml_root.back.auras.get("aura"):
+			chess.back_aura_dict = _parse_xml_auras(xml_path, xml_root.back.auras.aura)
+		
 		# load image
 		var image_path = used_dir + "/" + chess_name + "/" + chess_name + ".png" # TODO: only PNG is allowed; it has the same name as the folder
 		if FileAccess.file_exists(image_path):
@@ -187,30 +204,28 @@ func _load_chess_files():
 		chessmodel_dict[chess_name] = chess
 		
 	# set default chess num from JSON
-	var json_as_text = FileAccess.get_file_as_string(used_dir + "/" + CHESSAMOUNTJSON)
+	var json_as_text = FileAccess.get_file_as_string(used_dir + "/" + chess_amount_file)
 	var json_as_dict = JSON.parse_string(json_as_text)
 	if not json_as_dict:
-		error_message.emit(tr("CHESS_LOADER_ERROR_PARSE_JSON") % [used_dir + "/" + CHESSAMOUNTJSON])
+		error_message.emit(tr("CHESS_LOADER_ERROR_PARSE_JSON") % [used_dir + "/" + chess_amount_file])
 		return
 			
 	for chess_name in chess_name_list:
 		var amount_str = json_as_dict.get(chess_name)
 		
-		if not amount_str:
-			error_message.emit(tr("CHESS_LOADER_ERROR_AMOUNT") % [chess_name, used_dir + "/" + CHESSAMOUNTJSON])
-			return
-		
-		var amount = int(amount_str)
+		var amount = 0
+		if amount_str:
+			amount = int(amount_str)
 		
 		# some special rules
 		if (chess_name == "Duke"):
 			if (amount != 1):
-				error_message.emit(tr("CHESS_LOADER_ERROR_DUKE_AMOUNT") % [amount, used_dir + "/" + CHESSAMOUNTJSON])
+				error_message.emit(tr("CHESS_LOADER_ERROR_DUKE_AMOUNT") % [amount, used_dir + "/" + chess_amount_file])
 				return
 				
 		if (chess_name == "Footman"):
 			if (amount < 2):
-				error_message.emit(tr("CHESS_LOADER_ERROR_FOOTMAN_AMOUNT") % [amount, used_dir + "/" + CHESSAMOUNTJSON])
+				error_message.emit(tr("CHESS_LOADER_ERROR_FOOTMAN_AMOUNT") % [amount, used_dir + "/" + chess_amount_file])
 				return
 		
 		chess_max_amount_dict[chess_name] = amount
@@ -235,6 +250,27 @@ func _parse_xml_root(xml_path, xml_movement):
 		return null
 
 	return [ChessModel.ACTION_TYPE[action.to_upper()], targets]
+
+func _parse_xml_auras(xml_path, xml_aura):
+	# parse targets
+	var targets = {}
+	for xml_target in xml_aura.targets.children:
+		var destination = xml_target.destination.content
+		var type = xml_target.type.content
+		
+		# validate
+		if (not validate_aura_type(type, destination) or not validate_destination(destination)):
+			error_message.emit(tr("CHESS_LOADER_ERROR_INVALID_MOVEMENT") % [type, destination, xml_path])
+			return null
+		
+		var valid_aura_type = MovementManager.AURA_TYPE[type.to_upper()]
+		
+		if targets.get(valid_aura_type):
+			targets[valid_aura_type].append(destination)
+		else:
+			targets[valid_aura_type] = [destination]
+
+	return targets
 	
 # https://www.reddit.com/r/godot/comments/19f0mf2/is_there_a_way_to_copy_folders_from_res_to_user/
 # REMEMBER to export preset when exporting the project!!
@@ -244,10 +280,14 @@ func _copy_dir_recursively(source: String, destination: String):
 	var source_dir = DirAccess.open(source)
 	
 	for filename in source_dir.get_files():
+		# local chess amount file, copy only when not exists
 		if (filename == CHESSAMOUNTJSON):
-			# copy only when not exists
 			if not FileAccess.file_exists(destination + "/" + filename):
 				source_dir.copy(source + "/" + filename, destination + "/" + filename)
+				
+		# online chess amount file, never copy
+		if (filename == CHESSAMOUNTJSONONLINE):
+			continue
 		
 		if (filename.ends_with(".png") or filename.ends_with(".xml")): # TODO: only PNG and XML are supported now
 			source_dir.copy(source + filename, destination + filename)
@@ -265,29 +305,34 @@ func validate_action(a):
 func validate_type(t, d):
 	for vt in MovementManager.MOVEMENT_TYPE.keys():
 		if (t.to_upper() == str(vt)):
+			var offset_x = Global.dest_to_offsets_for_chess(d)[0]
+			var offset_y = Global.dest_to_offsets_for_chess(d)[1]
+
+			# check for Jump
+			if (t.to_upper() == "JUMP"):
+				if (abs(offset_x) <= 1 and abs(offset_y) <= 1):
+					return false
+					
+			# check for Slide
+			if (t.to_upper() == "SLIDE"):
+				if (abs(offset_x) >= 2 or abs(offset_y) >= 2):
+					return false
+					
+			# check for JumpSlide
+			if (t.to_upper() == "JUMPSLIDE"):
+				if (abs(offset_x) <= 1 and abs(offset_y) <= 1):
+					return false
+				elif ((abs(offset_x) + abs(offset_y)) % 2 != 0):
+					return false
+			
 			return true
 
-	var offset_x = Global.dest_to_offsets_for_chess(d)[0]
-	var offset_y = Global.dest_to_offsets_for_chess(d)[1]
-
-	# check for Jump
-	if (t.to_upper() == "JUMP"):
-		if (abs(offset_x) >= 2 or abs(offset_y >= 2)):
-			return false
-			
-	# check for Slide
-	if (t.to_upper() == "SLIDE"):
-		if (abs(offset_x) >= 2 or abs(offset_y >= 2)):
-			return false
-			
-	# check for JumpSlide
-	if (t.to_upper() == "JUMPSLIDE"):
-		if (abs(offset_x) <= 1 or abs(offset_y <= 1)):
-			return false
-		elif ((abs(offset_x) + abs(offset_y)) % 2 != 0):
-			return false
-
 	return false
+
+func validate_aura_type(t, d):
+	for vt in MovementManager.AURA_TYPE.keys():
+		if (t.to_upper() == str(vt)):
+			return true
 
 func validate_destination(d):
 	if (d.length() < 1 or d.length() > 4):

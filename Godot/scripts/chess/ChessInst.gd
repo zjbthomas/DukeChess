@@ -81,3 +81,20 @@ func get_control_area(board, pos):
 				ret.append_array(valid_ds)
 	
 	return ret
+
+func get_defended_area(board, pos):
+	var chess_model:ChessModel = Global.chess_loader.chessmodel_dict[name]
+	var auras_dict = chess_model.front_aura_dict if is_front else chess_model.back_aura_dict
+	var defense_auras = auras_dict.get(Global.movement_manager.AURA_TYPE.DEFENSE)
+
+	var ret = []
+	
+	if (defense_auras != null):
+		for dest in defense_auras:
+			var offset_x = Global.dest_to_offsets_for_chess(dest)[0]
+			var offset_y = Global.dest_to_offsets_for_chess(dest)[1]
+			
+			if (Global.movement_manager.is_inside_board(board, pos, offset_x, offset_y)):
+				ret.append(Global.movement_manager.pos_with_offsets(pos, offset_x, offset_y))
+			
+	return ret

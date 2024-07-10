@@ -71,16 +71,19 @@ func _on_client_disconnected():
 	$MainGUI/GridContainer/StartButton.disabled = false
 
 func _on_start_button_pressed():
-	# remove all chess
-	get_tree().call_group("chess", "queue_free")
-	
-	if (Global.is_local):
-		game.game_start()
+	if (not _is_in_animation):
+		# remove all chess
+		get_tree().call_group("chess", "queue_free")
 		
-		$MainGUI/ControlAreaControls/Player1ControlArea.visible = true
-		$MainGUI/ControlAreaControls/Player2ControlArea.visible = true
-	else:
-		game.websocket_connect()
+		await get_tree().create_timer(0.2).timeout # TODO: in case queue_free not finished
+		
+		if (Global.is_local):
+			game.game_start()
+			
+			$MainGUI/ControlAreaControls/Player1ControlArea.visible = true
+			$MainGUI/ControlAreaControls/Player2ControlArea.visible = true
+		else:
+			game.websocket_connect()
 
 func _on_back_button_pressed():
 	get_tree().change_scene_to_file.bind(mode_select_scene).call_deferred()
@@ -88,7 +91,7 @@ func _on_back_button_pressed():
 func _on_add_chess(pos, chess:ChessInst, is_no_effect):
 	var node = chess_scene.instantiate()
 	node.name = _get_chess_name_at_n(pos)
-	
+
 	node.connect("chess_collide", _on_chess_collide)
 	
 	if not chess.is_front:

@@ -13,6 +13,9 @@ var back_center_offset_y = 0
 var front_dict = {}
 var back_dict = {}
 
+var front_aura_dict = {}
+var back_aura_dict = {}
+
 var image = null
 
 var is_front = true

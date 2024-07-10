@@ -376,7 +376,9 @@ func emit_message():
 		GAMESTATE.CHOOSEDESTONE:
 			match (current_action):
 				ChessModel.ACTION_TYPE.SUMMON:
-					msg = tr("MAIN_MSG_SUMMON") % [summon_chess] if (current_player == player_list[0]) else tr("MAIN_MSG_WAIT_ACTION")
+					var chess_model:ChessModel = Global.chess_loader.chessmodel_dict[summon_chess]
+					
+					msg = tr("MAIN_MSG_SUMMON") % [chess_model.get_tr_name()] if (current_player == player_list[0]) else tr("MAIN_MSG_WAIT_ACTION")
 				ChessModel.ACTION_TYPE.MOVE:
 					msg = tr("MAIN_MSG_MOVE") if (current_player == player_list[0]) else tr("MAIN_MSG_WAIT_ACTION")
 				ChessModel.ACTION_TYPE.COMMAND:

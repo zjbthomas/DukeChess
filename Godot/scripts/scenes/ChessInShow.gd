@@ -79,6 +79,35 @@ func setup_ui():
 					else:
 						back_container.add_child(node)
 	
+		# set auras
+		var auras_dict = chess_model.front_aura_dict if is_front else chess_model.back_aura_dict
+		
+		for type in auras_dict:
+			var auras = auras_dict[type]
+			
+			for dest in auras:
+				var offset_x = Global.dest_to_offsets_for_chess(dest)[0]
+				var offset_y = Global.dest_to_offsets_for_chess(dest)[1]
+				
+				var node = Sprite2D.new()
+				
+				# set texture
+				node.set_texture(Global.chess_loader.aura_type_to_texture(type, offset_x, offset_y))
+						
+				# set node position
+				var center_offset_x = chess_model.front_center_offset_x if is_front else chess_model.back_center_offset_x
+				var center_offset_y = chess_model.front_center_offset_y if is_front else chess_model.back_center_offset_y
+				
+				node.position.x = CENTER_X + (center_offset_x + offset_x) * OFFSET
+				node.position.y = CENTER_Y + (center_offset_y + offset_y) * OFFSET
+
+				node.scale = Vector2(0.55, 0.55)
+
+				if (is_front):
+					front_container.add_child(node)
+				else:
+					back_container.add_child(node)
+	
 	# set name
 	front_name_label.text = chess_model.get_tr_name()
 	back_name_label.text = chess_model.get_tr_name()

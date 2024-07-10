@@ -14,6 +14,9 @@ func validate_movement(board, pos, dest, player):
 	if (not MovementManager.is_inside_board(board, pos, offset_x, offset_y) or 
 		MovementManager.has_friend_chess(board, pos, offset_x, offset_y, player)):
 		return ret
+	
+	if MovementManager.has_defended_enemy(board, pos, offset_x, offset_y, player):
+		return ret
 
 	ret.append(MovementManager.pos_with_offsets(pos, offset_x, offset_y))
 	

@@ -538,7 +538,9 @@ func emit_message():
 		GAMESTATE.CHOOSEDESTONE:
 			match (current_action):
 				ChessModel.ACTION_TYPE.SUMMON:
-					msg = add_message_prefix_for_player(tr("MAIN_MSG_SUMMON") % [summon_chess])
+					var chess_model:ChessModel = Global.chess_loader.chessmodel_dict[summon_chess]
+					
+					msg = add_message_prefix_for_player(tr("MAIN_MSG_SUMMON") % [chess_model.get_tr_name()])
 				ChessModel.ACTION_TYPE.MOVE:
 					msg = add_message_prefix_for_player(tr("MAIN_MSG_MOVE"))
 				ChessModel.ACTION_TYPE.COMMAND:

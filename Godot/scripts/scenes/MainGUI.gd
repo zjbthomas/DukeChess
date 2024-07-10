@@ -84,9 +84,34 @@ func setup_chess_back(chess, is_front):
 				node.add_to_group("movements")
 
 				$CardBack.add_child(node)
+	
+	# set auras
+	var auras_dict = chess_model.front_aura_dict if is_front else chess_model.back_aura_dict
+	
+	for type in auras_dict:
+		var auras = auras_dict[type]
+		
+		for dest in auras:
+			var offset_x = Global.dest_to_offsets_for_chess(dest)[0]
+			var offset_y = Global.dest_to_offsets_for_chess(dest)[1]
+			
+			var node = Sprite2D.new()
+			
+			# set texture
+			node.set_texture(Global.chess_loader.aura_type_to_texture(type, offset_x, offset_y))
 					
+			# set node position
+			node.position.x = CENTER_X + (center_offset_x + offset_x) * OFFSET
+			node.position.y = CENTER_Y + (center_offset_y + offset_y) * OFFSET
+
+			node.scale = Vector2(0.55, 0.55)
+			
+			node.add_to_group("movements")
+
+			$CardBack.add_child(node)
+		
 	# set name
-	$CardBack/Name/NameLabel.text = chess
+	$CardBack/Name/NameLabel.text = chess_model.get_tr_name()
 	
 	# set image
 	$CardBack/SideImage.set_texture(ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null)

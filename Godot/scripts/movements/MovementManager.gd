@@ -3,6 +3,7 @@ extends Node
 class_name MovementManager
 
 enum MOVEMENT_TYPE {MOVE, JUMP, SLIDE, JUMPSLIDE, STRIKE, COMMAND, SUMMON}
+enum AURA_TYPE {DEFENSE}
 
 var movement_insts = {
 	MOVEMENT_TYPE.MOVE: Move.new(),
@@ -56,3 +57,82 @@ static func get_step(offset_x, offset_y):
 		step_y = -1
 	
 	return [step_x, step_y]
+
+static func has_defended_enemy(board, pos, offset_x, offset_y, player):
+	# if destination is an enemy chess, check if there is a possible path without defense
+	if (MovementManager.has_enemy_chess(board, pos, offset_x, offset_y, player)):
+		# check original position
+		if MovementManager.is_defended_by_enemy(board, pos, 0, 0, player):
+			return true
+
+		var has_valid_path = false
+		for pp in MovementManager.find_possible_paths(offset_x, offset_y):
+			var is_path_valid = true
+			for point in pp:
+				var px = point[0]
+				var py = point[1]
+				
+				# final destination would not be defended
+				if (px == offset_x and py == offset_y):
+					continue
+					
+				if MovementManager.is_defended_by_enemy(board, pos, px, py, player):
+					is_path_valid = false
+					
+			if (is_path_valid):
+				has_valid_path = true
+				break
+		
+		if (not has_valid_path):
+			return true
+			
+	return false
+
+static func is_defended_by_enemy(board, pos, offset_x, offset_y, player):
+	for n in range(Global.MAXR * Global.MAXC):
+		if board[n] != null and board[n].player != player:
+			if (board[n].get_defended_area(board, pos).has(pos_with_offsets(pos, offset_x, offset_y))):
+				return true
+				
+	return false
+
+static func find_possible_paths(offset_x, offset_y):
+	var d_x = 0 if offset_x == 0 else (1 if offset_x > 0 else -1)
+	var d_y = 0 if offset_y == 0 else (1 if offset_y > 0 else -1)
+	
+	var possible_paths = []
+	
+	# straight line
+	if (abs(offset_x) == abs(offset_y) or abs(offset_x) == 0 or abs(offset_y) == 0):
+		var temp_x = 0
+		var temp_y = 0
+		
+		while (temp_x < offset_x or temp_y < offset_y):
+			temp_x += d_x
+			temp_y += d_y
+
+			possible_paths.append([temp_x, temp_y])
+	else:
+		find_possible_paths_step(0, 0, d_x, d_y, offset_x, offset_y, [], possible_paths)
+	
+	return possible_paths
+
+static func find_possible_paths_step(cur_x, cur_y, d_x, d_y, final_x, final_y, prev_path, possible_paths):
+	if (cur_x == final_x and cur_y == final_y):
+		possible_paths.append(prev_path)
+		return
+	
+	var new_cur_x = cur_x + d_x
+	var new_cur_y = cur_y + d_y
+	
+	if (abs(new_cur_x) <= abs(final_x)):
+		var new_prev_path = prev_path.duplicate()
+		new_prev_path.append([new_cur_x, cur_y])
+
+		find_possible_paths_step(new_cur_x, cur_y, d_x, d_y, final_x, final_y, new_prev_path, possible_paths)
+
+	if (abs(new_cur_y) <= abs(final_y)):
+		var new_prev_path = prev_path.copy()
+		new_prev_path.append([cur_x, new_cur_y])
+
+		find_possible_paths_step(cur_x, new_cur_y, d_x, d_y, final_x, final_y, new_prev_path, possible_paths)
