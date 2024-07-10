@@ -46,6 +46,7 @@ MAIN_MSG_JOIN_WAIT,Wait for another player to join.,等待其他玩家加入对�
 MAIN_MSG_DISCONNECT,Disconnected from server.,与服务器断开连接…
 MAIN_MSG_NOT_READY,"Server not ready, please retry.",服务器未响应，请重试。
 COLLECTION_CLOSE,Close,关闭
+COLLECTION_CLEAR_ALL,Clear all,清除所有棋子
 CHESS_SHOW_FRONT,front,正面
 CHESS_SHOW_BACK,back,反面
 MAIN_SHOW_PLAYER1_CONTROL_AREA,Hover to show Player 1's Control Area,显示玩家1的控制范围

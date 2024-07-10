@@ -10,7 +10,8 @@ extends ColorRect
 signal ok_button_pressed
 
 @onready var all_chess_container = $VBoxContainer/HBoxContainer/AllChessScrollContainer/GridContainer
-@onready var used_chess_container = $VBoxContainer/HBoxContainer/UsedChessScrollContainer/VBoxContainer
+@onready var used_chess_container = $VBoxContainer/HBoxContainer/VBoxContainer/UsedChessScrollContainer
+@onready var used_chess_container_inner = $VBoxContainer/HBoxContainer/VBoxContainer/UsedChessScrollContainer/VBoxContainer
 
 const CHESS_NAME_PREFIX = "chess_name_"
 
@@ -31,9 +32,9 @@ func _ready():
 		
 	# add chess to UsedChess container
 	# locked chess first
-	used_chess_container.add_child(_get_node_used_chess("Duke", true))
-	used_chess_container.add_child(_get_node_used_chess("Footman", true))
-	used_chess_container.add_child(_get_node_used_chess("Footman", true))
+	used_chess_container_inner.add_child(_get_node_used_chess("Duke", true))
+	used_chess_container_inner.add_child(_get_node_used_chess("Footman", true))
+	used_chess_container_inner.add_child(_get_node_used_chess("Footman", true))
 	
 	for chess in Global.chess_loader.chess_max_amount_dict:
 		var amount = Global.chess_loader.chess_max_amount_dict[chess]
@@ -50,9 +51,10 @@ func _ready():
 	
 			node.connect("pressed", _on_used_chess_pressed.bind(node))
 			
-			used_chess_container.add_child(node)
+			used_chess_container_inner.add_child(node)
 
 func _setup_ui_localization():
+	$VBoxContainer/HBoxContainer/VBoxContainer/ClearButton.text = tr("COLLECTION_CLEAR_ALL")
 	$VBoxContainer/OKButton.text = tr("COLLECTION_CLOSE")
 
 func _on_chess_pressed(node):
@@ -89,8 +91,8 @@ func _on_chess_pressed(node):
 	sprite.global_position = node.global_position
 	add_child(sprite)
 	
-	var x = $VBoxContainer/HBoxContainer/UsedChessScrollContainer.global_position.x + $VBoxContainer/HBoxContainer/UsedChessScrollContainer.size.x / 2
-	var y = $VBoxContainer/HBoxContainer/UsedChessScrollContainer.global_position.y + $VBoxContainer/HBoxContainer/UsedChessScrollContainer.size.y / 2
+	var x = used_chess_container.global_position.x + used_chess_container.size.x / 2
+	var y = used_chess_container.global_position.y + used_chess_container.size.y / 2
 	
 	var tween = get_tree().create_tween()
 	tween.tween_property(sprite, "scale", Vector2.ZERO, add_used_chess_animation_time)
@@ -102,13 +104,13 @@ func _on_chess_pressed(node):
 
 func _add_used_chess(chess_name):
 	# first find where to put the new used chess
-	var used_chess_container_children = used_chess_container.get_children()
+	var used_chess_container_inner_children = used_chess_container_inner.get_children()
 	
 	var cnt_locked_used_chess = 0
 	
 	var pos = 0
-	for ix in used_chess_container.get_child_count():
-		var used_chess_node = used_chess_container_children[ix]
+	for ix in used_chess_container_inner.get_child_count():
+		var used_chess_node = used_chess_container_inner_children[ix]
 		
 		if (used_chess_node.is_in_group("locked_used_chess")):
 			cnt_locked_used_chess += 1
@@ -124,8 +126,8 @@ func _add_used_chess(chess_name):
 			pos = ix
 			break
 	
-		if (ix == used_chess_container.get_child_count() - 1):
-			pos = used_chess_container.get_child_count()
+		if (ix == used_chess_container_inner.get_child_count() - 1):
+			pos = used_chess_container_inner.get_child_count()
 	
 	if (pos < cnt_locked_used_chess):
 		pos = cnt_locked_used_chess
@@ -134,8 +136,8 @@ func _add_used_chess(chess_name):
 	
 	node.connect("pressed", _on_used_chess_pressed.bind(node))
 	
-	used_chess_container.add_child(node)
-	used_chess_container.move_child(node, pos)
+	used_chess_container_inner.add_child(node)
+	used_chess_container_inner.move_child(node, pos)
 	
 	return node
 
@@ -177,5 +179,10 @@ func _get_node_used_chess(chess_name, is_locked):
 	
 	if (is_locked):
 		node.add_to_group("locked_used_chess")
+	else:
+		node.add_to_group("free_used_chess")
 	
 	return node
+
+func _on_clear_button_pressed():
+	get_tree().call_group("free_used_chess", "emit_signal", "pressed")
