@@ -94,8 +94,8 @@ func setup_ui(chess):
 	$Back/Name.text = chess_model.get_tr_name()
 	
 	# set image
-	$Front/SideImage.get_mesh().get_material().albedo_texture = ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null
-	$Back/SideImage.get_mesh().get_material().albedo_texture = ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null
+	$Front/SideImage.get_mesh().get_material().albedo_texture = chess_model.image
+	$Back/SideImage.get_mesh().get_material().albedo_texture = chess_model.image
 
 func _on_area_entered(area):
 	chess_collide.emit(self)

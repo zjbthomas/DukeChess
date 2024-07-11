@@ -114,8 +114,8 @@ func setup_ui():
 	name_label.text = chess_model.get_tr_name()
 	
 	# set image
-	front_side_image.set_texture(ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null)
-	back_side_image.set_texture(ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null)
+	front_side_image.texture =chess_model.image
+	back_side_image.texture = chess_model.image
 
 
 func _on_gui_input(event):

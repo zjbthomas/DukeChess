@@ -119,7 +119,7 @@ func setup_chess_back(chess, is_front):
 	$CardBack/Name/NameLabel.text = chess_model.get_tr_name()
 	
 	# set image
-	$CardBack/SideImage.set_texture(ImageTexture.create_from_image(Image.load_from_file(chess_model.image)) if chess_model.image != null else null)
+	$CardBack/SideImage.texture = chess_model.image
 
 
 func _on_exit_button_pressed():

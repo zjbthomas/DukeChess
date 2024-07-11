@@ -194,10 +194,10 @@ func _load_chess_files():
 		
 		# load image
 		var image_path = used_dir + "/" + chess_name + "/" + chess_name + ".png" # TODO: only PNG is allowed; it has the same name as the folder
-		if FileAccess.file_exists(image_path):
-			chess.image = image_path
+		if (Global.is_local):
+			chess.image = ImageTexture.create_from_image(Image.load_from_file(image_path))
 		else:
-			chess.image = null # is OK to not have image
+			chess.image = load(image_path)
 
 		# add chess to list
 		chess_name_list.append(chess_name)
