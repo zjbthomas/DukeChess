@@ -56,6 +56,7 @@ func _ready():
 		game.connect("client_connected", _on_client_connected)
 		game.connect("client_disconnected", _on_client_disconnected)
 		game.connect("online_game_started", _on_online_game_started)
+		game.connect("peer_disconnected", _on_peer_disconnected)
 
 func _setup_ui_localization():
 	$MainGUI/GridContainer/Label.text = tr("MAIN_MODE") + " " + (tr("SELECT_LOCAL") if Global.is_local else tr("SELECT_ONLINE"))
@@ -69,6 +70,12 @@ func _on_online_game_started():
 
 func _on_client_disconnected():
 	$MainGUI/GridContainer/StartButton.disabled = false
+
+func _on_peer_disconnected():
+	# clear everything
+	get_tree().call_group("chess", "queue_free")
+	get_tree().call_group("all_hover_cover_effects", "queue_free")
+	get_tree().call_group("state_cover_effects", "queue_free")
 
 func _on_start_button_pressed():
 	if (not _is_in_animation):

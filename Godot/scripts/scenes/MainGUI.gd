@@ -1,7 +1,5 @@
 extends ColorRect
 
-@onready var chess_back_center = $CardBack/Center
-
 const CENTER_X = 71
 const CENTER_Y = 71
 const OFFSET = 28
@@ -50,12 +48,19 @@ func setup_chess_back(chess, is_front):
 	
 	var chess_model:ChessModel = Global.chess_loader.chessmodel_dict[chess]
 	
+	# decide which center image to show
+	$CardBack/CenterFront.visible = false
+	$CardBack/CenterBack.visible = false
+	
+	var chess_center = $CardBack/CenterFront if is_front else $CardBack/CenterBack
+	chess_center.visible = true
+	
 	# move center if necessary
 	var center_offset_x = chess_model.front_center_offset_x if is_front else chess_model.back_center_offset_x
 	var center_offset_y = chess_model.front_center_offset_y if is_front else chess_model.back_center_offset_y
 	
-	chess_back_center.position.x = CENTER_X + center_offset_x * OFFSET
-	chess_back_center.position.y = CENTER_Y + center_offset_y * OFFSET
+	chess_center.position.x = CENTER_X + center_offset_x * OFFSET
+	chess_center.position.y = CENTER_Y + center_offset_y * OFFSET
 
 	# set movements
 	var movements_dict = chess_model.front_dict if is_front else chess_model.back_dict

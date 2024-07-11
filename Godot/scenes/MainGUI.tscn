@@ -1,10 +1,11 @@
-[gd_scene load_steps=11 format=3 uid="uid://bweec6jbyouee"]
+[gd_scene load_steps=12 format=3 uid="uid://bweec6jbyouee"]
 
 [ext_resource type="Script" path="res://scripts/scenes/MainGUI.gd" id="1_u4eab"]
 [ext_resource type="PackedScene" uid="uid://crcpfgmiooaa4" path="res://scenes/BlurContainer.tscn" id="2_tp78g"]
 [ext_resource type="Texture2D" uid="uid://ymryxj8phnv0" path="res://images/chess/frame.png" id="3_ol0sp"]
 [ext_resource type="Texture2D" uid="uid://dj6acywckbeas" path="res://chess/Duke/Duke.png" id="4_5wlyg"]
 [ext_resource type="Texture2D" uid="uid://c68ffyj3xoun4" path="res://images/chess/center_front.png" id="5_0ac7k"]
+[ext_resource type="Texture2D" uid="uid://ftm0wad78jmg" path="res://images/chess/center_back.png" id="6_erbbx"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h3ilx"]
 content_margin_left = 50.0
@@ -135,10 +136,15 @@ texture = ExtResource("4_5wlyg")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Center" type="Sprite2D" parent="CardBack"]
+[node name="CenterFront" type="Sprite2D" parent="CardBack"]
 position = Vector2(72, 72)
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("5_0ac7k")
+
+[node name="CenterBack" type="Sprite2D" parent="CardBack"]
+position = Vector2(72, 72)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("6_erbbx")
 
 [node name="Name" type="Node2D" parent="CardBack"]
 position = Vector2(72, 168)

@@ -5,6 +5,7 @@ class_name ServerGame
 signal client_connected
 signal client_disconnected
 signal online_game_started
+signal peer_disconnected
 
 const _IS_DEBUG:bool = false
 
@@ -42,6 +43,8 @@ func _on_socket_event(event_name: String, payload: Variant, _name_space):
 			"game":
 				if (payload["connection"] == "false"):
 					game_message.emit(tr("MAIN_MSG_JOIN_WAIT"))
+					
+					peer_disconnected.emit()
 				else:
 					var type = payload.get("type")
 					if (type != null):
@@ -243,10 +246,11 @@ func perform_op_for_server(user_op, summon_chess_from_server = null):
 			
 					ChessModel.ACTION_TYPE.MOVE:
 						# Special rule for Duke
-						if (current_player == player_list[0]): # only has effect for local operation
-							if board[current_chess_pos].name == "Duke":
-								if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(user_op)):
-									return false
+						# commented out because it does not have effect locally; need to fix the server side
+						#if (current_player == player_list[0]): # only has effect for local operation
+						#	if board[current_chess_pos].name == "Duke":
+						#		if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(user_op)):
+						#			return false
 						
 						perform_action(board, board[current_chess_pos], current_action, [current_chess_pos, user_op], null, null)
 
@@ -308,10 +312,11 @@ func perform_op_for_server(user_op, summon_chess_from_server = null):
 						board[current_chess_pos].get_available_destinations(board, current_chess_pos, ChessModel.ACTION_TYPE.COMMAND).has(user_op) and
 						(board[user_op] == null or board[user_op].player != current_player)):
 							# Special rule for Duke
-							if (current_player == player_list[0]): # only has effect for local operation
-								if board[command_pos].name == "Duke":
-									if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(user_op)):
-										return false
+							# commented out because it does not have effect locally; need to fix the server side
+							#if (current_player == player_list[0]): # only has effect for local operation
+							#	if board[command_pos].name == "Duke":
+							#		if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(user_op)):
+							#			return false
 							
 							perform_action(board, board[current_chess_pos], ChessModel.ACTION_TYPE.COMMAND, [command_pos, user_op], null, null)
 					else:
