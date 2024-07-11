@@ -62,7 +62,9 @@ func game_start():
 	player_list.append(Player.new(true))
 	player_list.append(Player.new(false))
 	
-	current_player = player_list[0]
+	# randomly select a starting player
+	var random_index = randi() % 2
+	current_player = player_list[random_index]
 	
 	# init board
 	board.resize(Global.MAXR * Global.MAXC)
@@ -124,11 +126,13 @@ func perform_op(user_op, is_from_menu):
 	
 	match current_state:
 		GAMESTATE.INITSUMMONPLAYERONEFOOTMANONE, GAMESTATE.INITSUMMONPLAYERONEFOOTMANTWO:
-			if board[POS_DUKE0].get_available_destinations(board, POS_DUKE0, ChessModel.ACTION_TYPE.SUMMON).has(user_op):
-				perform_action(board, board[POS_DUKE0], ChessModel.ACTION_TYPE.SUMMON, [user_op], "Footman", player_list[0])
+			var duke_pos = POS_DUKE0 if current_player == player_list[0] else POS_DUKE1
+			
+			if board[duke_pos].get_available_destinations(board, duke_pos, ChessModel.ACTION_TYPE.SUMMON).has(user_op):
+				perform_action(board, board[duke_pos], ChessModel.ACTION_TYPE.SUMMON, [user_op], "Footman", current_player)
 				
 				if (current_state == GAMESTATE.INITSUMMONPLAYERONEFOOTMANTWO):
-					current_player = player_list[1]
+					current_player = player_list[1] if current_player == player_list[0] else player_list[0]
 				
 				current_state += 1
 				
@@ -140,11 +144,13 @@ func perform_op(user_op, is_from_menu):
 				return false
 				
 		GAMESTATE.INITSUMMONPLAYERTWOFOOTMANONE, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANTWO:
-			if board[POS_DUKE1].get_available_destinations(board, POS_DUKE1, ChessModel.ACTION_TYPE.SUMMON).has(user_op):
-				perform_action(board, board[POS_DUKE1], ChessModel.ACTION_TYPE.SUMMON, [user_op], "Footman", player_list[1])
+			var duke_pos = POS_DUKE0 if current_player == player_list[0] else POS_DUKE1
+			
+			if board[duke_pos].get_available_destinations(board, duke_pos, ChessModel.ACTION_TYPE.SUMMON).has(user_op):
+				perform_action(board, board[duke_pos], ChessModel.ACTION_TYPE.SUMMON, [user_op], "Footman", current_player)
 				
 				if (current_state == GAMESTATE.INITSUMMONPLAYERTWOFOOTMANTWO):
-					current_player = player_list[0]
+					current_player = player_list[0] if current_player == player_list[1] else player_list[1]
 				
 				current_state += 1
 				
@@ -413,11 +419,15 @@ func emit_cover_effects(hover_pos):
 	
 	match current_state:
 		GAMESTATE.INITSUMMONPLAYERONEFOOTMANONE, GAMESTATE.INITSUMMONPLAYERONEFOOTMANTWO:
-			for d in board[POS_DUKE0].get_available_movements(board, POS_DUKE0, ChessModel.ACTION_TYPE.SUMMON):
+			var duke_pos = POS_DUKE0 if current_player == player_list[0] else POS_DUKE1
+			
+			for d in board[duke_pos].get_available_movements(board, duke_pos, ChessModel.ACTION_TYPE.SUMMON):
 				cover_effect_dict[d] = Color.YELLOW
 				
 		GAMESTATE.INITSUMMONPLAYERTWOFOOTMANONE, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANTWO:
-			for d in board[POS_DUKE1].get_available_movements(board, POS_DUKE1, ChessModel.ACTION_TYPE.SUMMON):
+			var duke_pos = POS_DUKE0 if current_player == player_list[0] else POS_DUKE1
+			
+			for d in board[duke_pos].get_available_movements(board, duke_pos, ChessModel.ACTION_TYPE.SUMMON):
 				cover_effect_dict[d] = Color.YELLOW
 				
 		GAMESTATE.CHOOSECHESS:
