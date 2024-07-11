@@ -7,9 +7,9 @@ extends Node
 @export var menu_scene:PackedScene
 
 @export_category("Variables")
-@export var _chess_up_dist = 1.5
-@export var _chess_up_down_time = 0.1
-@export var _chess_move_time = 0.8
+@export var _chess_up_dist = 1.2
+@export var _chess_up_down_time = 0.8
+@export var _chess_move_time = 0.5
 @export var _chess_flip_time = 0.5
 @export var _chess_remove_time = 0.2
 

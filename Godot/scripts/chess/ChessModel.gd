@@ -16,7 +16,7 @@ var back_dict = {}
 var front_aura_dict = {}
 var back_aura_dict = {}
 
-var image
+var image = null
 
 var is_front = true
 
