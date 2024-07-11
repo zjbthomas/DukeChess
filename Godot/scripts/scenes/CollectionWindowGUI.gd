@@ -74,6 +74,10 @@ func _on_chess_pressed(node):
 	
 	var added_node = _add_used_chess(chess_name)
 	
+	await get_tree().process_frame
+	$VBoxContainer/HBoxContainer/VBoxContainer/UsedChessScrollContainer.ensure_control_visible(added_node)
+	await get_tree().process_frame
+	
 	# animation
 	# https://forum.godotengine.org/t/can-i-take-a-screenshot-of-only-a-certain-area-of-my-scene/9193/2
 	_is_in_animation = true
@@ -91,12 +95,9 @@ func _on_chess_pressed(node):
 	sprite.global_position = node.global_position
 	add_child(sprite)
 	
-	var x = used_chess_container.global_position.x + used_chess_container.size.x / 2
-	var y = used_chess_container.global_position.y + used_chess_container.size.y / 2
-	
 	var tween = get_tree().create_tween()
 	tween.tween_property(sprite, "scale", Vector2.ZERO, add_used_chess_animation_time)
-	tween.parallel().tween_property(sprite, "global_position", Vector2(x, y), add_used_chess_animation_time)
+	tween.parallel().tween_property(sprite, "global_position", Vector2(added_node.global_position.x, added_node.global_position.y), add_used_chess_animation_time)
 	tween.tween_callback(func():
 		sprite.queue_free()
 		_is_in_animation = false
