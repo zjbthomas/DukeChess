@@ -233,11 +233,6 @@ func perform_op(user_op, is_from_menu):
 				
 				return true
 			
-			# Special rule for Duke
-			if board[current_chess_pos].name == "Duke":
-				if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(user_op)):
-					return false
-			
 			if board[current_chess_pos].get_available_destinations(board, current_chess_pos, current_action).has(user_op):
 				match current_action:
 					ChessModel.ACTION_TYPE.SUMMON:
@@ -261,6 +256,11 @@ func perform_op(user_op, is_from_menu):
 						return true
 			
 					ChessModel.ACTION_TYPE.MOVE:
+						# Special rule for Duke
+						if board[current_chess_pos].name == "Duke":
+							if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(user_op)):
+								return false
+						
 						perform_action(board, board[current_chess_pos], current_action, [current_chess_pos, user_op], null, null)
 
 						if (check_player_loss(true) or check_player_loss(false)):
@@ -332,6 +332,11 @@ func perform_op(user_op, is_from_menu):
 					if (user_op != command_pos and
 						board[current_chess_pos].get_available_destinations(board, current_chess_pos, ChessModel.ACTION_TYPE.COMMAND).has(user_op) and
 						(board[user_op] == null or board[user_op].player != current_player)):
+							# Special rule for Duke
+							if board[command_pos].name == "Duke":
+								if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(user_op)):
+									return false
+							
 							perform_action(board, board[current_chess_pos], ChessModel.ACTION_TYPE.COMMAND, [command_pos, user_op], null, null)
 					else:
 						return false
@@ -422,6 +427,7 @@ func emit_cover_effects(hover_pos):
 			for n in range(Global.MAXR * Global.MAXC):
 				if (board[n] != null):
 					if (board[n].player == current_player):
+						# TODO: avoid chess that cannot perform any actions
 						cover_effect_dict[n] = Color.YELLOW
 						
 		GAMESTATE.CHOOSEACTION:
@@ -468,6 +474,11 @@ func emit_cover_effects(hover_pos):
 					for d in board[current_chess_pos].get_available_destinations(board, current_chess_pos, ChessModel.ACTION_TYPE.COMMAND):
 						if (d != command_pos and
 							((board[d] != null and board[d].player != current_player) or board[d] == null)):
+								# Special rule for Duke
+								if board[command_pos].name == "Duke":
+									if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d)):
+										continue
+								
 								cover_effect_dict[d] = Color.YELLOW
 	
 	# check if any Duke is being checkmated

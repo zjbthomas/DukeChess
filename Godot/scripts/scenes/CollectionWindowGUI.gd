@@ -5,7 +5,7 @@ extends ColorRect
 
 @export_category("Variables")
 @export var used_chess_label_font_size = 24
-@export var add_used_chess_animation_time = 0.3
+@export var add_used_chess_animation_time = 0.2
 
 signal ok_button_pressed
 

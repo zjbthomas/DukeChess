@@ -136,7 +136,7 @@ static func find_possible_paths_step(cur_x, cur_y, d_x, d_y, final_x, final_y, p
 		find_possible_paths_step(new_cur_x, cur_y, d_x, d_y, final_x, final_y, new_prev_path, possible_paths)
 
 	if (abs(new_cur_y) <= abs(final_y)):
-		var new_prev_path = prev_path.copy()
+		var new_prev_path = prev_path.duplicate()
 		new_prev_path.append([cur_x, new_cur_y])
 
 		find_possible_paths_step(cur_x, new_cur_y, d_x, d_y, final_x, final_y, new_prev_path, possible_paths)

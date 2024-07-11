@@ -26,8 +26,11 @@ func validate_control_area(board, pos, dest, player):
 	var offset_x = Global.dest_to_offsets_with_player(dest, player)[0]
 	var offset_y = Global.dest_to_offsets_with_player(dest, player)[1]
 
-	if (not MovementManager.is_inside_board(board, pos, offset_x, offset_y) or 
-		MovementManager.has_friend_chess(board, pos, offset_x, offset_y, player)):
+	if (not MovementManager.is_inside_board(board, pos, offset_x, offset_y)):
+		return ret
+	
+	if (MovementManager.has_friend_chess(board, pos, offset_x, offset_y, player)):
+		ret.append(MovementManager.pos_with_offsets(pos, offset_x, offset_y)) # different at here!!
 		return ret
 
 	if MovementManager.has_defended_enemy(board, pos, offset_x, offset_y, player):
