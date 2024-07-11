@@ -474,7 +474,7 @@ func emit_cover_effects(hover_pos):
 					for d in board[current_chess_pos].get_available_destinations(board, current_chess_pos, ChessModel.ACTION_TYPE.COMMAND):
 						if (d != command_pos and
 							((board[d] != null and board[d].player != current_player) or board[d] == null)):
-								# Special rule for Duke
+								# Special rule for Duke (TODO: the server side logic should also have this)
 								if board[command_pos].name == "Duke":
 									if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d)):
 										continue
