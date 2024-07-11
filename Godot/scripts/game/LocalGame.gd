@@ -36,7 +36,6 @@ var current_player:Player
 var board = []
 
 var current_state:GAMESTATE
-var cached_state:GAMESTATE
 
 var current_chess_pos
 var current_action
@@ -122,8 +121,6 @@ func get_control_area_of_player(player):
 # return if the user_op is valid or not
 func perform_op(user_op, is_from_menu):
 	# in Local mode, no need to convert user_op based on player
-	
-	cached_state = current_state # TODO: why?
 	
 	match current_state:
 		GAMESTATE.INITSUMMONPLAYERONEFOOTMANONE, GAMESTATE.INITSUMMONPLAYERONEFOOTMANTWO:
@@ -427,8 +424,8 @@ func emit_cover_effects(hover_pos):
 			for n in range(Global.MAXR * Global.MAXC):
 				if (board[n] != null):
 					if (board[n].player == current_player):
-						# TODO: avoid chess that cannot perform any actions
-						cover_effect_dict[n] = Color.YELLOW
+						if len(board[n].get_available_actions(board, n)) > 0:
+							cover_effect_dict[n] = Color.YELLOW
 						
 		GAMESTATE.CHOOSEACTION:
 			cover_effect_dict[current_chess_pos] = Color.YELLOW

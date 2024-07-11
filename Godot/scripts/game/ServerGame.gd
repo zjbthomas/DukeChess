@@ -130,9 +130,7 @@ func send_to_server(user_op, is_from_menu):
 
 func perform_op_for_server(user_op, summon_chess_from_server = null):
 	user_op = convert_n_from_server(user_op)
-	
-	cached_state = current_state # TODO: why?
-	
+
 	match current_state:
 		GAMESTATE.INITSUMMONPLAYERONEFOOTMANONE, GAMESTATE.INITSUMMONPLAYERONEFOOTMANTWO:
 			var duke_pos = POS_DUKE0 if current_player == player_list[0] else POS_DUKE1

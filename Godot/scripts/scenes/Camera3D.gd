@@ -31,7 +31,7 @@ func _input(event):
 						
 						_is_in_animation = true
 						
-						var time = 0.5 * (abs($"..".rotation.x - deg_to_rad(0)) / deg_to_rad(45)) # TODO: magic numbers
+						var time = 0.3 * (abs($"..".rotation.x - deg_to_rad(0)) / deg_to_rad(45)) # TODO: magic numbers
 
 						var tween = get_tree().create_tween()
 						tween.tween_property($"..", "rotation:x", deg_to_rad(0), time) 
