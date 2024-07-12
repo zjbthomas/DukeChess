@@ -6,17 +6,16 @@ extends Node
 @export var chess_scene:PackedScene
 @export var menu_scene:PackedScene
 
-@export_category("Variables")
-@export var _chess_up_dist = 1.2
-@export var _chess_up_down_time = 0.8
-@export var _chess_move_time = 0.5
-@export var _chess_flip_time = 0.5
-@export var _chess_remove_time = 0.2
+const _CHESS_UP_DIST = 1.2
+const _CHESS_UP_DOWN_TIME = 0.3
+const _CHESS_MOVE_TIME = 0.5
+const _CHESS_FLIP_TIME = 0.5
+const _CHESS_REMOVE_TIME = 0.2
 
 const _CHESS_TILE_OFFSET = -2.5
 
 # variables for logic
-var game = LocalGame.new() if Global.is_local else ServerGame.new(self)
+var game = AIGame.new(self) if Global.is_ai else (LocalGame.new() if Global.is_local else ServerGame.new(self))
 
 var _is_in_animation = false
 
@@ -58,8 +57,12 @@ func _ready():
 		game.connect("online_game_started", _on_online_game_started)
 		game.connect("peer_disconnected", _on_peer_disconnected)
 
+	if (Global.is_ai):
+		game.connect("close_menu", func(): get_tree().call_group("menu", "queue_free"))
+	
 func _setup_ui_localization():
-	$MainGUI/GridContainer/Label.text = tr("MAIN_MODE") + " " + (tr("SELECT_LOCAL") if Global.is_local else tr("SELECT_ONLINE"))
+	$MainGUI/GridContainer/Label.text = tr("MAIN_MODE") + " " + \
+		("AI" if Global.is_ai else (tr("SELECT_LOCAL") if Global.is_local else tr("SELECT_ONLINE")))
 
 func _on_client_connected():
 	$MainGUI/GridContainer/StartButton.disabled = true
@@ -140,7 +143,7 @@ func _on_remove_chess(pos):
 	$Particles/DeadParticles.restart()
 	
 	var tween = get_tree().create_tween()
-	tween.tween_property(chess, "scale", Vector3.ZERO, _chess_remove_time)
+	tween.tween_property(chess, "scale", Vector3.ZERO, _CHESS_REMOVE_TIME)
 	tween.tween_callback(func():
 		chess.queue_free()
 		
@@ -174,19 +177,19 @@ func _on_move_chess(src, dst, is_flip_during_move):
 	
 	var tween = get_tree().create_tween()
 	# 1: raise the chess
-	tween.tween_property(src_chess, "position:y", ori_position_y + _chess_up_dist, _chess_up_down_time).set_trans(Tween.TRANS_QUART)
+	tween.tween_property(src_chess, "position:y", ori_position_y + _CHESS_UP_DIST, _CHESS_UP_DOWN_TIME).set_trans(Tween.TRANS_QUART)
 	
 	# 2: move the chess
-	tween.tween_property(src_chess, "global_position:x", dst_tile.global_position.x, _chess_move_time).set_trans(Tween.TRANS_QUART)
-	tween.parallel().tween_property(src_chess, "global_position:z", dst_tile.global_position.z, _chess_move_time).set_trans(Tween.TRANS_QUART)
+	tween.tween_property(src_chess, "global_position:x", dst_tile.global_position.x, _CHESS_MOVE_TIME).set_trans(Tween.TRANS_QUART)
+	tween.parallel().tween_property(src_chess, "global_position:z", dst_tile.global_position.z, _CHESS_MOVE_TIME).set_trans(Tween.TRANS_QUART)
 
 	# 3: flip the chess if needed
 	if (is_flip_during_move):
 		var rotation_z = deg_to_rad(0) if src_chess.rotation.z > 3 else deg_to_rad(180) # a rough estimiation
-		tween.tween_property(src_chess, "rotation:z", rotation_z, _chess_flip_time).set_trans(Tween.TRANS_QUART)
+		tween.tween_property(src_chess, "rotation:z", rotation_z, _CHESS_FLIP_TIME).set_trans(Tween.TRANS_QUART)
 		
 	# 4: put down the chess
-	tween.tween_property(src_chess, "position:y", ori_position_y, _chess_up_down_time).set_trans(Tween.TRANS_QUART)
+	tween.tween_property(src_chess, "position:y", ori_position_y, _CHESS_UP_DOWN_TIME).set_trans(Tween.TRANS_QUART)
 	
 	tween.tween_callback(func():
 		# move src_chess to final tile
@@ -285,7 +288,7 @@ func _on_menu_button_pressed(item):
 	
 	if (valid_op):
 		get_tree().call_group("menu", "queue_free")
-	
+
 func _on_game_message(msg):
 	if msg != null:
 		$MainGUI/MessageContainer/Panel/MessageLabel.text = msg

@@ -128,6 +128,7 @@ func send_to_server(user_op, is_from_menu):
 		
 		return true
 
+# TODO: we can separate this function into multiple sub-functions for each state, wo we can directly call super() for identical ones as in Local
 func perform_op_for_server(user_op, summon_chess_from_server = null):
 	user_op = convert_n_from_server(user_op)
 

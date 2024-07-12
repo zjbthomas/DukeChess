@@ -14,7 +14,7 @@ var chessmodel_dict = {}
 var chess_textures = {}
 
 func load_chess():
-	if (Global.is_local):
+	if (Global.is_local and not Global.is_ai):
 		# create "chess" folder under user:// if not exists
 		if not DirAccess.dir_exists_absolute(USERCHESSDIR):
 			var error_code = DirAccess.make_dir_recursive_absolute(USERCHESSDIR)
@@ -112,8 +112,8 @@ func aura_type_to_texture(type, offset_x, offset_y):
 			return chess_textures["Defense"]			
 
 func _load_chess_files():
-	var used_dir = USERCHESSDIR if Global.is_local else RESCHESSDIR
-	var chess_amount_file = CHESSAMOUNTJSON if Global.is_local else CHESSAMOUNTJSONONLINE
+	var used_dir = USERCHESSDIR if (Global.is_local and not Global.is_ai) else RESCHESSDIR
+	var chess_amount_file = CHESSAMOUNTJSON if (Global.is_local and not Global.is_ai) else CHESSAMOUNTJSONONLINE
 	
 	var chess_dir = DirAccess.open(used_dir)
 	
@@ -194,7 +194,7 @@ func _load_chess_files():
 		
 		# load image
 		var image_path = used_dir + "/" + chess_name + "/" + chess_name + ".png" # TODO: only PNG is allowed; it has the same name as the folder
-		if (Global.is_local):
+		if (Global.is_local and not Global.is_ai):
 			if (FileAccess.file_exists(image_path)):
 				chess.image = ImageTexture.create_from_image(Image.load_from_file(image_path))
 		else:

@@ -112,13 +112,21 @@ func get_control_area_of_player(player):
 				# Special rule for Duke
 				if (player == current_player):
 					if chess.name == "Duke":
-						if (get_control_area_of_player(player_list[1] if player == player_list[0] else player_list[0]).has(pos)):
+						if (get_control_area_of_player(player_list[1] if player == player_list[0] else player_list[0]).has(pos) and \
+							not has_enemy_duke(pos, player)):
 							continue
 				
 				if not ret.has(pos):
 					ret.append(pos)
 					
 	return ret
+
+func has_enemy_duke(pos, player):
+	if (len(board) != 0 and board[pos] != null and \
+		board[pos].name == "Duke" and board[pos].player != player):
+			return true
+	else:
+		return false
 
 # return if the user_op is valid or not
 func perform_op(user_op, is_from_menu):
@@ -261,7 +269,8 @@ func perform_op(user_op, is_from_menu):
 					ChessModel.ACTION_TYPE.MOVE:
 						# Special rule for Duke
 						if board[current_chess_pos].name == "Duke":
-							if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(user_op)):
+							if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(user_op) and \
+								not has_enemy_duke(user_op, current_player)):
 								return false
 						
 						perform_action(board, board[current_chess_pos], current_action, [current_chess_pos, user_op], null, null)
@@ -337,7 +346,8 @@ func perform_op(user_op, is_from_menu):
 						(board[user_op] == null or board[user_op].player != current_player)):
 							# Special rule for Duke
 							if board[command_pos].name == "Duke":
-								if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(user_op)):
+								if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(user_op) and \
+									not has_enemy_duke(user_op, current_player)):
 									return false
 							
 							perform_action(board, board[current_chess_pos], ChessModel.ACTION_TYPE.COMMAND, [command_pos, user_op], null, null)
@@ -407,7 +417,7 @@ func check_dukes_being_checkmated():
 	var ret = []
 	
 	for n in range(Global.MAXR * Global.MAXC):
-		if (board[n] != null and board[n].name == "Duke"):
+		if (len(board) != 0 and board[n] != null and board[n].name == "Duke"):
 			if (get_control_area_of_player(player_list[0] if board[n].player == player_list[1] else player_list[1]).has(n)):
 				ret.append(n)
 	
@@ -453,7 +463,8 @@ func emit_cover_effects(hover_pos):
 					for d in movements:
 						# Special rule for Duke
 						if board[current_chess_pos].name == "Duke":
-							if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d)):
+							if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d) and \
+								not has_enemy_duke(d, current_player)):
 								continue
 						
 						match movements[d]:
@@ -483,7 +494,8 @@ func emit_cover_effects(hover_pos):
 							((board[d] != null and board[d].player != current_player) or board[d] == null)):
 								# Special rule for Duke (TODO: the server side logic should also have this)
 								if board[command_pos].name == "Duke":
-									if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d)):
+									if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d) and \
+										not has_enemy_duke(d, current_player)):
 										continue
 								
 								cover_effect_dict[d] = Color.YELLOW
@@ -492,7 +504,7 @@ func emit_cover_effects(hover_pos):
 	for n in check_dukes_being_checkmated():
 		cover_effect_dict[n] = Color.RED
 	
-	if (hover_pos != null and board[hover_pos] != null):
+	if (hover_pos != null and len(board) != 0 and board[hover_pos] != null):
 		var color = Color.BLUE if board[hover_pos].player == current_player else Color.RED
 		
 		if cover_effect_dict.keys().has(hover_pos):
@@ -502,7 +514,8 @@ func emit_cover_effects(hover_pos):
 			# Special rule for Duke
 			if board[hover_pos].player == current_player:
 				if board[hover_pos].name == "Duke":
-					if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d)):
+					if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d) and \
+						not has_enemy_duke(d, current_player)):
 						continue
 			
 			cover_effect_dict[d] = color

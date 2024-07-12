@@ -17,6 +17,7 @@ var chess_loader:ChessLoader
 var movement_manager:MovementManager = MovementManager.new()
 
 var is_local = false
+var is_ai = false
 
 func rc_to_n(r, c):
 	return r * Global.MAXC + c

@@ -29,10 +29,17 @@ func _setup_ui_localization():
 
 func _on_local_mode_button_pressed():
 	Global.is_local = true
+	Global.is_ai = false
+	get_tree().change_scene_to_packed.bind(load_scene).call_deferred()
+
+func _on_ai_mode_button_pressed():
+	Global.is_local = true
+	Global.is_ai = true
 	get_tree().change_scene_to_packed.bind(load_scene).call_deferred()
 
 func _on_server_mode_button_pressed():
 	Global.is_local = false
+	Global.is_ai = false
 	get_tree().change_scene_to_packed.bind(load_scene).call_deferred()
 
 func _on_option_button_item_selected(index):

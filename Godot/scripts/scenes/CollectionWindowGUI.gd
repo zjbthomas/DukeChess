@@ -58,7 +58,7 @@ func _setup_ui_localization():
 	$VBoxContainer/OKButton.text = tr("COLLECTION_CLOSE")
 
 func _on_chess_pressed(node):
-	if (not Global.is_local):
+	if (not Global.is_local or Global.is_ai):
 		return
 	
 	if (_is_in_animation):
@@ -143,7 +143,7 @@ func _add_used_chess(chess_name):
 	return node
 
 func _on_used_chess_pressed(node):
-	if (not Global.is_local):
+	if (not Global.is_local or Global.is_ai):
 		return
 	
 	node.queue_free()
