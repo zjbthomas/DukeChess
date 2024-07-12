@@ -42,11 +42,12 @@ func _on_collection_button_pressed():
 	$BlurContainer.activate()
 
 # TODO: this is similar to the one in ChessInShow.gd, can we combine into one function?
-func setup_chess_back(chess, is_front):
+func setup_chess_back(chess_inst, is_main_player):
 	# remove all previous nodes in group "movements"
 	get_tree().call_group("movements", "queue_free")
 	
-	var chess_model:ChessModel = Global.chess_loader.chessmodel_dict[chess]
+	var chess_model:ChessModel = Global.chess_loader.chessmodel_dict[chess_inst.name]
+	var is_front = !chess_inst.is_front
 	
 	# decide which center image to show
 	$CardBack/CenterFront.visible = false
@@ -121,6 +122,9 @@ func setup_chess_back(chess, is_front):
 	# set image
 	$CardBack/SideImage.texture = chess_model.image
 
+	# rotate the whole card back based on player
+	$CardBack.pivot_offset = $CardBack.size / 2
+	$CardBack.rotation = deg_to_rad(0 if is_main_player else 180)
 
 func _on_exit_button_pressed():
 	get_tree().quit()

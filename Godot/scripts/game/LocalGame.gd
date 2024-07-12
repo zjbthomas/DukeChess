@@ -91,12 +91,11 @@ func game_start():
 	emit_cover_effects(null)
 	emit_message()
 	
-func get_chess_back(r, c):
+func get_chess(r, c):
 	if len(board) == 0 or board[Global.rc_to_n(r, c)] == null:
 		return null
 	else:
-		var chess = board[Global.rc_to_n(r, c)]
-		return [chess.name, !board[Global.rc_to_n(r, c)].is_front]
+		return board[Global.rc_to_n(r, c)]
 
 func get_control_area_of_player(player):
 	if len(board) == 0:

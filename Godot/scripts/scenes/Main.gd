@@ -332,9 +332,9 @@ func _get_hover_cover_effect_group_name_at_rc(r, c):
 
 func _on_tile_mouse_entered(r, c):
 	if (not _is_in_animation):
-		var chess_back = game.get_chess_back(r, c)
-		if (chess_back != null):
-			$MainGUI.setup_chess_back(chess_back[0], chess_back[1])
+		var chess_inst = game.get_chess(r, c)
+		if (chess_inst != null):
+			$MainGUI.setup_chess_back(chess_inst, chess_inst.player == game.player_list[0])
 			$MainGUI/CardBack.visible = true
 		
 		game.emit_cover_effects(Global.rc_to_n(r, c))
