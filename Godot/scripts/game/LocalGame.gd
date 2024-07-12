@@ -382,6 +382,10 @@ func perform_action(board, src_chess:ChessInst, action, dest_arr, target_chess_n
 				board[dest_arr[1]] = null
 				
 				remove_chess.emit(dest_arr[1])
+				
+				src_chess.is_front = !src_chess.is_front
+				
+				move_chess.emit(current_chess_pos, current_chess_pos, true) # same location flip
 			else:
 				board[dest_arr[1]] = board[dest_arr[0]]
 				board[dest_arr[0]] = null
