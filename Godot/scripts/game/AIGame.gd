@@ -16,6 +16,7 @@ var GUI
 
 # for AI decision
 const DEPTH = 3
+const DEPTH_DECAY = 0.8
 
 const SUMMON_SCORE = 0
 
@@ -94,7 +95,7 @@ func ai_act():
 		
 		GAMESTATE.CHOOSECHESS:
 			# calculate best op
-			var score_and_dict = find_best_op(current_player, board, DEPTH) # TODO: magic number for depth
+			var score_and_dict = find_best_op(current_player, board, DEPTH)
 			best_selection_dict = score_and_dict[1]
 			
 			# DEBUG
@@ -319,7 +320,8 @@ func find_best_op(player, imagined_board, depth):
 	var score = 0
 	var possible_selections = []
 	
-	if (depth == 0):
+	if (depth == 0 or 
+		board.count(null) == (Global.MAXR * Global.MAXC)): # TODO: (need confirmation) this happens when there is no chess on the board (and score is always (-)INF)
 		return [score, {}]
 	
 	var multiplier = 1 if player == current_player else -1
@@ -342,11 +344,6 @@ func find_best_op(player, imagined_board, depth):
 							ChessModel.ACTION_TYPE.SUMMON:
 								var possible_destinations = imagined_board[n].get_available_movements(imagined_board, n, a).keys()
 
-								# TODO: rarely, possible_destinations is empty, but currently not able to reproduce...
-								
-								# DEBUG
-								print(possible_destinations)
-
 								for sp in possible_destinations:
 									var attempt_score = SUMMON_SCORE * multiplier
 
@@ -358,7 +355,7 @@ func find_best_op(player, imagined_board, depth):
 									var dummy_chess = ChessInst.new("Dummy", player)
 									new_imagined_board[sp] = dummy_chess
 										
-									attempt_score += find_best_op(player_list[1] if player == player_list[0] else player_list[0], new_imagined_board, depth - 1)[0]
+									attempt_score += DEPTH_DECAY * find_best_op(player_list[1] if player == player_list[0] else player_list[0], new_imagined_board, depth - 1)[0]
 
 									if (multiplier > 0 and attempt_score > score) or (multiplier < 0 and attempt_score < score):
 										score = attempt_score
@@ -392,7 +389,7 @@ func find_best_op(player, imagined_board, depth):
 									
 									if (imagined_board[d] != null and imagined_board[d].player != player):
 										if (imagined_board[d].player == current_player): 
-											attempt_score += get_chess_score(imagined_board[d].name) * multiplier * 10  # if AI's Duke is destroyed, make score even lower; but this does not make good decision when AI can eat player's Duke faster
+											attempt_score += get_chess_score(imagined_board[d].name) * multiplier
 										else:
 											attempt_score += get_chess_score(imagined_board[d].name) * multiplier
 										
@@ -411,7 +408,7 @@ func find_best_op(player, imagined_board, depth):
 										
 										new_imagined_board[d].is_front = !new_imagined_board[d].is_front
 										
-									attempt_score += find_best_op(player_list[1] if player == player_list[0] else player_list[0], new_imagined_board, depth - 1)[0]
+									attempt_score += DEPTH_DECAY * find_best_op(player_list[1] if player == player_list[0] else player_list[0], new_imagined_board, depth - 1)[0]
 									
 									if (multiplier > 0 and attempt_score > score) or (multiplier < 0 and attempt_score < score):
 										score = attempt_score
@@ -461,7 +458,7 @@ func find_best_op(player, imagined_board, depth):
 													
 													new_imagined_board[n].is_front = !new_imagined_board[n].is_front
 														
-													attempt_score += find_best_op(player_list[1] if player == player_list[0] else player_list[0], new_imagined_board, depth - 1)[0]
+													attempt_score += DEPTH_DECAY * find_best_op(player_list[1] if player == player_list[0] else player_list[0], new_imagined_board, depth - 1)[0]
 													
 													if (multiplier > 0 and attempt_score > score) or (multiplier < 0 and attempt_score < score):
 														score = attempt_score
