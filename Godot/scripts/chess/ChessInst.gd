@@ -39,30 +39,7 @@ func get_all_movements(action):
 	return chess_model.front_dict.get(action) if is_front else chess_model.back_dict.get(action)
 
 func get_available_destinations(board, pos, action):
-	var ret = []
-	
-	if (action == ChessModel.ACTION_TYPE.COMMAND):
-		var has_commandable_chess = false
-		var all_command_movements = get_all_movements(ChessModel.ACTION_TYPE.COMMAND)
-		if (all_command_movements != null):
-			for possible_d in all_command_movements:
-				var offset_x = Global.dest_to_offsets_with_player(possible_d, player)[0]
-				var offset_y = Global.dest_to_offsets_with_player(possible_d, player)[1]
-				
-				if (Global.movement_manager.has_friend_chess(board, pos, offset_x, offset_y, player)):
-					has_commandable_chess = true
-					break
-			
-		if (not has_commandable_chess):
-			return ret
-	
-	var all_movements = get_all_movements(action)
-	if (all_movements != null):
-		for possible_d in all_movements:
-			var valid_ds = Global.movement_manager.validate_movement(all_movements[possible_d], board, pos, possible_d, player)
-			ret.append_array(valid_ds)
-			
-	return ret
+	return get_available_movements(board, pos, action).keys()
 
 func get_available_movements(board, pos, action):
 	var ret = {}

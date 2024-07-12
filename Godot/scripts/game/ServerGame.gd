@@ -361,9 +361,22 @@ func emit_cover_effects(hover_pos):
 		for d in board[hover_pos].get_control_area(board, hover_pos):
 			# Special rule for Duke
 			if board[hover_pos].player == current_player:
-				if board[hover_pos].name == "Duke":
-					if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d)):
-						continue
+				var is_safe_d = true
+				for a in board[hover_pos].get_available_actions(board, hover_pos):
+					match a:
+						ChessModel.ACTION_TYPE.MOVE:
+							if not _is_duke_safe_after_action(board, hover_pos, board[hover_pos].player, a, d):
+								is_safe_d = false
+								break
+						ChessModel.ACTION_TYPE.COMMAND:
+							pass # TODO: no filtering for COMMAND
+				
+				if (not is_safe_d):
+					continue
+				
+				#if board[hover_pos].name == "Duke":
+				#	if (get_control_area_of_player(board, player_list[1] if current_player == player_list[0] else player_list[0]).has(d)):
+				#		continue
 			cover_effect_dict[d] = color
 
 	if (hover_pos == null):

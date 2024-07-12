@@ -97,7 +97,7 @@ func get_chess(r, c):
 	else:
 		return board[Global.rc_to_n(r, c)]
 
-func get_control_area_of_player(player):
+func get_control_area_of_player(board, player):
 	if len(board) == 0:
 		return null
 	
@@ -109,11 +109,25 @@ func get_control_area_of_player(player):
 			var control_area = chess.get_control_area(board, n)
 			for pos in control_area:
 				# Special rule for Duke
-				if (player == current_player):
-					if chess.name == "Duke":
-						if (get_control_area_of_player(player_list[1] if player == player_list[0] else player_list[0]).has(pos) and \
-							not has_enemy_duke(pos, player)):
-							continue
+				if player == current_player:
+					var is_safe_d = true
+					for a in board[n].get_available_actions(board, n):
+						match a:
+							ChessModel.ACTION_TYPE.MOVE:
+								if not _is_duke_safe_after_action(board, n, board[n].player, a, pos):
+									is_safe_d = false
+									break
+							ChessModel.ACTION_TYPE.COMMAND:
+								pass # TODO: no filtering for COMMAND
+					
+					if (not is_safe_d):
+						continue
+				
+				#if (player == current_player):
+				#	if chess.name == "Duke":
+				#		if (get_control_area_of_player(board, player_list[1] if player == player_list[0] else player_list[0]).has(pos) and \
+				#			not has_enemy_duke(pos, player)):
+				#			continue
 				
 				if not ret.has(pos):
 					ret.append(pos)
@@ -267,10 +281,13 @@ func perform_op(user_op, is_from_menu):
 			
 					ChessModel.ACTION_TYPE.MOVE:
 						# Special rule for Duke
-						if board[current_chess_pos].name == "Duke":
-							if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(user_op) and \
-								not has_enemy_duke(user_op, current_player)):
-								return false
+						if not _is_duke_safe_after_action(board, current_chess_pos, current_player, current_action, user_op):
+							return false
+				
+						#if board[current_chess_pos].name == "Duke":
+						#	if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(user_op) and \
+						#		not has_enemy_duke(user_op, current_player)):
+						#		return false
 						
 						perform_action(board, board[current_chess_pos], current_action, [current_chess_pos, user_op], null, null)
 
@@ -344,10 +361,13 @@ func perform_op(user_op, is_from_menu):
 						board[current_chess_pos].get_available_destinations(board, current_chess_pos, ChessModel.ACTION_TYPE.COMMAND).has(user_op) and
 						(board[user_op] == null or board[user_op].player != current_player)):
 							# Special rule for Duke
-							if board[command_pos].name == "Duke":
-								if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(user_op) and \
-									not has_enemy_duke(user_op, current_player)):
-									return false
+							if not _is_duke_safe_after_action(board, current_chess_pos, current_player, current_action, user_op, command_pos):
+								return false
+								
+							#if board[command_pos].name == "Duke":
+							#	if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(user_op) and \
+							#		not has_enemy_duke(user_op, current_player)):
+							#		return false
 							
 							perform_action(board, board[current_chess_pos], ChessModel.ACTION_TYPE.COMMAND, [command_pos, user_op], null, null)
 					else:
@@ -421,7 +441,7 @@ func check_dukes_being_checkmated():
 	
 	for n in range(Global.MAXR * Global.MAXC):
 		if (len(board) != 0 and board[n] != null and board[n].name == "Duke"):
-			if (get_control_area_of_player(player_list[0] if board[n].player == player_list[1] else player_list[1]).has(n)):
+			if (get_control_area_of_player(board, player_list[0] if board[n].player == player_list[1] else player_list[1]).has(n)):
 				ret.append(n)
 	
 	return ret
@@ -465,10 +485,13 @@ func emit_cover_effects(hover_pos):
 					var movements = board[current_chess_pos].get_available_movements(board, current_chess_pos, ChessModel.ACTION_TYPE.MOVE)
 					for d in movements:
 						# Special rule for Duke
-						if board[current_chess_pos].name == "Duke":
-							if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d) and \
-								not has_enemy_duke(d, current_player)):
-								continue
+						if not _is_duke_safe_after_action(board, current_chess_pos, current_player, current_action, d):
+							continue
+						
+						#if board[current_chess_pos].name == "Duke":
+						#	if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d) and \
+						#		not has_enemy_duke(d, current_player)):
+						#		continue
 						
 						match movements[d]:
 							MovementManager.MOVEMENT_TYPE.STRIKE:
@@ -496,10 +519,13 @@ func emit_cover_effects(hover_pos):
 						if (d != command_pos and
 							((board[d] != null and board[d].player != current_player) or board[d] == null)):
 								# Special rule for Duke (TODO: the server side logic should also have this)
-								if board[command_pos].name == "Duke":
-									if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d) and \
-										not has_enemy_duke(d, current_player)):
-										continue
+								if not _is_duke_safe_after_action(board, current_chess_pos, current_player, current_action, d, command_pos):
+									return false
+								
+								#if board[command_pos].name == "Duke":
+								#	if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d) and \
+								#		not has_enemy_duke(d, current_player)):
+								#		continue
 								
 								cover_effect_dict[d] = Color.YELLOW
 	
@@ -516,10 +542,23 @@ func emit_cover_effects(hover_pos):
 		for d in board[hover_pos].get_control_area(board, hover_pos):
 			# Special rule for Duke
 			if board[hover_pos].player == current_player:
-				if board[hover_pos].name == "Duke":
-					if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d) and \
-						not has_enemy_duke(d, current_player)):
-						continue
+				var is_safe_d = true
+				for a in board[hover_pos].get_available_actions(board, hover_pos):
+					match a:
+						ChessModel.ACTION_TYPE.MOVE:
+							if not _is_duke_safe_after_action(board, hover_pos, board[hover_pos].player, a, d):
+								is_safe_d = false
+								break
+						ChessModel.ACTION_TYPE.COMMAND:
+							pass # TODO: no filtering for COMMAND
+				
+				if (not is_safe_d):
+					continue
+				
+				#if board[hover_pos].name == "Duke":
+				#	if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d) and \
+				#		not has_enemy_duke(d, current_player)):
+				#		continue
 			
 			cover_effect_dict[d] = color
 
@@ -528,10 +567,53 @@ func emit_cover_effects(hover_pos):
 	else:
 		hover_cover_effect.emit(hover_pos, cover_effect_dict)
 
+func _is_duke_safe_after_action(board, chess_pos, player, action, op_pos, command_pos=null):
+	match action:
+		ChessModel.ACTION_TYPE.MOVE:
+			var imagined_board = []
+			for nn in range(Global.MAXR * Global.MAXC):
+				imagined_board.append(board[nn].duplicate() if board[nn]!= null else null)
+			
+			if (imagined_board[chess_pos].get_available_movements(imagined_board, chess_pos, action).get(op_pos) == MovementManager.MOVEMENT_TYPE.STRIKE):
+				imagined_board[op_pos] = null
+				
+				imagined_board[chess_pos].is_front = !imagined_board[chess_pos].is_front
+			else:
+				imagined_board[op_pos] = imagined_board[chess_pos]
+				imagined_board[chess_pos] = null
+				
+				imagined_board[op_pos].is_front = !imagined_board[op_pos].is_front
+				
+			for nn in range(Global.MAXR * Global.MAXC):
+				if (imagined_board[nn] != null and imagined_board[nn].name == "Duke" and imagined_board[nn].player == player):
+					if (get_control_area_of_player(imagined_board, player_list[1] if player == player_list[0] else player_list[0]).has(nn)):
+						return false
+					else:
+						break
+					
+		ChessModel.ACTION_TYPE.COMMAND:
+			var imagined_board = []
+			for nn in range(Global.MAXR * Global.MAXC):
+				imagined_board.append(board[nn].duplicate() if board[nn]!= null else null)
+			
+			imagined_board[op_pos] = imagined_board[command_pos]
+			imagined_board[command_pos] = null
+			
+			imagined_board[chess_pos].is_front = !imagined_board[chess_pos].is_front
+				
+			for nn in range(Global.MAXR * Global.MAXC):
+				if (imagined_board[nn] != null and imagined_board[nn].name == "Duke" and imagined_board[nn].player == player):
+					if (get_control_area_of_player(imagined_board, player_list[1] if player == player_list[0] else player_list[0]).has(nn)):
+						return false
+					else:
+						break
+						
+	return true
+
 func emit_control_area_cover_effects(player):
 	var cover_effect_dict = {}
 	
-	for d in get_control_area_of_player(player):
+	for d in get_control_area_of_player(board, player):		
 		cover_effect_dict[d] = Color.RED
 		
 	hover_control_area_cover_effect.emit(cover_effect_dict)

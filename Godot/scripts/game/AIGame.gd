@@ -163,10 +163,13 @@ func ai_act():
 					var movements = board[current_chess_pos].get_available_movements(board, current_chess_pos, ChessModel.ACTION_TYPE.MOVE)
 					for d in movements:
 						# Special rule for Duke
-						if board[current_chess_pos].name == "Duke":
-							if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d) and \
-								not has_enemy_duke(d, current_player)):
-								continue
+						if not _is_duke_safe_after_action(board, current_chess_pos, current_player, current_action, d):
+							continue
+						
+						#if board[current_chess_pos].name == "Duke":
+						#	if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d) and \
+						#		not has_enemy_duke(d, current_player)):
+						#		continue
 						
 						possible_destinations.append(d)
 
@@ -213,11 +216,14 @@ func ai_act():
 					for d in board[current_chess_pos].get_available_destinations(board, current_chess_pos, ChessModel.ACTION_TYPE.COMMAND):
 						if (d != command_pos and
 							((board[d] != null and board[d].player != current_player) or board[d] == null)):
-								# Special rule for Duke (TODO: the server side logic should also have this)
-								if board[command_pos].name == "Duke":
-									if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d) and \
-										not has_enemy_duke(d, current_player)):
-										continue
+								# Special rule for Duke
+								if not _is_duke_safe_after_action(board, current_chess_pos, current_player, current_action, d, command_pos):
+									continue
+								
+								#if board[command_pos].name == "Duke":
+								#	if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d) and \
+								#		not has_enemy_duke(d, current_player)):
+								#		continue
 								
 								possible_destinations.append(d)
 					
@@ -380,10 +386,13 @@ func find_best_op(player, imagined_board, depth):
 								var movements = imagined_board[n].get_available_movements(imagined_board, n, a)
 								for d in movements:
 									# Special rule for Duke
-									if imagined_board[n].name == "Duke":
-										if (get_control_area_of_player(player_list[1] if player == player_list[0] else player_list[0]).has(d) and \
-											not has_enemy_duke(d, player)):
-											continue
+									if not _is_duke_safe_after_action(imagined_board, n, player, a, d):
+										continue
+									
+									#if imagined_board[n].name == "Duke":
+									#	if (get_control_area_of_player(player_list[1] if player == player_list[0] else player_list[0]).has(d) and \
+									#		not has_enemy_duke(d, player)):
+									#		continue
 									
 									var attempt_score = 0
 									
@@ -434,11 +443,14 @@ func find_best_op(player, imagined_board, depth):
 										for target_d in imagined_board[n].get_available_destinations(imagined_board, n, a): # TODO: why different?
 											if (target_d != command_d and
 												((imagined_board[target_d] != null and imagined_board[target_d].player != player) or imagined_board[target_d] == null)):
-													# Special rule for Duke (TODO: the server side logic should also have this)
-													if imagined_board[command_d].name == "Duke":
-														if (get_control_area_of_player(player_list[1] if player == player_list[0] else player_list[0]).has(target_d) and \
-															not has_enemy_duke(target_d, player)):
-															continue
+													# Special rule for Duke
+													if not _is_duke_safe_after_action(imagined_board, n, player, a, target_d, command_pos):
+														continue
+													
+													#if imagined_board[command_d].name == "Duke":
+													#	if (get_control_area_of_player(player_list[1] if player == player_list[0] else player_list[0]).has(target_d) and \
+													#		not has_enemy_duke(target_d, player)):
+													#		continue
 
 													var attempt_score = 0
 													
