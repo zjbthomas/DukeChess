@@ -4,11 +4,23 @@ class_name AIGame
 
 signal close_menu
 
-const HISTORY_SAVED_DIR = "user://history"
+signal disable_start_button
+signal enable_start_button
 
+# for saving history
+const HISTORY_SAVED_DIR = "user://history"
+var history
+
+# connection to GUI
 var GUI
 
-var history
+# for AI decision
+const DEPTH = 3
+
+const SUMMON_SCORE = 0
+
+var first_ai_summon_pos
+var best_selection_dict
 
 func _init(GUI):
 	self.GUI = GUI
@@ -17,6 +29,8 @@ func game_start():
 	super()
 	
 	history = []
+	
+	first_ai_summon_pos = null
 	
 	# if AI is the first player, summon initial Footmans
 	if (current_player != player_list[0]):
@@ -42,8 +56,12 @@ func perform_op(user_op, is_from_menu):
 		return false
 
 func ai_act():
+	disable_start_button.emit()
+	
 	var wait_time = 0.2 + 2 * GUI._CHESS_UP_DOWN_TIME + GUI._CHESS_MOVE_TIME + GUI._CHESS_FLIP_TIME
 	await GUI.get_tree().create_timer(wait_time).timeout # TODO: wait for some seconds for playing animation; it is better to be in GUI
+	
+	enable_start_button.emit()
 	
 	match current_state:
 		GAMESTATE.INITSUMMONPLAYERONEFOOTMANONE, GAMESTATE.INITSUMMONPLAYERONEFOOTMANTWO, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANONE, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANTWO:
@@ -51,6 +69,18 @@ func ai_act():
 				
 			var random_op_ix = randi() % len(possible_destinations)
 			var random_op = possible_destinations[random_op_ix]
+			
+			if (first_ai_summon_pos == null):
+				first_ai_summon_pos = random_op
+			else:
+				var lr = Global.n_to_rc(first_ai_summon_pos)[0]
+				
+				var cr = Global.n_to_rc(random_op)[0]
+				
+				while (lr == cr):
+					random_op_ix = randi() % len(possible_destinations)
+					random_op = possible_destinations[random_op_ix]
+					cr = Global.n_to_rc(random_op)[0]
 			
 			# write to history before perform_op
 			store_to_history(1, current_state, board, random_op, 1.0 / len(possible_destinations))
@@ -63,6 +93,13 @@ func ai_act():
 				ai_act()
 		
 		GAMESTATE.CHOOSECHESS:
+			# calculate best op
+			var score_and_dict = find_best_op(current_player, board, DEPTH) # TODO: magic number for depth
+			best_selection_dict = score_and_dict[1]
+			
+			# DEBUG
+			print(score_and_dict[0])
+			
 			# find available chess
 			var possible_n = []
 			for n in range(Global.MAXR * Global.MAXC):
@@ -71,14 +108,16 @@ func ai_act():
 						if len(board[n].get_available_actions(board, n)) > 0:
 							possible_n.append(n)
 							
-			var random_op_ix = randi() % len(possible_n)
-			var random_op = possible_n[random_op_ix]
+			#var random_op_ix = randi() % len(possible_n)
+			#var op = possible_n[random_op_ix]
+			
+			var op = best_selection_dict[current_state]
 			
 			# write to history before perform_op
-			store_to_history(1, current_state, board, random_op, 1.0 / len(possible_n))
+			store_to_history(1, current_state, board, op, 1.0 / len(possible_n))
 			
 			# perform op
-			super.perform_op(random_op, false)
+			super.perform_op(op, false)
 			
 			# still in AI's turn
 			if (current_player != player_list[0]):
@@ -90,11 +129,13 @@ func ai_act():
 			
 			var possible_actions = board[current_chess_pos].get_available_actions(board, current_chess_pos)
 		
-			var random_action_ix = randi() % len(possible_actions)
-			var random_action = possible_actions[random_action_ix]
+			#var random_action_ix = randi() % len(possible_actions)
+			#var selected_action = possible_actions[random_action_ix]
+			
+			var selected_action = best_selection_dict[current_state]
 
 			var converted_op
-			match random_action:
+			match selected_action:
 				ChessModel.ACTION_TYPE.SUMMON:
 					converted_op = "MAIN_MENU_SUMMON"
 				ChessModel.ACTION_TYPE.MOVE:
@@ -133,13 +174,15 @@ func ai_act():
 						if (board[d] != null and board[d].player == current_player):
 							possible_destinations.append(d)
 			
-			var random_op_ix = randi() % len(possible_destinations)
-			var random_op = possible_destinations[random_op_ix]
+			#var random_op_ix = randi() % len(possible_destinations)
+			#var op = possible_destinations[random_op_ix]
 			
-			store_to_history(1, current_state, board, random_op, 1.0 / len(possible_destinations))
+			var op = best_selection_dict[current_state]
+			
+			store_to_history(1, current_state, board, op, 1.0 / len(possible_destinations))
 
 			# perform op
-			super.perform_op(random_op, false)
+			super.perform_op(op, false)
 
 			# still in AI's turn
 			if (current_player != player_list[0]):
@@ -177,13 +220,15 @@ func ai_act():
 								
 								possible_destinations.append(d)
 					
-					var random_op_ix = randi() % len(possible_destinations)
-					var random_op = possible_destinations[random_op_ix]
+					#var random_op_ix = randi() % len(possible_destinations)
+					#var op = possible_destinations[random_op_ix]
 					
-					store_to_history(1, current_state, board, random_op, 1.0 / len(possible_destinations))
+					var op = best_selection_dict[current_state]
+					
+					store_to_history(1, current_state, board, op, 1.0 / len(possible_destinations))
 
 					# perform op
-					super.perform_op(random_op, false)
+					super.perform_op(op, false)
 					
 					# still in AI's turn
 					if (current_player != player_list[0]):
@@ -269,3 +314,212 @@ func emit_after_move_animation():
 	if (current_state == GAMESTATE.ENDSTATE):
 		history.append({"winner": 0 if not check_player_loss(true) else 1})
 		save_history()
+
+func find_best_op(player, imagined_board, depth):
+	var score = 0
+	var possible_selections = []
+	
+	if (depth == 0):
+		return [score, {}]
+	
+	var multiplier = 1 if player == current_player else -1
+	
+	# set init score
+	if (multiplier > 0):
+		score = -INF
+	else:
+		score = INF
+	
+	# iterate all possible chess
+	for n in range(Global.MAXR * Global.MAXC):
+		if (imagined_board[n] != null):
+			if (imagined_board[n].player == player):
+				if len(imagined_board[n].get_available_actions(imagined_board, n)) > 0:
+
+					# iterate all possible actions
+					for a in imagined_board[n].get_available_actions(imagined_board, n):
+						match a:
+							ChessModel.ACTION_TYPE.SUMMON:
+								var possible_destinations = imagined_board[n].get_available_movements(imagined_board, n, a).keys()
+
+								# TODO: rarely, possible_destinations is empty, but currently not able to reproduce...
+								
+								# DEBUG
+								print(possible_destinations)
+
+								for sp in possible_destinations:
+									var attempt_score = SUMMON_SCORE * multiplier
+
+									# we assume that a dummy chess is summon
+									var new_imagined_board = []
+									for nn in range(Global.MAXR * Global.MAXC):
+										new_imagined_board.append(imagined_board[nn].duplicate() if imagined_board[nn]!= null else null)
+									
+									var dummy_chess = ChessInst.new("Dummy", player)
+									new_imagined_board[sp] = dummy_chess
+										
+									attempt_score += find_best_op(player_list[1] if player == player_list[0] else player_list[0], new_imagined_board, depth - 1)[0]
+
+									if (multiplier > 0 and attempt_score > score) or (multiplier < 0 and attempt_score < score):
+										score = attempt_score
+									
+										possible_selections = []
+										possible_selections.append({
+											GAMESTATE.CHOOSECHESS: n,
+											GAMESTATE.CHOOSEACTION: a,
+											GAMESTATE.CHOOSEDESTONE: sp
+										})
+									elif (attempt_score == score):
+										
+										score = attempt_score
+								
+										possible_selections.append({
+											GAMESTATE.CHOOSECHESS: n,
+											GAMESTATE.CHOOSEACTION: a,
+											GAMESTATE.CHOOSEDESTONE: sp
+										})
+									
+							ChessModel.ACTION_TYPE.MOVE:
+								var movements = imagined_board[n].get_available_movements(imagined_board, n, a)
+								for d in movements:
+									# Special rule for Duke
+									if imagined_board[n].name == "Duke":
+										if (get_control_area_of_player(player_list[1] if player == player_list[0] else player_list[0]).has(d) and \
+											not has_enemy_duke(d, player)):
+											continue
+									
+									var attempt_score = 0
+									
+									if (imagined_board[d] != null and imagined_board[d].player != player):
+										if (imagined_board[d].player == current_player): 
+											attempt_score += get_chess_score(imagined_board[d].name) * multiplier * 10  # if AI's Duke is destroyed, make score even lower; but this does not make good decision when AI can eat player's Duke faster
+										else:
+											attempt_score += get_chess_score(imagined_board[d].name) * multiplier
+										
+									# perform imagined action
+									var new_imagined_board = []
+									for nn in range(Global.MAXR * Global.MAXC):
+										new_imagined_board.append(imagined_board[nn].duplicate() if imagined_board[nn]!= null else null)
+									
+									if (new_imagined_board[n].get_available_movements(new_imagined_board, n, a).get(d) == MovementManager.MOVEMENT_TYPE.STRIKE):
+										new_imagined_board[d] = null
+										
+										new_imagined_board[n].is_front = !new_imagined_board[n].is_front
+									else:
+										new_imagined_board[d] = new_imagined_board[n]
+										new_imagined_board[n] = null
+										
+										new_imagined_board[d].is_front = !new_imagined_board[d].is_front
+										
+									attempt_score += find_best_op(player_list[1] if player == player_list[0] else player_list[0], new_imagined_board, depth - 1)[0]
+									
+									if (multiplier > 0 and attempt_score > score) or (multiplier < 0 and attempt_score < score):
+										score = attempt_score
+									
+										possible_selections = []
+										possible_selections.append({
+											GAMESTATE.CHOOSECHESS: n,
+											GAMESTATE.CHOOSEACTION: a,
+											GAMESTATE.CHOOSEDESTONE: d
+										})
+									elif (attempt_score == score):
+										score = attempt_score
+								
+										possible_selections.append({
+											GAMESTATE.CHOOSECHESS: n,
+											GAMESTATE.CHOOSEACTION: a,
+											GAMESTATE.CHOOSEDESTONE: d
+										})
+
+							ChessModel.ACTION_TYPE.COMMAND:
+								for command_d in imagined_board[n].get_available_movements(imagined_board, n, a): # command pos
+									if (imagined_board[command_d] != null and imagined_board[command_d].player == player):
+										for target_d in imagined_board[n].get_available_destinations(imagined_board, n, a): # TODO: why different?
+											if (target_d != command_d and
+												((imagined_board[target_d] != null and imagined_board[target_d].player != player) or imagined_board[target_d] == null)):
+													# Special rule for Duke (TODO: the server side logic should also have this)
+													if imagined_board[command_d].name == "Duke":
+														if (get_control_area_of_player(player_list[1] if player == player_list[0] else player_list[0]).has(target_d) and \
+															not has_enemy_duke(target_d, player)):
+															continue
+
+													var attempt_score = 0
+													
+													if (imagined_board[target_d] != null and imagined_board[target_d].player != player):
+														if (imagined_board[target_d].player == current_player): # if AI's Duke is destroyed, make score even lower
+															attempt_score += get_chess_score(imagined_board[target_d].name) * multiplier * 10
+														else:
+															attempt_score += get_chess_score(imagined_board[target_d].name) * multiplier
+														
+													# perform imagined action
+													var new_imagined_board = []
+													for nn in range(Global.MAXR * Global.MAXC):
+														new_imagined_board.append(imagined_board[nn].duplicate() if imagined_board[nn]!= null else null)
+													
+													new_imagined_board[target_d] = new_imagined_board[command_d]
+													new_imagined_board[command_d] = null
+													
+													new_imagined_board[n].is_front = !new_imagined_board[n].is_front
+														
+													attempt_score += find_best_op(player_list[1] if player == player_list[0] else player_list[0], new_imagined_board, depth - 1)[0]
+													
+													if (multiplier > 0 and attempt_score > score) or (multiplier < 0 and attempt_score < score):
+														score = attempt_score
+													
+														possible_selections = []
+														possible_selections.append({
+															GAMESTATE.CHOOSECHESS: n,
+															GAMESTATE.CHOOSEACTION: a,
+															GAMESTATE.CHOOSEDESTONE: command_d,
+															GAMESTATE.CHOOSEDESTTWO: target_d
+														})
+													elif (attempt_score == score):
+														score = attempt_score
+												
+														possible_selections.append({
+															GAMESTATE.CHOOSECHESS: n,
+															GAMESTATE.CHOOSEACTION: a,
+															GAMESTATE.CHOOSEDESTONE: command_d,
+															GAMESTATE.CHOOSEDESTTWO: target_d
+														})
+	
+	# DEBUG
+	print("depth: %s, score: %s" % [depth, score])
+	
+	var random_ix = randi() % len(possible_selections)
+	return [score, possible_selections[random_ix]]								
+	
+static func get_chess_score(chess_name):
+	match chess_name:
+		"Duke":
+			return 1000
+		"Assassin":
+			return 45
+		"Bowman":
+			return 45
+		"Champion":
+			return 70
+		"Dragoon":
+			return 50
+		"Footman":
+			return 20
+		"General":
+			return 65
+		"Knight":
+			return 35
+		"LongBowman":
+			return 25
+		"Marshall":
+			return 65
+		"Pikeman":
+			return 25
+		"Priest":
+			return 60
+		"Ranger":
+			return 60
+		"Seer":
+			return 60
+		"Wizard":
+			return 60
+		_:
+			return 45

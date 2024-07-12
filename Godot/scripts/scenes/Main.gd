@@ -59,6 +59,9 @@ func _ready():
 
 	if (Global.is_ai):
 		game.connect("close_menu", func(): get_tree().call_group("menu", "queue_free"))
+		
+		game.connect("disable_start_button", func(): $MainGUI/GridContainer/StartButton.disabled = true)
+		game.connect("enable_start_button", func(): $MainGUI/GridContainer/StartButton.disabled = false)
 	
 func _setup_ui_localization():
 	$MainGUI/GridContainer/Label.text = tr("MAIN_MODE") + " " + \

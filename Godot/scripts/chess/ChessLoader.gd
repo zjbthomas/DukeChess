@@ -28,6 +28,11 @@ func load_chess():
 	# load chess from files
 	_load_chess_files()
 	
+	# add a dummy ChessModel (for AI SUMMON)
+	var dummy_chess = ChessModel.new()
+	dummy_chess.name = "Dummy"
+	chessmodel_dict["Dummy"] = dummy_chess
+	
 func load_chess_textures():
 	chess_textures["Move"] = load("res://images//chess//movements//Move.png")
 	chess_textures["Jump"] = load("res://images//chess//movements//Jump.png")

@@ -9,6 +9,12 @@ func _init(name, player):
 	self.name = name
 	self.player = player
 
+func duplicate():
+	var new_chess_inst = ChessInst.new(self.name, self.player)
+	new_chess_inst.is_front = self.is_front
+	
+	return new_chess_inst
+
 func get_available_actions(board, pos):
 	var chess_model:ChessModel = Global.chess_loader.chessmodel_dict[name]
 	var all_actions = chess_model.front_dict.keys() if is_front else chess_model.back_dict.keys()
@@ -35,6 +41,21 @@ func get_all_movements(action):
 func get_available_destinations(board, pos, action):
 	var ret = []
 	
+	if (action == ChessModel.ACTION_TYPE.COMMAND):
+		var has_commandable_chess = false
+		var all_command_movements = get_all_movements(ChessModel.ACTION_TYPE.COMMAND)
+		if (all_command_movements != null):
+			for possible_d in all_command_movements:
+				var offset_x = Global.dest_to_offsets_with_player(possible_d, player)[0]
+				var offset_y = Global.dest_to_offsets_with_player(possible_d, player)[1]
+				
+				if (Global.movement_manager.has_friend_chess(board, pos, offset_x, offset_y, player)):
+					has_commandable_chess = true
+					break
+			
+		if (not has_commandable_chess):
+			return ret
+	
 	var all_movements = get_all_movements(action)
 	if (all_movements != null):
 		for possible_d in all_movements:
@@ -45,6 +66,21 @@ func get_available_destinations(board, pos, action):
 
 func get_available_movements(board, pos, action):
 	var ret = {}
+	
+	if (action == ChessModel.ACTION_TYPE.COMMAND):
+		var has_commandable_chess = false
+		var all_command_movements = get_all_movements(ChessModel.ACTION_TYPE.COMMAND)
+		if (all_command_movements != null):
+			for possible_d in all_command_movements:
+				var offset_x = Global.dest_to_offsets_with_player(possible_d, player)[0]
+				var offset_y = Global.dest_to_offsets_with_player(possible_d, player)[1]
+				
+				if (Global.movement_manager.has_friend_chess(board, pos, offset_x, offset_y, player)):
+					has_commandable_chess = true
+					break
+			
+		if (not has_commandable_chess):
+			return ret
 	
 	var all_movements = get_all_movements(action)
 	if (all_movements != null):
