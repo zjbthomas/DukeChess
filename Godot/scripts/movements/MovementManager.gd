@@ -32,7 +32,8 @@ static func is_inside_board(board, pos, offset_x, offset_y):
 			(r + offset_y >= 0) and (r + offset_y < Global.MAXR)
 			
 static func has_any_chess(board, pos, offset_x, offset_y):
-	return board[pos_with_offsets(pos, offset_x, offset_y)] != null
+	return is_inside_board(board, pos, offset_x, offset_y) and \
+			board[pos_with_offsets(pos, offset_x, offset_y)] != null
 
 static func has_friend_chess(board, pos, offset_x, offset_y, player):
 	return has_any_chess(board, pos, offset_x, offset_y) and \

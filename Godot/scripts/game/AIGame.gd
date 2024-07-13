@@ -446,7 +446,7 @@ func find_best_op(player, imagined_board, depth):
 											if (target_d != command_d and
 												((imagined_board[target_d] != null and imagined_board[target_d].player != player) or imagined_board[target_d] == null)):
 													# Special rule for Duke
-													if not _is_duke_safe_after_action(imagined_board, n, player, a, target_d, command_pos):
+													if not _is_duke_safe_after_action(imagined_board, n, player, a, target_d, command_d):
 														continue
 													
 													#if imagined_board[command_d].name == "Duke":
@@ -457,8 +457,8 @@ func find_best_op(player, imagined_board, depth):
 													var attempt_score = 0
 													
 													if (imagined_board[target_d] != null and imagined_board[target_d].player != player):
-														if (imagined_board[target_d].player == current_player): # if AI's Duke is destroyed, make score even lower
-															attempt_score += get_chess_score(imagined_board[target_d].name) * multiplier * 10
+														if (imagined_board[target_d].player == current_player):
+															attempt_score += get_chess_score(imagined_board[target_d].name) * multiplier
 														else:
 															attempt_score += get_chess_score(imagined_board[target_d].name) * multiplier
 														
