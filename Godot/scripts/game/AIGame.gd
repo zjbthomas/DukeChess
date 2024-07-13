@@ -22,8 +22,14 @@ const SUMMON_SCORE = 0
 var first_ai_summon_pos
 var best_selection_dict
 
+const WAITING_CNT_MAX = 2
+var _waiting_cnt
+signal finished_thinking
+
 func _init(GUI):
 	self.GUI = GUI
+	
+	connect("finished_thinking", _on_waiting_signals)
 
 func game_start():
 	super()
@@ -34,7 +40,7 @@ func game_start():
 	
 	# if AI is the first player, summon initial Footmans
 	if (current_player != player_list[0]):
-		ai_act()
+		ai_handle()
 		
 func perform_op(user_op, is_from_menu):
 	if (current_player == null or current_player != player_list[0]):
@@ -49,20 +55,57 @@ func perform_op(user_op, is_from_menu):
 
 		# AI's turn
 		if (current_player != player_list[0]):
-			ai_act()
+			ai_handle()
 			
 		return true
 	else:
 		return false
 
-func ai_act():
+func ai_handle():
 	disable_start_button.emit()
 	
-	var wait_time = 0.2 + 2 * GUI._CHESS_UP_DOWN_TIME + GUI._CHESS_MOVE_TIME + GUI._CHESS_FLIP_TIME
-	await GUI.get_tree().create_timer(wait_time).timeout # TODO: wait for some seconds for playing animation; it is better to be in GUI
+	_waiting_cnt = WAITING_CNT_MAX
 	
-	enable_start_button.emit()
+	var wait_time = 0.3 + 2 * GUI._CHESS_UP_DOWN_TIME + GUI._CHESS_MOVE_TIME + GUI._CHESS_FLIP_TIME
+	GUI.get_tree().create_timer(wait_time).connect("timeout", _on_waiting_signals) # TODO: wait for some seconds for playing animation; it is better to be in GUI
+
+	match current_state:
+		GAMESTATE.CHOOSECHESS:
+			var thread = Thread.new()
+			thread.start(ai_think)
+		GAMESTATE.CHOOSEDESTONE:
+			if current_action == ChessModel.ACTION_TYPE.SUMMON:
+				var thread = Thread.new()
+				thread.start(ai_think)
+			else:
+				finished_thinking.emit()
+		_:
+			finished_thinking.emit()
+
+func ai_think():
+	match current_state:
+		GAMESTATE.CHOOSECHESS:
+			# calculate best op
+			var score_and_dict = find_best_op(current_player, board, Global.ai_depth)
+			best_selection_dict = score_and_dict[1]
+			
+			# DEBUG
+			print(score_and_dict[0])
+		GAMESTATE.CHOOSEDESTONE:
+			if current_action == ChessModel.ACTION_TYPE.SUMMON:
+				# re-calculate best op as now we know summon_chess
+				var score_and_dict = find_best_op_for_summon()
+				best_selection_dict = score_and_dict[1]
+		
+	finished_thinking.emit()
+
+func _on_waiting_signals():
+	_waiting_cnt -= 1
 	
+	if (_waiting_cnt == 0):
+		call_deferred("ai_act")
+		
+func ai_act():
 	match current_state:
 		GAMESTATE.INITSUMMONPLAYERONEFOOTMANONE, GAMESTATE.INITSUMMONPLAYERONEFOOTMANTWO, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANONE, GAMESTATE.INITSUMMONPLAYERTWOFOOTMANTWO:
 			var possible_destinations = board[POS_DUKE1].get_available_destinations(board, POS_DUKE1, ChessModel.ACTION_TYPE.SUMMON)
@@ -90,16 +133,9 @@ func ai_act():
 			
 			# still in AI's turn
 			if (current_player != player_list[0]):
-				ai_act()
+				ai_handle()
 		
 		GAMESTATE.CHOOSECHESS:
-			# calculate best op
-			var score_and_dict = find_best_op(current_player, board, Global.ai_depth)
-			best_selection_dict = score_and_dict[1]
-			
-			# DEBUG
-			print(score_and_dict[0])
-			
 			# find available chess
 			var possible_n = []
 			for n in range(Global.MAXR * Global.MAXC):
@@ -121,7 +157,7 @@ func ai_act():
 			
 			# still in AI's turn
 			if (current_player != player_list[0]):
-				ai_act()
+				ai_handle()
 				
 		GAMESTATE.CHOOSEACTION:
 			# send a signal to close menu
@@ -150,16 +186,12 @@ func ai_act():
 			
 			# still in AI's turn
 			if (current_player != player_list[0]):
-				ai_act()
+				ai_handle()
 				
 		GAMESTATE.CHOOSEDESTONE:
 			var possible_destinations = []
 			match current_action:
 				ChessModel.ACTION_TYPE.SUMMON:
-					# re-calculate best op as now we know summon_chess
-					var score_and_dict = find_best_op_for_summon()
-					best_selection_dict = score_and_dict[1]
-					
 					possible_destinations = board[current_chess_pos].get_available_movements(board, current_chess_pos, ChessModel.ACTION_TYPE.SUMMON).keys()
 						
 				ChessModel.ACTION_TYPE.MOVE:
@@ -193,7 +225,7 @@ func ai_act():
 
 			# still in AI's turn
 			if (current_player != player_list[0]):
-				ai_act()
+				ai_handle()
 
 		GAMESTATE.CHOOSEDESTTWO:
 			match (current_action):
@@ -211,7 +243,7 @@ func ai_act():
 				
 					# still in AI's turn
 					if (current_player != player_list[0]):
-						ai_act()
+						ai_handle()
 			
 				ChessModel.ACTION_TYPE.COMMAND:
 					var possible_destinations = []
@@ -242,7 +274,13 @@ func ai_act():
 					
 					# still in AI's turn
 					if (current_player != player_list[0]):
-						ai_act()
+						ai_handle()
+
+func next_turn():
+	super()
+	
+	if (current_player == player_list[0]):
+		enable_start_button.emit()
 
 func store_to_history(actor, state, board, op, prob):
 	history.append({

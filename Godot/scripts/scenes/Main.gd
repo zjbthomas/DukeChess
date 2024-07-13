@@ -280,7 +280,6 @@ func _get_cover_effect_node(color):
 	return node
 
 func _on_game_show_menu(pos, items):
-	# DEBUG
 	var r = Global.n_to_rc(pos)[0]
 	var c = Global.n_to_rc(pos)[1]
 	
