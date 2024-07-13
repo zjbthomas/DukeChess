@@ -89,8 +89,6 @@ func ai_think():
 			var score_and_dict = find_best_op(current_player, board, Global.ai_depth)
 			best_selection_dict = score_and_dict[1]
 			
-			# DEBUG
-			print(score_and_dict[0])
 		GAMESTATE.CHOOSEDESTONE:
 			if current_action == ChessModel.ACTION_TYPE.SUMMON:
 				# re-calculate best op as now we know summon_chess
@@ -359,9 +357,9 @@ func emit_message():
 func emit_after_move_animation():
 	super()
 	
-	if (current_state == GAMESTATE.ENDSTATE):
-		history.append({"winner": 0 if not check_player_loss(true) else 1})
-		save_history()
+	#if (current_state == GAMESTATE.ENDSTATE):
+	#	history.append({"winner": 0 if not check_player_loss(true) else 1})
+	#	save_history()
 
 func find_best_op(player, imagined_board, depth):
 	var score = 0
@@ -535,9 +533,6 @@ func find_best_op(player, imagined_board, depth):
 															GAMESTATE.CHOOSEDESTTWO: target_d
 														})
 	
-	# DEBUG
-	print("depth: %s, score: %s" % [depth, score])
-	
 	# TODO: (need confirmation) this happens when score is always (-)INF)
 	if (score == (-INF if multiplier > 0 else INF)):
 		return [0, {}]
@@ -581,9 +576,6 @@ func find_best_op_for_summon():
 			possible_selections.append({
 				GAMESTATE.CHOOSEDESTONE: sp
 			})
-		
-	# DEBUG
-	print("SUMMON score: %s" % [score])
 	
 	# TODO: do we need this?
 	if (score == (-INF if multiplier > 0 else INF)):

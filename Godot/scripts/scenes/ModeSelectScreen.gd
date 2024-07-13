@@ -13,6 +13,8 @@ func _ready():
 			
 			break
 			
+	TranslationServer.set_locale("en")
+			
 	# add localization options
 	for ix in Global.LOCALES.size():
 		$MarginContainer/LanguageContainer/OptionButton.add_item(Global.LOCALES[Global.LOCALES.keys()[ix]], ix)

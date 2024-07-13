@@ -69,6 +69,7 @@ theme_override_font_sizes/font_size = 40
 text = "Select game mode:"
 
 [node name="LocalModeButton" type="Button" parent="VBoxContainer"]
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 theme_override_styles/normal = SubResource("StyleBoxFlat_lw36n")
@@ -103,6 +104,7 @@ layout_mode = 2
 theme_override_constants/separation = 10
 
 [node name="ServerModeButton" type="Button" parent="VBoxContainer"]
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 theme_override_styles/normal = SubResource("StyleBoxFlat_lw36n")
@@ -111,6 +113,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_24xia")
 text = "Online Server"
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
+visible = false
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
