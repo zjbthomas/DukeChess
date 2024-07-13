@@ -432,7 +432,9 @@ func check_player_loss(is_main_player):
 		if (board[n] != null and
 			board[n].name == "Duke" and 
 			board[n].player == player_list[0 if is_main_player else 1]):
-			return false
+	
+			if (has_available_movement(player_list[0 if is_main_player else 1], board)):
+				return false
 	
 	return true
 
@@ -679,3 +681,38 @@ func emit_after_move_animation():
 	else:
 		emit_cover_effects(null)
 		emit_message()
+
+func has_available_movement(player, board):
+	# iterate all possible chess
+	for n in range(Global.MAXR * Global.MAXC):
+		if (board[n] != null):
+			if (board[n].player == player):
+				if len(board[n].get_available_actions(board, n)) > 0:
+
+					# iterate all possible actions
+					for a in board[n].get_available_actions(board, n):
+						match a:
+							ChessModel.ACTION_TYPE.SUMMON:
+								var possible_destinations = board[n].get_available_movements(board, n, a).keys()
+
+								if (len(possible_destinations) > 0):
+									return true
+									
+							ChessModel.ACTION_TYPE.MOVE:
+								var movements = board[n].get_available_movements(board, n, a)
+								for d in movements:
+									# Special rule for Duke
+									if _is_duke_safe_after_action(board, n, player, a, d):
+										return true
+										
+							ChessModel.ACTION_TYPE.COMMAND:
+								for command_d in board[n].get_available_movements(board, n, a): # command pos
+									if (board[command_d] != null and board[command_d].player == player):
+										for target_d in board[n].get_available_destinations(board, n, a): # TODO: why different?
+											if (target_d != command_d and
+												((board[target_d] != null and board[target_d].player != player) or board[target_d] == null)):
+													# Special rule for Duke
+													if _is_duke_safe_after_action(board, n, player, a, target_d, command_pos):
+														return true
+	
+	return false

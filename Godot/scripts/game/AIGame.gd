@@ -326,8 +326,10 @@ func find_best_op(player, imagined_board, depth):
 	var score = 0
 	var possible_selections = []
 	
-	if (depth == 0 or 
-		board.count(null) == (Global.MAXR * Global.MAXC)): # TODO: (need confirmation) this happens when there is no chess on the board (and score is always (-)INF)
+	if (depth == 0): 
+		return [score, {}]
+	
+	if (not has_available_movement(player, imagined_board)):
 		return [score, {}]
 	
 	var multiplier = 1 if player == current_player else -1
@@ -494,6 +496,10 @@ func find_best_op(player, imagined_board, depth):
 	
 	# DEBUG
 	print("depth: %s, score: %s" % [depth, score])
+	
+	# TODO: (need confirmation) this happens when score is always (-)INF)
+	if (score == (-INF if multiplier > 0 else INF)):
+		return [0, {}]
 	
 	var random_ix = randi() % len(possible_selections)
 	return [score, possible_selections[random_ix]]								
