@@ -15,7 +15,6 @@ var history
 var GUI
 
 # for AI decision
-const DEPTH = 3
 const DEPTH_DECAY = 0.8
 
 const SUMMON_SCORE = 0
@@ -95,7 +94,7 @@ func ai_act():
 		
 		GAMESTATE.CHOOSECHESS:
 			# calculate best op
-			var score_and_dict = find_best_op(current_player, board, DEPTH)
+			var score_and_dict = find_best_op(current_player, board, Global.ai_depth)
 			best_selection_dict = score_and_dict[1]
 			
 			# DEBUG
@@ -528,7 +527,7 @@ func find_best_op_for_summon():
 		var added_chess = ChessInst.new(summon_chess, current_player)
 		new_imagined_board[sp] = added_chess
 			
-		attempt_score += DEPTH_DECAY * find_best_op(player_list[1] if current_player == player_list[0] else player_list[0], new_imagined_board, DEPTH - 1)[0]
+		attempt_score += DEPTH_DECAY * find_best_op(player_list[1] if current_player == player_list[0] else player_list[0], new_imagined_board, Global.ai_depth - 1)[0]
 
 		if (multiplier > 0 and attempt_score > score) or (multiplier < 0 and attempt_score < score):
 			score = attempt_score

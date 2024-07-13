@@ -76,7 +76,11 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_j21eo")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_24xia")
 text = "Local"
 
-[node name="AIModeButton" type="Button" parent="VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="AIEasyModeButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 theme_override_styles/normal = SubResource("StyleBoxFlat_lw36n")
@@ -84,6 +88,19 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_j21eo")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_24xia")
 text = "AI
 "
+
+[node name="AIHardModeButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxFlat_lw36n")
+theme_override_styles/hover = SubResource("StyleBoxFlat_j21eo")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_24xia")
+text = "AI
+"
+
+[node name="HSeparator2" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
 
 [node name="ServerModeButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
@@ -117,6 +134,7 @@ theme_override_font_sizes/font_size = 40
 icon_alignment = 1
 
 [connection signal="pressed" from="VBoxContainer/LocalModeButton" to="." method="_on_local_mode_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/AIModeButton" to="." method="_on_ai_mode_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/AIEasyModeButton" to="." method="_on_ai_easy_mode_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/AIHardModeButton" to="." method="_on_ai_hard_mode_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/ServerModeButton" to="." method="_on_server_mode_button_pressed"]
 [connection signal="item_selected" from="MarginContainer/LanguageContainer/OptionButton" to="." method="_on_option_button_item_selected"]

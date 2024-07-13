@@ -25,6 +25,8 @@ func _ready():
 func _setup_ui_localization():
 	$VBoxContainer/Label.text = tr("SELECT_MODE")
 	$VBoxContainer/LocalModeButton.text = tr("SELECT_LOCAL")
+	$VBoxContainer/AIEasyModeButton.text = tr("SELECT_AI_EASY")
+	$VBoxContainer/AIHardModeButton.text = tr("SELECT_AI_HARD")
 	$VBoxContainer/ServerModeButton.text = tr("SELECT_ONLINE")
 
 func _on_local_mode_button_pressed():
@@ -32,9 +34,20 @@ func _on_local_mode_button_pressed():
 	Global.is_ai = false
 	get_tree().change_scene_to_packed.bind(load_scene).call_deferred()
 
-func _on_ai_mode_button_pressed():
+func _on_ai_easy_mode_button_pressed():
 	Global.is_local = true
 	Global.is_ai = true
+	
+	Global.ai_depth = Global.AI_MODE.EASY
+	
+	get_tree().change_scene_to_packed.bind(load_scene).call_deferred()
+	
+func _on_ai_hard_mode_button_pressed():
+	Global.is_local = true
+	Global.is_ai = true
+	
+	Global.ai_depth = Global.AI_MODE.HARD
+	
 	get_tree().change_scene_to_packed.bind(load_scene).call_deferred()
 
 func _on_server_mode_button_pressed():

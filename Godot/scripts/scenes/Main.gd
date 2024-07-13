@@ -64,8 +64,19 @@ func _ready():
 		game.connect("enable_start_button", func(): $MainGUI/GridContainer/StartButton.disabled = false)
 	
 func _setup_ui_localization():
-	$MainGUI/GridContainer/Label.text = tr("MAIN_MODE") + " " + \
-		("AI" if Global.is_ai else (tr("SELECT_LOCAL") if Global.is_local else tr("SELECT_ONLINE")))
+	var mode
+	if (Global.is_ai):
+		if (Global.ai_depth == Global.AI_MODE.EASY):
+			mode = tr("SELECT_AI_EASY")
+		else:
+			mode = tr("SELECT_AI_HARD")
+	else:
+		if (Global.is_local):
+			mode = tr("SELECT_LOCAL")
+		else:
+			mode = tr("SELECT_ONLINE")
+	
+	$MainGUI/GridContainer/Label.text = tr("MAIN_MODE") + " " + mode
 
 func _on_client_connected():
 	$MainGUI/GridContainer/StartButton.disabled = true

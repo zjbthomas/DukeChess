@@ -12,12 +12,15 @@ const LOCALES = {
 	"zh": "简体中文"
 }
 
+enum AI_MODE {EASY=2, HARD=3}
+
 var chess_loader:ChessLoader
 
 var movement_manager:MovementManager = MovementManager.new()
 
 var is_local = false
 var is_ai = false
+var ai_depth:AI_MODE
 
 func rc_to_n(r, c):
 	return r * Global.MAXC + c

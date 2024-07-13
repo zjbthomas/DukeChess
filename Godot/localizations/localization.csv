@@ -12,6 +12,8 @@ CHESS_LOADER_ERROR_INVALID_MOVEMENT,ERROR: invald type %s or destination %s in X
 CHESS_LOADER_ERROR_INVALID_ACTION,ERROR: invald action %s in XML %s.,加载错误：行动类型%s不合法。请检查%s。
 SELECT_MODE,Select game mode:,选择游戏模式：
 SELECT_LOCAL,Local,本地
+SELECT_AI_EASY,Easy AI,简单AI
+SELECT_AI_HARD,Hard AI,困难AI
 SELECT_ONLINE,Online Server,在线
 MAIN_MODE,Mode:,游戏模式：
 MAIN_BUTTON_BACK,Back to mode selection,重选游戏模式
