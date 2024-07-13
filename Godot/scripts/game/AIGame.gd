@@ -280,7 +280,7 @@ func next_turn():
 	super()
 	
 	if (current_player == player_list[0]):
-		enable_start_button.emit()
+		enable_start_button.emit() # move this here so it will be run when UI is free
 
 func store_to_history(actor, state, board, op, prob):
 	history.append({
