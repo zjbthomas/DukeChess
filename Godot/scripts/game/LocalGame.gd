@@ -714,7 +714,7 @@ func has_available_movement(player, board):
 											if (target_d != command_d and
 												((board[target_d] != null and board[target_d].player != player) or board[target_d] == null)):
 													# Special rule for Duke
-													if _is_duke_safe_after_action(board, n, player, a, target_d, command_pos):
+													if _is_duke_safe_after_action(board, n, player, a, target_d, command_d):
 														return true
 	
 	return false
