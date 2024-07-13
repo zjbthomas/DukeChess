@@ -157,6 +157,10 @@ func ai_act():
 			var possible_destinations = []
 			match current_action:
 				ChessModel.ACTION_TYPE.SUMMON:
+					# re-calculate best op as now we know summon_chess
+					var score_and_dict = find_best_op_for_summon()
+					best_selection_dict = score_and_dict[1]
+					
 					possible_destinations = board[current_chess_pos].get_available_movements(board, current_chess_pos, ChessModel.ACTION_TYPE.SUMMON).keys()
 						
 				ChessModel.ACTION_TYPE.MOVE:
@@ -502,8 +506,55 @@ func find_best_op(player, imagined_board, depth):
 		return [0, {}]
 	
 	var random_ix = randi() % len(possible_selections)
-	return [score, possible_selections[random_ix]]								
+	return [score, possible_selections[random_ix]]
+
+func find_best_op_for_summon():
+	var score = -INF
+	var possible_selections = []
 	
+	var multiplier = 1
+	
+	# iterate all possible chess
+	var possible_destinations = board[current_chess_pos].get_available_movements(board, current_chess_pos, ChessModel.ACTION_TYPE.SUMMON).keys()
+
+	for sp in possible_destinations:
+		var attempt_score = SUMMON_SCORE * multiplier
+
+		# we assume that a dummy chess is summon
+		var new_imagined_board = []
+		for nn in range(Global.MAXR * Global.MAXC):
+			new_imagined_board.append(board[nn].duplicate() if board[nn]!= null else null)
+		
+		var added_chess = ChessInst.new(summon_chess, current_player)
+		new_imagined_board[sp] = added_chess
+			
+		attempt_score += DEPTH_DECAY * find_best_op(player_list[1] if current_player == player_list[0] else player_list[0], new_imagined_board, DEPTH - 1)[0]
+
+		if (multiplier > 0 and attempt_score > score) or (multiplier < 0 and attempt_score < score):
+			score = attempt_score
+		
+			possible_selections = []
+			possible_selections.append({
+				GAMESTATE.CHOOSEDESTONE: sp
+			})
+		elif (attempt_score == score):
+			
+			score = attempt_score
+	
+			possible_selections.append({
+				GAMESTATE.CHOOSEDESTONE: sp
+			})
+		
+	# DEBUG
+	print("SUMMON score: %s" % [score])
+	
+	# TODO: do we need this?
+	if (score == (-INF if multiplier > 0 else INF)):
+		return [0, {}]
+	
+	var random_ix = randi() % len(possible_selections)
+	return [score, possible_selections[random_ix]]
+
 static func get_chess_score(chess_name):
 	match chess_name:
 		"Duke":
