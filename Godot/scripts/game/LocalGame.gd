@@ -588,7 +588,8 @@ func _is_duke_safe_after_action(board, chess_pos, player, action, op_pos, comman
 				
 			for nn in range(Global.MAXR * Global.MAXC):
 				if (imagined_board[nn] != null and imagined_board[nn].name == "Duke" and imagined_board[nn].player == player):
-					if (get_control_area_of_player(imagined_board, player_list[1] if player == player_list[0] else player_list[0]).has(nn)):
+					if (get_control_area_of_player(imagined_board, player_list[1] if player == player_list[0] else player_list[0]).has(nn) and \
+						not has_enemy_duke(nn, player)):
 						return false
 					else:
 						break
@@ -605,7 +606,8 @@ func _is_duke_safe_after_action(board, chess_pos, player, action, op_pos, comman
 				
 			for nn in range(Global.MAXR * Global.MAXC):
 				if (imagined_board[nn] != null and imagined_board[nn].name == "Duke" and imagined_board[nn].player == player):
-					if (get_control_area_of_player(imagined_board, player_list[1] if player == player_list[0] else player_list[0]).has(nn)):
+					if (get_control_area_of_player(imagined_board, player_list[1] if player == player_list[0] else player_list[0]).has(nn) and \
+						not has_enemy_duke(nn, player)):
 						return false
 					else:
 						break
