@@ -16,7 +16,7 @@ var GUI
 
 # for AI decision
 const DEPTH = 3
-const DEPTH_DECAY = 1.0
+const DEPTH_DECAY = 0.8
 
 const SUMMON_SCORE = 0
 
@@ -95,7 +95,7 @@ func ai_act():
 		
 		GAMESTATE.CHOOSECHESS:
 			# calculate best op
-			var score_and_dict = find_best_op(current_player, board, DEPTH, -INF, INF)
+			var score_and_dict = find_best_op(current_player, board, DEPTH)
 			best_selection_dict = score_and_dict[1]
 			
 			# DEBUG
@@ -322,7 +322,7 @@ func emit_after_move_animation():
 		history.append({"winner": 0 if not check_player_loss(true) else 1})
 		save_history()
 
-func find_best_op(player, imagined_board, depth, alpha, beta):
+func find_best_op(player, imagined_board, depth):
 	var score = 0
 	var possible_selections = []
 	
@@ -341,30 +341,18 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 		score = INF
 	
 	# iterate all possible chess
-	var is_break = false
-	
 	for n in range(Global.MAXR * Global.MAXC):
-		if (is_break):
-			break
-		
 		if (imagined_board[n] != null):
 			if (imagined_board[n].player == player):
 				if len(imagined_board[n].get_available_actions(imagined_board, n)) > 0:
 
 					# iterate all possible actions
 					for a in imagined_board[n].get_available_actions(imagined_board, n):
-						
-						if (is_break):
-							break
-						
 						match a:
 							ChessModel.ACTION_TYPE.SUMMON:
 								var possible_destinations = imagined_board[n].get_available_movements(imagined_board, n, a).keys()
 
 								for sp in possible_destinations:
-									if (is_break):
-										break
-									
 									var attempt_score = SUMMON_SCORE * multiplier
 
 									# we assume that a dummy chess is summon
@@ -375,7 +363,7 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 									var dummy_chess = ChessInst.new("Dummy", player)
 									new_imagined_board[sp] = dummy_chess
 										
-									attempt_score += DEPTH_DECAY * find_best_op(player_list[1] if player == player_list[0] else player_list[0], new_imagined_board, depth - 1, alpha, beta)[0]
+									attempt_score += DEPTH_DECAY * find_best_op(player_list[1] if player == player_list[0] else player_list[0], new_imagined_board, depth - 1)[0]
 
 									if (multiplier > 0 and attempt_score > score) or (multiplier < 0 and attempt_score < score):
 										score = attempt_score
@@ -396,21 +384,9 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 											GAMESTATE.CHOOSEDESTONE: sp
 										})
 									
-									#if (multiplier > 0):
-										#alpha = max(alpha, score)
-										#if (beta <= alpha):
-											#is_break = true
-									#else:
-										#beta = min(beta, score)
-										#if (beta <= alpha):
-											#is_break = true
-									
 							ChessModel.ACTION_TYPE.MOVE:
 								var movements = imagined_board[n].get_available_movements(imagined_board, n, a)
 								for d in movements:
-									if (is_break):
-										break
-									
 									# Special rule for Duke
 									if not _is_duke_safe_after_action(imagined_board, n, player, a, d):
 										continue
@@ -423,13 +399,10 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 									var attempt_score = 0
 									
 									if (imagined_board[d] != null and imagined_board[d].player != player):
-										if (imagined_board[d].name == "Duke" and depth == DEPTH): 
-											attempt_score += get_chess_score(imagined_board[d].name) * multiplier * 10 # if enemy's Duke is attacked, assign a super high score
+										if (imagined_board[d].player == current_player): 
+											attempt_score += get_chess_score(imagined_board[d].name) * multiplier
 										else:
-											if (imagined_board[d].player == current_player): 
-												attempt_score += get_chess_score(imagined_board[d].name) * multiplier
-											else:
-												attempt_score += get_chess_score(imagined_board[d].name) * multiplier
+											attempt_score += get_chess_score(imagined_board[d].name) * multiplier
 										
 									# perform imagined action
 									var new_imagined_board = []
@@ -446,7 +419,7 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 										
 										new_imagined_board[d].is_front = !new_imagined_board[d].is_front
 										
-									attempt_score += DEPTH_DECAY * find_best_op(player_list[1] if player == player_list[0] else player_list[0], new_imagined_board, depth - 1, alpha, beta)[0]
+									attempt_score += DEPTH_DECAY * find_best_op(player_list[1] if player == player_list[0] else player_list[0], new_imagined_board, depth - 1)[0]
 									
 									if (multiplier > 0 and attempt_score > score) or (multiplier < 0 and attempt_score < score):
 										score = attempt_score
@@ -465,26 +438,11 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 											GAMESTATE.CHOOSEACTION: a,
 											GAMESTATE.CHOOSEDESTONE: d
 										})
-										
-									if (multiplier > 0):
-										alpha = max(alpha, score)
-										if (beta <= alpha):
-											is_break = true
-									else:
-										beta = min(beta, score)
-										if (beta <= alpha):
-											is_break = true
 
 							ChessModel.ACTION_TYPE.COMMAND:
 								for command_d in imagined_board[n].get_available_movements(imagined_board, n, a): # command pos
-									if (is_break):
-										break
-									
 									if (imagined_board[command_d] != null and imagined_board[command_d].player == player):
 										for target_d in imagined_board[n].get_available_destinations(imagined_board, n, a): # TODO: why different?
-											if (is_break):
-												break
-											
 											if (target_d != command_d and
 												((imagined_board[target_d] != null and imagined_board[target_d].player != player) or imagined_board[target_d] == null)):
 													# Special rule for Duke
@@ -499,13 +457,10 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 													var attempt_score = 0
 													
 													if (imagined_board[target_d] != null and imagined_board[target_d].player != player):
-														if (imagined_board[target_d].name == "Duke" and depth == DEPTH): 
-															attempt_score += get_chess_score(imagined_board[target_d].name) * multiplier * 10 # if enemy's Duke is attacked, assign a super high score
+														if (imagined_board[target_d].player == current_player):
+															attempt_score += get_chess_score(imagined_board[target_d].name) * multiplier
 														else:
-															if (imagined_board[target_d].player == current_player):
-																attempt_score += get_chess_score(imagined_board[target_d].name) * multiplier
-															else:
-																attempt_score += get_chess_score(imagined_board[target_d].name) * multiplier
+															attempt_score += get_chess_score(imagined_board[target_d].name) * multiplier
 														
 													# perform imagined action
 													var new_imagined_board = []
@@ -517,7 +472,7 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 													
 													new_imagined_board[n].is_front = !new_imagined_board[n].is_front
 														
-													attempt_score += DEPTH_DECAY * find_best_op(player_list[1] if player == player_list[0] else player_list[0], new_imagined_board, depth - 1, alpha, beta)[0]
+													attempt_score += DEPTH_DECAY * find_best_op(player_list[1] if player == player_list[0] else player_list[0], new_imagined_board, depth - 1)[0]
 													
 													if (multiplier > 0 and attempt_score > score) or (multiplier < 0 and attempt_score < score):
 														score = attempt_score
@@ -538,20 +493,9 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 															GAMESTATE.CHOOSEDESTONE: command_d,
 															GAMESTATE.CHOOSEDESTTWO: target_d
 														})
-														
-													if (multiplier > 0):
-														alpha = max(alpha, score)
-														if (beta <= alpha):
-															is_break = true
-													else:
-														beta = min(beta, score)
-														if (beta <= alpha):
-															is_break = true
 	
 	# DEBUG
 	print("depth: %s, score: %s" % [depth, score])
-	if (depth == 3):
-		print(possible_selections)
 	
 	# TODO: (need confirmation) this happens when score is always (-)INF)
 	if (score == (-INF if multiplier > 0 else INF)):
