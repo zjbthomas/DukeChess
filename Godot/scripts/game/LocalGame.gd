@@ -585,14 +585,20 @@ func _is_duke_safe_after_action(board, chess_pos, player, action, op_pos, comman
 				imagined_board[chess_pos] = null
 				
 				imagined_board[op_pos].is_front = !imagined_board[op_pos].is_front
-				
+			
+			var duke_under_control = false
+			var found_enemy_duke = false
 			for nn in range(Global.MAXR * Global.MAXC):
-				if (imagined_board[nn] != null and imagined_board[nn].name == "Duke" and imagined_board[nn].player == player):
-					if (get_control_area_of_player(imagined_board, player_list[1] if player == player_list[0] else player_list[0]).has(nn) and \
-						not has_enemy_duke(nn, player)):
-						return false
+				if (imagined_board[nn] != null and imagined_board[nn].name == "Duke"):
+					if (imagined_board[nn].player == player):
+						if (get_control_area_of_player(imagined_board, player_list[1] if player == player_list[0] else player_list[0]).has(nn) and \
+							not has_enemy_duke(nn, player)):
+							duke_under_control = true
 					else:
-						break
+						found_enemy_duke = true
+						
+			if (found_enemy_duke and duke_under_control):
+				return false
 					
 		ChessModel.ACTION_TYPE.COMMAND:
 			var imagined_board = []
@@ -603,15 +609,21 @@ func _is_duke_safe_after_action(board, chess_pos, player, action, op_pos, comman
 			imagined_board[command_pos] = null
 			
 			imagined_board[chess_pos].is_front = !imagined_board[chess_pos].is_front
-				
+
+			var duke_under_control = false
+			var found_enemy_duke = false
 			for nn in range(Global.MAXR * Global.MAXC):
-				if (imagined_board[nn] != null and imagined_board[nn].name == "Duke" and imagined_board[nn].player == player):
-					if (get_control_area_of_player(imagined_board, player_list[1] if player == player_list[0] else player_list[0]).has(nn) and \
-						not has_enemy_duke(nn, player)):
-						return false
+				if (imagined_board[nn] != null and imagined_board[nn].name == "Duke"):
+					if (imagined_board[nn].player == player):
+						if (get_control_area_of_player(imagined_board, player_list[1] if player == player_list[0] else player_list[0]).has(nn) and \
+							not has_enemy_duke(nn, player)):
+							duke_under_control = true
 					else:
-						break
-						
+						found_enemy_duke = true
+			
+			if (found_enemy_duke and duke_under_control):
+				return false
+				
 	return true
 
 func emit_control_area_cover_effects(player):
