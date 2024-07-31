@@ -9,7 +9,7 @@ signal peer_disconnected
 
 const _IS_DEBUG:bool = false
 
-const WEBSOCKET_URL = "http://" + ("localhost" if _IS_DEBUG else "175.178.11.87:7135") + "/socket.io/"
+const WEBSOCKET_URL = "http://" + ("localhost" if _IS_DEBUG else "175.178.11.87") + "/socket.io/"
 const NAMESPACE = "/dukechess" # NO / AT THE END!!!
 
 var _client
