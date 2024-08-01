@@ -44,6 +44,55 @@ class JumpSlide extends MovementImpl {
 		}
 		return ret;
 	}
+
+	validateControlArea(field, pos, d, p) {
+		var ret = [];
+		
+		var offsets = DestUtils.dest2Offset(d, p);
+		
+		if (0 != offsets[0] & 0 != offsets[1] & Math.abs(offsets[0]) != Math.abs(offsets[1])) return ret;
+		
+		if ((1 == Math.abs(offsets[0])) || (1 == Math.abs(offsets[1]))) return ret;
+		
+		if (!this.isInField(field, pos, offsets)) return ret;
+		
+		if (this.hasMyChess(field, pos, offsets, p)) {
+			ret = ret.concat(this.offset2Dest(field, pos, offsets)); // different at here!!
+			return ret;
+		}
+		
+		ret = ret.concat(this.offset2Dest(field, pos, offsets));
+		
+		var startPos = this.offset2Dest(field, pos, offsets);
+		
+		var moveStep = this.getStep(offsets);
+
+		var temp = [0, 0];
+		temp[0] += moveStep[0];
+		temp[1] += moveStep[1];
+		
+		while (this.isInField(field, startPos, temp))
+		{
+			if (this.hasMyChess(field, startPos, temp, p)) 
+			{
+				ret = ret.concat(this.offset2Dest(field, startPos, temp)); // different at here!!
+				return ret;
+			}
+			else if(this.hasNotMyChess(field, startPos, temp, p))
+			{
+				ret = ret.concat(this.offset2Dest(field, startPos, temp));
+				return ret;
+			}
+			else 
+			{
+				ret = ret.concat(this.offset2Dest(field, startPos, temp));
+			}
+			
+			temp[0] += moveStep[0];
+			temp[1] += moveStep[1];
+		}
+		return ret;
+	}
 }
 
 module.exports = JumpSlide;

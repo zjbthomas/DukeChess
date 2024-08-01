@@ -17,6 +17,10 @@ class Summon extends MovementImpl {
 		
 		return ret;
 	}
+
+	validateControlArea(field, pos, d, p) {
+		return [];
+	}
 }
 
 module.exports = Summon;

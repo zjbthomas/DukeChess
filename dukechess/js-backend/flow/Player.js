@@ -19,6 +19,10 @@ class Player {
     removeFromList(type) {
         this.chessList.splice(this.chessList.indexOf(type), 1);
     }
+
+    isSummonAvailable() {
+        return this.chessList.length > 0;
+    }
 }
 
 module.exports = Player;
