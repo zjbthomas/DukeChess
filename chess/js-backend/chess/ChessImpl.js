@@ -56,12 +56,7 @@ class ChessImpl {
 	
 
 	getAvailableDests(field, pos, action) {
-		var ret = [];
-		for (var [d, m] of this.getStyle(action)) {
-			var dest = field.movementFactory.createMovement(m).validateMovement(field, pos, d, this.player);
-			ret= ret.concat(dest);			
-		}
-		return ret;
+		return [...this.getAvailableMovements(field, pos, action).keys()];
 	}	
 	
 	getAvailableMovements(field, pos, action) {
