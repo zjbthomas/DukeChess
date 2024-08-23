@@ -599,13 +599,11 @@ func find_best_op_for_summon(alpha, beta):
 	var score = -INF
 	var possible_selections = []
 	
-	var multiplier = 1
-	
 	# iterate all possible chess
 	var possible_destinations = board[current_chess_pos].get_available_movements(board, current_chess_pos, ChessModel.ACTION_TYPE.SUMMON).keys()
 
 	for sp in possible_destinations:
-		var attempt_score = SUMMON_SCORE * multiplier
+		var attempt_score = SUMMON_SCORE
 
 		# we assume that a dummy chess is summon
 		var new_imagined_board = []
@@ -615,9 +613,9 @@ func find_best_op_for_summon(alpha, beta):
 		var added_chess = ChessInst.new(summon_chess, current_player)
 		new_imagined_board[sp] = added_chess
 			
-		attempt_score += 1.0 * find_best_op(player_list[1] if current_player == player_list[0] else player_list[0], new_imagined_board, Global.ai_depth - 1, alpha, beta)[0]
+		attempt_score += find_best_op(player_list[1] if current_player == player_list[0] else player_list[0], new_imagined_board, Global.ai_depth - 1, alpha, beta)[0]
 
-		if (multiplier > 0 and attempt_score > score) or (multiplier < 0 and attempt_score < score):
+		if (attempt_score > score):
 			score = attempt_score
 		
 			possible_selections = []
@@ -633,12 +631,17 @@ func find_best_op_for_summon(alpha, beta):
 				"score": score,
 				GAMESTATE.CHOOSEDESTONE: sp
 			})
+			
+		alpha = max(alpha, score)
+		if (beta <= alpha):
+			break
 		
 	# DEBUG
 	print("SUMMON score: %s" % [score])
+	print(possible_selections)
 	
 	# TODO: do we need this?
-	if (score == (-INF if multiplier > 0 else INF)):
+	if (score == -INF):
 		return [0, {}]
 	
 	var random_ix = randi() % len(possible_selections)
