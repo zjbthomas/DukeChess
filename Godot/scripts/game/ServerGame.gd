@@ -345,6 +345,10 @@ func emit_cover_effects_from_server(payload):
 					cover_effect_dict[pos] = Color.YELLOW
 				"green":
 					cover_effect_dict[pos] = Color.GREEN
+				"blue":
+					cover_effect_dict[pos] = Color.BLUE
+				"red":
+					cover_effect_dict[pos] = Color.RED
 
 	state_cover_effect.emit(cover_effect_dict)
 
