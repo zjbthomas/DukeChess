@@ -15,7 +15,7 @@ var history
 var GUI
 
 # for AI decision
-const DEPTH_DECAY = 0.8
+const DEPTH_DECAY = 1.0
 
 const SUMMON_SCORE = 0
 
@@ -380,11 +380,9 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 		score = -INF
 	else:
 		score = INF
-	
-	var ori_alpha = alpha
-	var ori_beta = beta
-	
+
 	# iterate all possible chess
+	var pruned = false
 	for n in range(Global.MAXR * Global.MAXC):
 		if (imagined_board[n] != null):
 			if (imagined_board[n].player == player):
@@ -395,9 +393,6 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 						match a:
 							ChessModel.ACTION_TYPE.SUMMON:
 								var possible_destinations = imagined_board[n].get_available_movements(imagined_board, n, a).keys()
-
-								alpha = ori_alpha
-								beta = ori_beta
 
 								for sp in possible_destinations:
 									var attempt_score = SUMMON_SCORE * multiplier
@@ -438,16 +433,15 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 									if (multiplier > 0):
 										alpha = max(alpha, score)
 										if (beta <= alpha):
+											pruned = true
 											break
 									else:
-										beta = min(beta, score)
+										beta = min(beta, -score)
 										if (beta <= alpha):
+											pruned = true
 											break
 									
 							ChessModel.ACTION_TYPE.MOVE:
-								alpha = ori_alpha
-								beta = ori_beta
-								
 								var movements = imagined_board[n].get_available_movements(imagined_board, n, a)
 								for d in movements:
 									# Special rule for Duke
@@ -506,19 +500,19 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 									if (multiplier > 0):
 										alpha = max(alpha, score)
 										if (beta <= alpha):
+											pruned = true
 											break
 									else:
-										beta = min(beta, score)
+										beta = min(beta, -score)
 										if (beta <= alpha):
+											pruned = true
 											break
+								if (pruned): break
 
 							ChessModel.ACTION_TYPE.COMMAND:
 								for command_d in imagined_board[n].get_available_movements(imagined_board, n, a): # command pos
 									if (imagined_board[command_d] != null and imagined_board[command_d].player == player):
-										
-										alpha = ori_alpha
-										beta = ori_beta
-										
+
 										for target_d in imagined_board[n].get_available_destinations(imagined_board, n, a): # TODO: why different?
 											if (target_d != command_d and
 												((imagined_board[target_d] != null and imagined_board[target_d].player != player) or imagined_board[target_d] == null)):
@@ -575,11 +569,18 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 													if (multiplier > 0):
 														alpha = max(alpha, score)
 														if (beta <= alpha):
+															pruned = true
 															break
 													else:
-														beta = min(beta, score)
+														beta = min(beta, -score)
 														if (beta <= alpha):
+															pruned = true
 															break
+								if (pruned): break
+								
+					if (pruned): break
+					
+		if (pruned): break
 	
 	# DEBUG
 	print("depth: %s, score: %s" % [depth, score])
