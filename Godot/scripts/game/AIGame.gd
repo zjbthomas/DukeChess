@@ -432,14 +432,16 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 									
 									if (multiplier > 0):
 										alpha = max(alpha, score)
-										if (beta <= alpha):
+										if (beta < alpha):
 											pruned = true
 											break
 									else:
-										beta = min(beta, -score)
-										if (beta <= alpha):
+										beta = min(beta, score)
+										if (beta < alpha):
 											pruned = true
 											break
+											
+								if (pruned): break
 									
 							ChessModel.ACTION_TYPE.MOVE:
 								var movements = imagined_board[n].get_available_movements(imagined_board, n, a)
@@ -499,12 +501,12 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 										
 									if (multiplier > 0):
 										alpha = max(alpha, score)
-										if (beta <= alpha):
+										if (beta < alpha):
 											pruned = true
 											break
 									else:
-										beta = min(beta, -score)
-										if (beta <= alpha):
+										beta = min(beta, score)
+										if (beta < alpha):
 											pruned = true
 											break
 								if (pruned): break
@@ -568,12 +570,12 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 														
 													if (multiplier > 0):
 														alpha = max(alpha, score)
-														if (beta <= alpha):
+														if (beta < alpha):
 															pruned = true
 															break
 													else:
-														beta = min(beta, -score)
-														if (beta <= alpha):
+														beta = min(beta, score)
+														if (beta < alpha):
 															pruned = true
 															break
 								if (pruned): break
@@ -583,7 +585,7 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 		if (pruned): break
 	
 	# DEBUG
-	print("depth: %s, score: %s" % [depth, score])
+	print("depth: %s, score: %s, alpha: %s, beta: %s" % [depth, score, alpha, beta])
 	
 	if (depth == Global.ai_depth):
 		print(possible_selections)
@@ -633,7 +635,7 @@ func find_best_op_for_summon(alpha, beta):
 			})
 			
 		alpha = max(alpha, score)
-		if (beta <= alpha):
+		if (beta < alpha):
 			break
 		
 	# DEBUG
