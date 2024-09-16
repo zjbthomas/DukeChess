@@ -215,7 +215,7 @@ class Controller {
 		var out = null;
 
 		if (this.game.performState(op)) {
-			if (this.game.checkPlayerWin(true) || this.game.checkPlayerWin(false)) {
+			if (this.game.checkPlayerLoss(true) || this.game.checkPlayerLoss(false)) {
 				// Gameover
 				var end_out = new Map();
 				end_out.set("connection", "true");

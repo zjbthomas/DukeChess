@@ -9,7 +9,7 @@ signal peer_disconnected
 
 const _IS_DEBUG:bool = false
 
-const WEBSOCKET_URL = "http://" + ("localhost" if _IS_DEBUG else "175.178.11.87:4115") + "/socket.io/"
+const WEBSOCKET_URL = "http://" + ("localhost" if _IS_DEBUG else "175.178.11.87") + "/socket.io/"
 const NAMESPACE = "/dukechess" # NO / AT THE END!!!
 
 var _client
@@ -345,6 +345,10 @@ func emit_cover_effects_from_server(payload):
 					cover_effect_dict[pos] = Color.YELLOW
 				"green":
 					cover_effect_dict[pos] = Color.GREEN
+				"blue":
+					cover_effect_dict[pos] = Color.BLUE
+				"red":
+					cover_effect_dict[pos] = Color.RED
 
 	state_cover_effect.emit(cover_effect_dict)
 

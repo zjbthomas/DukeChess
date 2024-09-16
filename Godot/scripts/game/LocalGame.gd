@@ -522,7 +522,7 @@ func emit_cover_effects(hover_pos):
 							((board[d] != null and board[d].player != current_player) or board[d] == null)):
 								# Special rule for Duke (TODO: the server side logic should also have this)
 								if not _is_duke_safe_after_action(board, current_chess_pos, current_player, current_action, d, command_pos):
-									return false
+									continue
 								
 								#if board[command_pos].name == "Duke":
 								#	if (get_control_area_of_player(player_list[1] if current_player == player_list[0] else player_list[0]).has(d) and \
