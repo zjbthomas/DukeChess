@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e977cf7595e06794dbab0ebfd8b5b16f, type: 3}
+  m_Name: Library
+  m_EditorClassIdentifier: 
+  notes:
+  - noteTitle: Example Note
+    noteContent: "This is just an example note which was created with Note Library.
+      You can add new notes by using <b>Tools > DreamOS > Show Note Library</b>.
+      \n\nIf you want, you can also create a new note by clicking to the button on
+      the left bar.\n\nSince notes are managed by scriptable objects, new notes created
+      outside the editor won't be stored.\n\nNote content can be changed by clicking
+      this area. The title can be also edited in the same way."
+    isDeleted: 0

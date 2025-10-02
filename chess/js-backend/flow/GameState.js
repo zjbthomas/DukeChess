@@ -1,8 +1,0 @@
-module.exports.GameState = {
-	INITIALIZATION: 0,
-	CHOOSECHESS: 1,
-	CHOOSEACTION: 2,
-	CHOOSEDEST: 3,
-	PROMOTE: 4,
-	ENDSTATE: 5
-}

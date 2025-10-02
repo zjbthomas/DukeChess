@@ -90,7 +90,7 @@ func ai_think():
 			best_selection_dict = score_and_dict[1]
 			
 			# DEBUG
-			print(score_and_dict[0])
+			#print(score_and_dict[0])
 		GAMESTATE.CHOOSEDESTONE:
 			if current_action == ChessModel.ACTION_TYPE.SUMMON:
 				# re-calculate best op as now we know summon_chess
@@ -585,10 +585,10 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 		if (pruned): break
 	
 	# DEBUG
-	print("depth: %s, score: %s, alpha: %s, beta: %s" % [depth, score, alpha, beta])
+	#print("depth: %s, score: %s, alpha: %s, beta: %s" % [depth, score, alpha, beta])
 	
-	if (depth == Global.ai_depth):
-		print(possible_selections)
+	#if (depth == Global.ai_depth):
+	#	print(possible_selections)
 	
 	# TODO: (need confirmation) this happens when score is always (-)INF)
 	if (score == (-INF if multiplier > 0 else INF)):
@@ -639,8 +639,8 @@ func find_best_op_for_summon(alpha, beta):
 			break
 		
 	# DEBUG
-	print("SUMMON score: %s" % [score])
-	print(possible_selections)
+	#print("SUMMON score: %s" % [score])
+	#print(possible_selections)
 	
 	# TODO: do we need this?
 	if (score == -INF):

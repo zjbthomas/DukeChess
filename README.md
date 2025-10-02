@@ -2,7 +2,16 @@
 
 This is a demo of my favourite boardgame [The Duke](https://boardgamegeek.com/boardgame/36235/duke).
 
-It is originally based on Java 7 with Tomcat 7 websocket (see folder ["/Java-deprecated/"](./Java-deprecated/)), and jQurey (see folder ["/jQuery-deprecated/"](./jQuery-deprecated/)). The latest version is based on [Node.js](https://nodejs.org/en/), [socket.io](https://socket.io/), and [React](https://reactjs.org/).
+- [Desktop version](./Godot/):
+  - Tech stack: [Godot](https://godotengine.org/)
+
+- Web app version 1:
+  - [Front-end](./web-app/React/): [React](https://reactjs.org/)
+  - [Back-end](./web-app/): [Node.js](https://nodejs.org/en/) with [Socket.IO](https://socket.io/) 
+
+- Web app version 2 (deprecated):
+  - [Front-end](./deprecated/jQuery/): jQuery
+  - [Back-end](./deprecated/Java/): Java 7 with Tomcat 7 WebSocket
 
 ## How to play?
 
@@ -12,27 +21,28 @@ You can get the full rules from [here](https://www.catalystgamelabs.com/download
 
 ### Online version
 
-**This game is available [here](http://games.junbinzhang.com/dukechess/) to play.**
+**This game is available [here](https://dexaint.itch.io/dukechess) to play.**
+
+## How to deploy web app version 1?
 
 ### Run it locally
 
 - Clone the project.
 - Make sure you have [`npm`](https://www.npmjs.com/) and `node` ([Node.js](https://nodejs.org/en/)) installed.
 - Go to the root directory of the project, and run `npm install` in command prompt to install all dependencies.
-- (Optional) Modify ["/index.js"](./index.js) and ["/dukechess/index.html"](./dukechess/index.html) for port and path.
+- (Optional) Modify [index.js"](./web-app/index.js) and ["dukechess/index.html"](./web-app/dukechess/index.html) for port and path.
 - (Optional) This project is originally designed on **Windows**. For **Linux**, please modify paths to the following files:
-  - Path to ["Chess.xml"](./dukechess/resources/Chess.xml) in ["/dukechess/js-backend/chess/ChessFactory.js"](./dukechess/js-backend/chess/ChessFactory.js);
-  - Path to ["Player.properties"](./dukechess/resources/Player.properties) in ["/dukechess/js-backend/flow/Player.js"](./dukechess/js-backend/flow/Player.js)
+  - Path to ["Chess.xml"](./web-app/dukechess/resources/Chess.xml) in ["dukechess/js-backend/chess/ChessFactory.js"](./web-app/dukechess/js-backend/chess/ChessFactory.js);
+  - Path to ["Player.properties"](./web-app/dukechess/resources/Player.properties) in ["dukechess/js-backend/flow/Player.js"](./web-app/dukechess/js-backend/flow/Player.js)
 - Run `node index.js` at the root directory.
-- Visit `http://host:port/path` (the default is ["http://localhost:80/"](http://localhost/)) on two or more pages and enjoy!
+- Visit `http://host:port/path` (the default is ["http://localhost:80/"](http://localhost:80/)) on two or more pages and enjoy!
 
 ### Build it yourself
 
-- Source code of [React](https://reactjs.org/) is under folder ["/React/src/"](./React/src).
-- You need ["/React/0_babel.bat"](./React/0_babel.bat) to preprocess JSX.
-- You need ["/React/1_terser.bat"](./React/1_terser.bat) to minify JavaScript for Production.
+- You need ["0_babel.bat"](./web-app/React/0_babel.bat) to preprocess JSX.
+- You need ["1_terser.bat"](./web-app/React/1_terser.bat) to minify JavaScript for Production.
 - More details can be found [here](https://reactjs.org/docs/add-react-to-a-website.html).
 
 # Chess Demo
 
-The code is also adapted for Chess, under the folder ["/chess/"](./chess/)). Chess is available [here](http://games.junbinzhang.com/chess/) to play.
+This code is also adapted for  [here](./web-app/chess/). Chess is available [here](http://games.junbinzhang.com/chess/) to play.
