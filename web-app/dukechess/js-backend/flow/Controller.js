@@ -1,46 +1,42 @@
+"use strict";
+
 const Game = require("./Game");
 
 class Controller {
-    constructor(first, firstPointPlatform, second, secondPointPlatform, socket) {
+    constructor(first, firstPointPlatform, second, secondPointPlatform, emitter) {
         this.firstPoint = first;
 		this.firstPlatform = firstPointPlatform;
 
         this.secondPoint = second;
 		this.secondPlatform = secondPointPlatform;
 
-        this.socket = socket;
+        this.emitter = emitter;
     
         this.game = new Game(6, 6);
     
         this.point2Player = new Map();
-        var randPlayer = Math.floor(Math.random() * 2);
+        const randPlayer = Math.floor(Math.random() * 2);
         this.point2Player.set(first, randPlayer);
-        this.point2Player.set(second, (0 == randPlayer)? 1: 0);
+        this.point2Player.set(second, (0 === randPlayer)? 1: 0);
 
         this.init();
     }
 
     send(point, map) {
-        var json = {};
-        for (var [k, v] of map) {
-            json[k] = v;
-        }
+        const json = {};
+        for (const [k, v] of map) json[k] = v;
 
-        if (this.socket.id == point) {
-            this.socket.emit("game", json);
-        } else {
-            this.socket.to(point).emit("game", json);
-        }
+        this.emitter.emitToSocket(point, "game", json);
     }
 
 	browserDefaultOutput(point) {
 		// Chess output
-		var out = new Map();
+		let out = new Map();
 		out.set("connection", "true");
 		out.set("message", this.game.getMessage(this.point2Player.get(point) == 0));
 		out.set("type", "chess");
-		for (var [i, s] of this.game.getChessMap(this.point2Player.get(point) == 0)) {
-			var grid = "grid_" + i;
+		for (const [i, s] of this.game.getChessMap(this.point2Player.get(point) == 0)) {
+			const grid = "grid_" + i;
 			out.set(grid, s);
 		}
 		this.send(point, out);
@@ -50,16 +46,15 @@ class Controller {
 		out.set("connection", "true");
 		out.set("message", this.game.getMessage(this.point2Player.get(point) == 0));
 		out.set("type", "color");
-		for (var [i, s] of this.game.getColorMap(this.point2Player.get(point) == 0, false, 0)) {
-			var grid = "grid_" + i;
+		for (const [i, s] of this.game.getColorMap(this.point2Player.get(point) == 0, false, 0)) {
+			const grid = "grid_" + i;
 			out.set(grid, s);
 		}
 		this.send(point, out);
-
 	}
 
 	unityDefaultOutput(op, point, needTransform) {
-		var out = new Map();
+		const out = new Map();
 		out.set("connection", "true");
 		out.set("message", this.game.getMessage(this.point2Player.get(point) == 0));
 		out.set("type", "game");
@@ -70,8 +65,8 @@ class Controller {
 		out.set("summon", this.game.getSummonChess());
 		
 		// Always store color
-		for (var [i, s] of this.game.getColorMap(this.point2Player.get(point) == 0, false, 0)) {
-			var grid = "grid_" + i;
+		for (const [i, s] of this.game.getColorMap(this.point2Player.get(point) == 0, false, 0)) {
+			const grid = "grid_" + i;
 			out.set(grid, s);
 		}
 
@@ -85,53 +80,13 @@ class Controller {
 		} else {
 			out.set("active", "false");
 		}
-		if (this.game.getWaitingMenu()) {
-			out.set("subtype", "inmenu");
-		} else {
-			out.set("subtype", "nomenu");
-		}
-		
-		this.send(point, out);
-	}
+		out.set("subtype", this.game.getWaitingMenu() ? "inmenu" : "nomenu");
 
-	unityDefaultOutput(op, point, needTransform) {
-		var out = new Map();
-		out.set("connection", "true");
-		out.set("message", this.game.getMessage(this.point2Player.get(point) == 0));
-		out.set("type", "game");
-		// Confirm previous state op
-		out.set("state", this.game.getPreviousState());
-		out.set("userop", needTransform? this.game.getTransformedUserOp(op): op);
-		out.set("action", this.game.getAction());
-		out.set("summon", this.game.getSummonChess());
-		
-		// Always store color
-		for (var [i, s] of this.game.getColorMap(this.point2Player.get(point) == 0, false, 0)) {
-			var grid = "grid_" + i;
-			out.set(grid, s);
-		}
-
-		// Show current state op
-		if (this.point2Player.get(point) == this.game.getCurrentPlayer()) {
-			out.set("active", "true");
-	
-			if (this.game.getWaitingMenu()) {
-				out.set("menus", this.game.getMenu());
-			}
-		} else {
-			out.set("active", "false");
-		}
-		if (this.game.getWaitingMenu()) {
-			out.set("subtype", "inmenu");
-		} else {
-			out.set("subtype", "nomenu");
-		}
-		
 		this.send(point, out);
 	}
 
 	unityGameoverOutput(op, point, needTransform) {
-		var out = new Map();
+		const out = new Map();
 		out.set("connection", "true");
 		out.set("message", this.game.getMessage(this.point2Player.get(point) == 0));
 		out.set("type", "gameover");
@@ -153,7 +108,7 @@ class Controller {
     init() {
 		// For Unity, send an initialization signal
 		if (this.firstPlatform.localeCompare("unity") == 0) {
-			var out = new Map();
+			const out = new Map();
 			out.set("connection", "true");
 			out.set("message", this.game.getMessage(this.point2Player.get(this.firstPoint) == 0));
 			out.set("type", "init");
@@ -161,7 +116,7 @@ class Controller {
 			this.send(this.firstPoint, out);
 		}
 		if (this.secondPlatform.localeCompare("unity") == 0) {
-			var out = new Map();
+			const out = new Map();
 			out.set("connection", "true");
 			out.set("message", this.game.getMessage(this.point2Player.get(this.secondPoint) == 0));
 			out.set("type", "init");
@@ -178,12 +133,12 @@ class Controller {
 				this.browserDefaultOutput(this.firstPoint);
 				break;
 			case "unity":
-				var out = new Map();
+				const out = new Map();
 				out.set("connection", "true");
 				out.set("message", this.game.getMessage(this.point2Player.get(this.firstPoint) == 0));
 				out.set("type", "color");
-				for (var [i, s] of this.game.getColorMap(this.point2Player.get(this.firstPoint) == 0, false, 0)) {
-					var grid = "grid_" + i;
+				for (const [i, s] of this.game.getColorMap(this.point2Player.get(this.firstPoint) == 0, false, 0)) {
+					const grid = "grid_" + i;
 					out.set(grid, s);
 				}
 				this.send(this.firstPoint, out);
@@ -197,12 +152,12 @@ class Controller {
 				this.browserDefaultOutput(this.secondPoint);
 				break;
 			case "unity":
-				var out = new Map();
+				const out = new Map();
 				out.set("connection", "true");
 				out.set("message", this.game.getMessage(this.point2Player.get(this.secondPoint) == 0));
 				out.set("type", "color");
-				for (var [i, s] of this.game.getColorMap(this.point2Player.get(this.secondPoint) == 0, false, 0)) {
-					var grid = "grid_" + i;
+				for (const [i, s] of this.game.getColorMap(this.point2Player.get(this.secondPoint) == 0, false, 0)) {
+					const grid = "grid_" + i;
 					out.set(grid, s);
 				}
 				this.send(this.secondPoint, out);
@@ -212,12 +167,12 @@ class Controller {
 	}
 	
 	performOp(isMenu, op, eventPoint, peerPoint, eventPointPlatform, peerPointPlatform) {
-		var out = null;
+		let out = null;
 
 		if (this.game.performState(op)) {
 			if (this.game.checkPlayerLoss(true) || this.game.checkPlayerLoss(false)) {
 				// Gameover
-				var end_out = new Map();
+				const end_out = new Map();
 				end_out.set("connection", "true");
 				end_out.set("message", this.game.getMessage(this.point2Player.get(eventPoint) == 0));
 
@@ -228,8 +183,8 @@ class Controller {
 						out.set("connection", "true");
 						out.set("message", this.game.getMessage(this.point2Player.get(eventPoint) == 0));
 						out.set("type", "chess");
-						for (var [i, s] of this.game.getChessMap(this.point2Player.get(eventPoint) == 0)) {
-							var grid = "grid_" + i;
+						for (const [i, s] of this.game.getChessMap(this.point2Player.get(eventPoint) == 0)) {
+							const grid = "grid_" + i;
 							out.set(grid, s);
 						}
 						this.send(eventPoint, out);
@@ -239,7 +194,7 @@ class Controller {
 
 						break;
 					case "unity":
-						this.unityGameoverOutput(op, eventPoint, false)
+						this.unityGameoverOutput(op, eventPoint, false);
 						break;
 				}
 
@@ -250,8 +205,8 @@ class Controller {
 						out.set("connection", "true");
 						out.set("message", this.game.getMessage(this.point2Player.get(peerPoint) == 0));
 						out.set("type", "chess");
-						for (var [i, s] of this.game.getChessMap(this.point2Player.get(peerPoint) == 0)) {
-							var grid = "grid_" + i;
+						for (const [i, s] of this.game.getChessMap(this.point2Player.get(peerPoint) == 0)) {
+							const grid = "grid_" + i;
 							out.set(grid, s);
 						}
 						this.send(peerPoint, out);
@@ -260,7 +215,7 @@ class Controller {
 						this.send(peerPoint, end_out);
 						break;
 					case "unity":
-						this.unityGameoverOutput(op, peerPoint, !isMenu)
+						this.unityGameoverOutput(op, peerPoint, !isMenu);
 						break;
 				}
 			} else {
@@ -299,63 +254,65 @@ class Controller {
 
 	execute(eventPoint, inMsg) {
 		// Get peer
-		var peerPoint = (eventPoint == this.firstPoint)?this.secondPoint: this.firstPoint;
+		const peerPoint = (eventPoint == this.firstPoint)?this.secondPoint: this.firstPoint;
 
 		// Get platforms
-		var eventPointPlatform = (eventPoint == this.firstPoint)?this.firstPlatform: this.secondPlatform;
-		var peerPointPlatform = (peerPoint == this.firstPoint)?this.firstPlatform: this.secondPlatform;
+		const eventPointPlatform = (eventPoint == this.firstPoint)?this.firstPlatform: this.secondPlatform;
+		const peerPointPlatform = (peerPoint == this.firstPoint)?this.firstPlatform: this.secondPlatform;
 		
-		var type = inMsg.type;
+		const type = inMsg.type;
         
-        var out = null;
+        let out = null;
 
 		switch (type) {
-		case "grid_click":
+		case "grid_click": {
 			// Check player
 			if (this.game.getCurrentPlayer() != this.point2Player.get(eventPoint)) return;
 			// Check waitingMenu
 			if (this.game.waitingMenu) return;
 			// Read Input
-			var grid_click = inMsg.grid;
-			var id = parseInt(grid_click.substring("grid_".length));
+			const grid_click = inMsg.grid;
+			let id = parseInt(grid_click.substring("grid_".length));
 			// Perform
 			this.performOp(false, id, eventPoint, peerPoint, eventPointPlatform, peerPointPlatform);
 			break;
+		}
 		case "menu_click":
 			// Check player
 			if (this.game.getCurrentPlayer() != this.point2Player.get(eventPoint)) return;
 			// Check waitingMenu
 			if (!this.game.waitingMenu) return;
 			// Read Input
-            var menuClicked = inMsg.value;
-            var userOp = 0;
-			switch(menuClicked) {
-			case "Summon": userOp = 1; break;
-			case "Move": userOp = 2; break;
-			case "Command": userOp = 3; break;
-			case "Confirm": userOp = 1; break;
-			case "Cancel": userOp = 0; break;
-			default: userOp = 0; break;
+            const menuClicked = inMsg.value;
+            let userOp = 0;
+			switch (menuClicked) {
+				case "Summon": userOp = 1; break;
+				case "Move": userOp = 2; break;
+				case "Command": userOp = 3; break;
+				case "Confirm": userOp = 1; break;
+				case "Cancel": userOp = 0; break;
+				default: userOp = 0; break;
 			}
 			// Perform
 			this.performOp(true, userOp, eventPoint, peerPoint, eventPointPlatform, peerPointPlatform);
 			break;
-		case "grid_hover":
+		case "grid_hover": {
 			// Read Input
-			var grid_hover = inMsg.grid;
-			var id = parseInt(grid_hover.substring("grid_".length));
+			const grid_hover = inMsg.grid;
+			let id = parseInt(grid_hover.substring("grid_".length));
 			// Event point color output
 			out = new Map();
 			out.set("connection", "true");
 			out.set("message", this.game.getMessage(this.point2Player.get(eventPoint) == 0));
 			out.set("type", "color");
-			for (var [i, s] of this.game.getColorMap(this.point2Player.get(eventPoint) == 0, true, id)) {
-				var grid = "grid_" + i;
+			for (const [i, s] of this.game.getColorMap(this.point2Player.get(eventPoint) == 0, true, id)) {
+				const grid = "grid_" + i;
 				out.set(grid, s);
 			}
             this.send(eventPoint, out);
 
 			break;
+		}
         case "hover_restore":
         default:
 			// Event point color output
@@ -363,8 +320,8 @@ class Controller {
 			out.set("connection", "true");
 			out.set("message", this.game.getMessage(this.point2Player.get(eventPoint) == 0));
 			out.set("type", "color");
-			for (var [i, s] of this.game.getColorMap(this.point2Player.get(eventPoint) == 0, false, 0)) {
-				var grid = "grid_" + i;
+			for (const [i, s] of this.game.getColorMap(this.point2Player.get(eventPoint) == 0, false, 0)) {
+				const grid = "grid_" + i;
 				out.set(grid, s);
 			}
             this.send(eventPoint, out);
