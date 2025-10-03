@@ -15,6 +15,25 @@ class Jump extends MovementImpl {
 		
 		return ret;
 	}
+
+	validateControlArea(field, pos, d, p) {
+		var ret = [];
+
+		var offsets = DestUtils.dest2Offset(d, p);
+
+		if (1 >= Math.abs(offsets[0]) & 1 >= Math.abs(offsets[1])) return ret;
+		
+		if (!this.isInField(field, pos, offsets)) return ret;
+			
+		if (this.hasMyChess(field, pos, offsets, p)) {
+			ret = ret.concat(this.offset2Dest(field, pos, offsets)); // different at here!!
+			return ret;
+		}
+
+		ret = ret.concat(this.offset2Dest(field, pos, offsets));
+
+		return ret;
+	}
 }
 
 module.exports = Jump;

@@ -41,6 +41,10 @@ class ChessImpl {
 	getAvailableActions(field, pos) {
 		var ret = [];
 		for (var action of this.actions) {
+			if (action == ActionType.SUMMON) {
+				if (!this.player.isSummonAvailable()) continue;
+			}
+
 			var dest = this.getAvailableDests(field, pos, action);
 			if (0 == dest.length) continue;
 				
@@ -49,18 +53,25 @@ class ChessImpl {
 		return ret;
 	}
 	
-
 	getAvailableDests(field, pos, action) {
-		var ret = [];
-		for (var [d, m] of this.getStyle(action)) {
-			var dest = field.movementFactory.createMovement(m).validateMovement(field, pos, d, this.player);
-			ret= ret.concat(dest);			
-		}
-		return ret;
+		return [...this.getAvailableMovements(field, pos, action).keys()];
 	}	
 	
 	getAvailableMovements(field, pos, action) {
 		var ret = new Map();
+
+		if (action == ActionType.COMMAND) {
+			var hasCommandableChess = false;
+			for (var [d, m] of this.getStyle(action)) {
+				if (field.movementFactory.createMovement(m).hasMyChess(field, pos, d, this.player)) {
+					hasCommandableChess = true;
+					break;
+				}
+			}
+
+			if (!hasCommandableChess) return ret;
+		}
+
 		for (var [d, m] of this.getStyle(action)) {
 			var dest = field.movementFactory.createMovement(m).validateMovement(field, pos, d, this.player);
 			for (var dd of dest) {
@@ -72,12 +83,31 @@ class ChessImpl {
 	
 	getControlArea(field, pos) {
 		var ret = [];
-		for (var d of this.getAvailableDests(field, pos, ActionType.MOVE)) {
-			if (!ret.includes(d)) ret = ret.concat(d);	
+
+		for (var [d, m] of this.getStyle(ActionType.MOVE)) {
+			var dest = field.movementFactory.createMovement(m).validateControlArea(field, pos, d, this.player);
+			for (var dd of dest) {
+				if (!ret.includes(dd)) ret = ret.concat(dd);
+			}
 		}
-		for (var d of this.getAvailableDests(field, pos, ActionType.COMMAND)) {
-			if (!ret.includes(d)) ret = ret.concat(d);
+
+		var hasCommandableChess = false;
+		for (var [d, m] of this.getStyle(ActionType.COMMAND)) {
+			if (field.movementFactory.createMovement(m).hasMyChess(field, pos, d, this.player)) {
+				hasCommandableChess = true;
+				break;
+			}
 		}
+
+		if (hasCommandableChess) {
+			for (var [d, m] of this.getStyle(ActionType.COMMAND)) {
+				var dest = field.movementFactory.createMovement(m).validateControlArea(field, pos, d, this.player);
+				for (var dd of dest) {
+					if (!ret.includes(dd)) ret = ret.concat(dd);
+				}
+			}
+		}
+
 		return ret;
 	}
     
