@@ -31,15 +31,17 @@ const subClient = pubClient.duplicate();
 const busPub = pubClient.duplicate();
 const busSub = pubClient.duplicate();
 
-const CH_MSG = "game:msg";
-const CH_DIS = "game:disconnect";
+const REDIS_NS = "dc"; // namespace
+
+const CH_MSG = `${REDIS_NS}:channel:msg`;
+const CH_DIS = `${REDIS_NS}:channel:disconnect`;
 
 // Keys
-const qKey = (game) => `queue:${game}`;
-const s2gKey = (sid) => `socket:${sid}:game`; // sid -> gid
-const s2pKey = (sid) => `socket:${sid}:platform`; // sid -> platform
-const gOwnerKey = (gid) => `game:${gid}:owner`; // which node owns the controller
-const gInfoKey = (gid) => `game:${gid}:info`;   // HSET gid -> {name, p1, p1Platform, p2, p2Platform}
+const qKey = (game) => `${REDIS_NS}:queue:${game}`;
+const s2gKey = (sid) => `${REDIS_NS}:socket:game:${sid}`; // sid -> gid
+const s2pKey = (sid) => `${REDIS_NS}:socket:platform:${sid}`; // sid -> platform
+const gOwnerKey = (gid) => `${REDIS_NS}:game:owner:${gid}`; // which node owns the controller
+const gInfoKey = (gid) => `${REDIS_NS}:game:info:${gid}`;   // HSET gid -> {name, p1, p1Platform, p2, p2Platform}
 const TTL = 60 * 60;
 
 function makeEmitter(io, name) {
@@ -172,11 +174,20 @@ function setupGame(name) {
         await pubClient.connect();
         await subClient.connect();
 
-        if (process.env.FLUSH_ON_BOOT !== 'false') {
-            await pubClient.sendCommand(['FLUSHDB', 'ASYNC']);
-            console.log('Redis FLUSHDB ASYNC done');
+        // remove all keys
+        const iter = pubClient.scanIterator({ MATCH: `${REDIS_NS}:*`, COUNT: 1000 });
+        const batch = [];
+        for await (const key of iter) {
+            if (key.length !== 0)batch.push(key);
+            if (batch.length >= 500) {
+                await pubClient.unlink(...batch); // non-blocking delete
+                batch.length = 0;
+            }
         }
+        if (batch.length) await pubClient.unlink(...batch);
+        console.log('Redis wipe ds done');
 
+        // adapter
         io.adapter(createAdapter(pubClient, subClient));
 
         // serverSideEmit alternative
@@ -213,7 +224,7 @@ function setupGame(name) {
             const name = info.name;
 
             // rematch
-            io.to(peerId).emit("game", {
+            io.of(`/${name}`).to(peerId).emit("game", {
                 connection: "false",
                 message: "Wait for another player to join."
             });
@@ -232,7 +243,7 @@ function setupGame(name) {
         setupGame("chess");
 
         const PORT = Number(process.env.PORT || 80);
-        server.listen(PORT, () => {
+        server.listen(PORT, "127.0.0.1", () => {
             console.log(`Server listening on: ${PORT}`);
             console.log(`Redis adapter connected to ${REDIS_URL}`);
         });
