@@ -30,7 +30,7 @@ var _pingInterval: int = 0
 var _connected: bool = false
 var _auth: Variant = null
 
-const KEEPALIVE_INTERVAL = 20
+const KEEPALIVE_INTERVAL = 1000
 var _keepalive_timer = 0
 
 # triggered when engine.io connection is established
@@ -62,6 +62,11 @@ func _preprocess_url(url: String) -> String:
 	return url
 
 func _ready():
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	
+	_client = WebSocketPeer.new()
+	_client.set_no_delay(true)
+	
 	_client.connect_to_url(_url)
 
 func _process(_delta):

@@ -9,7 +9,7 @@ signal peer_disconnected
 
 const _IS_DEBUG:bool = false
 
-const WEBSOCKET_URL = "http://" + ("localhost" if _IS_DEBUG else "175.178.11.87") + "/socket.io/"
+const WEBSOCKET_URL = "http://" + ("127.0.0.1" if _IS_DEBUG else "175.178.11.87") + "/socket.io/"
 const NAMESPACE = "/dukechess" # NO / AT THE END!!!
 
 var _client
@@ -18,22 +18,23 @@ var _is_client_ready = false
 func _init(main):
 	_client = SocketIOClient.new(WEBSOCKET_URL)
 	
-	_client.on_engine_connected.connect(_on_socket_ready)
+	_client.on_engine_connected.connect(_on_engine_connect)
 	_client.on_connect.connect(_on_socket_connect)
 	_client.on_event.connect(_on_socket_event)
 	_client.on_disconnect.connect(_on_socket_disconnect)
+	_client.on_engine_disconnected.connect(_on_engine_disconnect)
 	
 	main.add_child(_client)
+
+func _on_engine_connect(_sid: String):
+	_is_client_ready = true
 
 func _on_socket_connect(_payload: Variant, _name_space, error: bool):
 	if (_name_space == NAMESPACE):
 		_client.socketio_send("platform", "unity", NAMESPACE)
 		
 		client_connected.emit()
-
-func _on_socket_ready(_sid: String):
-	_is_client_ready = true
-
+		
 func _on_socket_event(event_name: String, payload: Variant, _name_space):
 	if (_name_space == NAMESPACE):
 		if (_IS_DEBUG):
@@ -67,6 +68,11 @@ func _on_socket_event(event_name: String, payload: Variant, _name_space):
 								emit_message()
 
 func _on_socket_disconnect(name_space: String):
+	# TODO
+	game_message.emit(tr("MAIN_MSG_DISCONNECT"))
+	client_disconnected.emit()
+	
+func _on_engine_disconnect(code, reason):
 	# TODO
 	game_message.emit(tr("MAIN_MSG_DISCONNECT"))
 	client_disconnected.emit()

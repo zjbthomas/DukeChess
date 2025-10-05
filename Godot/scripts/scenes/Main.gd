@@ -87,6 +87,8 @@ func _on_online_game_started():
 
 func _on_client_disconnected():
 	$MainGUI/GridContainer/StartButton.disabled = false
+	
+	_on_peer_disconnected(); # TODO
 
 func _on_peer_disconnected():
 	# clear everything
