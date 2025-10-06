@@ -11,7 +11,7 @@ function Login(props) {
   const [error, setError]       = React.useState("");
   const [busy, setBusy]         = React.useState(false);
 
-  const API_URL = "http://127.0.0.1/api/login";
+  const API_URL = "/api/login";
 
   async function handleSubmit(e) {
     e.preventDefault();
