@@ -1,0 +1,154 @@
+[gd_scene load_steps=7 format=3 uid="uid://3xfyqnbkvhxj"]
+
+[ext_resource type="Script" path="res://scripts/scenes/LoginScreen.gd" id="1_bpee2"]
+[ext_resource type="PackedScene" uid="uid://bx37xxgvwv7d" path="res://scenes/ModeSelectScreen.tscn" id="2_5soyd"]
+[ext_resource type="Texture2D" uid="uid://cfvj7ybmeoo5g" path="res://images/screens/logo.png" id="2_yk2hp"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x547u"]
+bg_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7pto7"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6458r"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 1, 1, 1)
+
+[node name="LoginScreen" type="ColorRect"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+script = ExtResource("1_bpee2")
+mode_select_scene = ExtResource("2_5soyd")
+
+[node name="ImageContainer" type="AspectRatioContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+grow_horizontal = 2
+
+[node name="Logo" type="Sprite2D" parent="ImageContainer"]
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("2_yk2hp")
+offset = Vector2(0, 700)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -60.0
+offset_right = 300.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="UsernameSplit" type="HSplitContainer" parent="VBoxContainer"]
+layout_mode = 2
+split_offset = 250
+
+[node name="UsernameLabel" type="Label" parent="VBoxContainer/UsernameSplit"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Username:"
+
+[node name="UsernameLineEdit" type="LineEdit" parent="VBoxContainer/UsernameSplit"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_x547u")
+max_length = 16
+
+[node name="PasswordSplit" type="HSplitContainer" parent="VBoxContainer"]
+layout_mode = 2
+split_offset = 250
+
+[node name="PasswordLabel" type="Label" parent="VBoxContainer/PasswordSplit"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Password:"
+
+[node name="PasswordLineEdit" type="LineEdit" parent="VBoxContainer/PasswordSplit"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_x547u")
+max_length = 16
+secret = true
+secret_character = "*"
+
+[node name="LoginButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_7pto7")
+text = "Login"
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -300.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 200
+
+[node name="MsgLabel" type="RichTextLabel" parent="MarginContainer"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_6458r")
+bbcode_enabled = true
+text = "[center]Please login with your username and password.[center]"
+
+[node name="LanguageMarginContainer" type="MarginContainer" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="LanguageContainer" type="HBoxContainer" parent="LanguageMarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="LanguageMarginContainer/LanguageContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Language:"
+
+[node name="OptionButton" type="OptionButton" parent="LanguageMarginContainer/LanguageContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_font_sizes/font_size = 40
+icon_alignment = 1
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
+[connection signal="pressed" from="VBoxContainer/LoginButton" to="." method="_on_login_button_pressed"]
+[connection signal="item_selected" from="LanguageMarginContainer/LanguageContainer/OptionButton" to="." method="_on_option_button_item_selected"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

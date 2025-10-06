@@ -31,7 +31,12 @@ func _on_engine_connect(_sid: String):
 
 func _on_socket_connect(_payload: Variant, _name_space, error: bool):
 	if (_name_space == NAMESPACE):
-		_client.socketio_send("platform", "unity", NAMESPACE)
+		var out = {}
+		out["username"] = Global.user.username
+		out["password"] = Global.user.password
+		out["platform"] = "unity"
+		
+		_client.socketio_send("init", out, NAMESPACE)
 		
 		client_connected.emit()
 		

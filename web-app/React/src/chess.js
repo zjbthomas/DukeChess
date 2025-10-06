@@ -1,12 +1,12 @@
 class View extends React.Component {
-    constructor({maxRow, maxCol}) {
+    constructor({maxRow, maxCol, username, password}) {
         super()
 
         this.socket = io('/chess')
 
         // Send platform
         this.socket.on("connect", () => {
-            this.socket.emit("platform", "browser")
+            this.socket.emit("init", {"username": username, "password": password, "platform": "browser"})
         })
 
         this.X = null
@@ -163,7 +163,7 @@ class View extends React.Component {
         )
     }
 
-    createTable = () => {
+    createTable() {
         let table = []
 
         for (var i = this.props.maxRow - 1; i >= 0; i--) {
@@ -246,7 +246,33 @@ class Tile extends React.Component {
     }
 }
 
-ReactDOM.render(
-    <View maxRow={8} maxCol={8} />,
+(function () {
+  function ChessApp() {
+    const [auth, setAuth] = React.useState(null);
+
+    function handleLogin(username, password) {
+      setAuth({ username, password });
+    }
+
+    if (!auth) {
+      if (!window.Login) {
+        return React.createElement("div", null, "Login not available");
+      }
+      return React.createElement(window.Login, {
+        onLogin: handleLogin
+      });
+    }
+
+    return React.createElement(View, {
+        maxRow: 8,
+        maxCol: 8,
+        username: auth.username,
+        password: auth.password
+    });
+  }
+
+  ReactDOM.render(
+    React.createElement(ChessApp),
     document.getElementById("view")
-);
+  );
+})();

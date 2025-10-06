@@ -8,6 +8,9 @@ const OFFSET = 28
 func _ready():
 	_setup_ui_localization()
 	
+	# set username
+	$GridContainer/UsernameLabel.text = Global.user.username;
+	
 	$CardBack.visible = false
 	
 	# set remaining chess area

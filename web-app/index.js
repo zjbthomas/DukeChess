@@ -8,9 +8,11 @@ const { Server } = require("socket.io");
 const { createClient } = require('redis');
 const { createAdapter } = require('@socket.io/redis-adapter');
 const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 
 // For webpages
 const app = express();
+app.use(express.json());
 const server = http.createServer(app);
 const io = new Server(server, {pingTimeout: 20000});
 
@@ -21,9 +23,10 @@ const ChessController = require("./chess/js-backend/flow/Controller");
 // Serve pages
 app.use("/dukechess", express.static(__dirname + "/dukechess"));
 app.use("/chess", express.static(__dirname + "/chess"));
+app.use("/global", express.static(__dirname + "/global"));
 
 // Redis
-const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
+const REDIS_URL = process.env.REDIS_URL || "redis://127.0.0.1:6379";
 const pubClient = createClient({ url: REDIS_URL });
 const subClient = pubClient.duplicate();
 
@@ -31,13 +34,46 @@ const subClient = pubClient.duplicate();
 const busPub = pubClient.duplicate();
 const busSub = pubClient.duplicate();
 
+// Global setup
+const REDIS_GLOBAL_NS = "global";
+
+const authKey = (u) => `${REDIS_GLOBAL_NS}:user:auth:${u}`;
+
+// POST /api/login
+app.post("/api/login", async (req, res) => {
+    const { username, password } = req.body || {};
+
+    if (!username || !password) return res.status(400).json({ error: "missing creds" });
+
+    const userData = await pubClient.hGetAll(authKey(username));
+    const hash = userData.password_hash;
+
+    // register
+    if (!hash) {
+        const newHash = await bcrypt.hash(password, 12);
+        await pubClient.hSet(authKey(username), {
+            password_hash: newHash
+        });
+        return res.json({ status: "registered" });
+    }
+
+    const ok = await bcrypt.compare(password, hash);
+    if (!ok) return res.status(401).json({ error: "wrong_password" });
+
+    return res.json({ status: "ok" });
+});
+
+// Setup for DukeChess
 const REDIS_NS = "dc"; // namespace
 
 const CH_MSG = `${REDIS_NS}:channel:msg`;
 const CH_DIS = `${REDIS_NS}:channel:disconnect`;
 
-// Keys
 const qKey = (game) => `${REDIS_NS}:queue:${game}`;
+
+const u2sKey = (u) => `${REDIS_NS}:user:socket:${u}`; // username -> sid
+const s2uKey = (sid) => `${REDIS_NS}:socket:user:${sid}`; // sid -> username
+
 const s2gKey = (sid) => `${REDIS_NS}:socket:game:${sid}`; // sid -> gid
 const s2pKey = (sid) => `${REDIS_NS}:socket:platform:${sid}`; // sid -> platform
 const gOwnerKey = (gid) => `${REDIS_NS}:game:owner:${gid}`; // which node owns the controller
@@ -132,11 +168,38 @@ function setupGame(name) {
     const gio = io.of(`/${name}`);
 
     gio.on("connection", (socket) => {
-        socket.on('platform', async function(platform) {
-            //console.log('Platform received from ' + socket.id + ': ' + platform);
-
-            await match(name, socket.id, platform);
-        });
+        socket.on('init', async function(payload) {
+                    const { username, password, platform } = payload;
+        
+                    // authenticate
+                    if (!username || !password) return res.status(400).json({ error: "missing creds" });
+        
+                    const userData = await pubClient.hGetAll(authKey(username));
+                    const hash = userData.password_hash;
+        
+                    if (!hash || await bcrypt.compare(password, hash)) {
+                        socket.emit("game", {
+                            connection: "false",
+                            message: "Authentication failed."
+                        });
+                    }
+        
+                    const existingU2S = await pubClient.get(u2sKey(username));
+                    if (existingU2S && existingU2S !== socket.id) {
+                        socket.emit("game", {
+                            connection: "false",
+                            message: "You already have a running session!"
+                        });
+                        return;
+                    }
+        
+                    // write mappings
+                    await pubClient.setEx(u2sKey(username), TTL, socket.id);
+                    await pubClient.setEx(s2uKey(socket.id), TTL, username);
+        
+                    //console.log('Platform received from ' + socket.id + ': ' + platform);
+                    await match(name, socket.id, platform);
+                });
 
         socket.on("game", async function(msg) {
             const gid = await pubClient.get(s2gKey(socket.id));
@@ -164,6 +227,12 @@ function setupGame(name) {
                 await pubClient.del(s2pKey(socket.id));
                 await pubClient.lRem(qKey(name), 0, socket.id);
             }
+            
+            // remove user mappings
+            const username = await pubClient.get(s2uKey(socket.id));
+
+            await pubClient.del(u2sKey(username));
+            await pubClient.del(s2uKey(socket.id));
         });
     });
 }
