@@ -14,6 +14,8 @@ const LOCALES = {
 
 enum AI_MODE {EASY=2, HARD=3}
 
+const IS_DEBUG_SERVER: bool = false
+
 var user = User.new()
 
 var http: HTTPRequest

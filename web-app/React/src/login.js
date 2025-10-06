@@ -11,8 +11,7 @@ function Login(props) {
   const [error, setError]       = React.useState("");
   const [busy, setBusy]         = React.useState(false);
 
-  const IS_DEBUG = false;
-  const API_URL = (IS_DEBUG ? "http://127.0.0.1" : "https://175.178.11.87") + "/api/login";
+  const API_URL = "http://127.0.0.1/api/login";
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -23,7 +22,7 @@ function Login(props) {
       const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: username, password: password_hash }) 
+        body: JSON.stringify({ username: username, password: password_hash, name: props.game }) 
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -31,7 +30,7 @@ function Login(props) {
         return;
       }
       if (data.status === "ok" || data.status === "registered") {
-        // Pass creds to dukechess.js
+        // Pass creds
         props.onLogin && props.onLogin(username, password_hash);
       } else {
         setError("Unexpected response");

@@ -39,30 +39,6 @@ const REDIS_GLOBAL_NS = "global";
 
 const authKey = (u) => `${REDIS_GLOBAL_NS}:user:auth:${u}`;
 
-// POST /api/login
-app.post("/api/login", async (req, res) => {
-    const { username, password } = req.body || {};
-
-    if (!username || !password) return res.status(400).json({ error: "missing creds" });
-
-    const userData = await pubClient.hGetAll(authKey(username));
-    const hash = userData.password_hash;
-
-    // register
-    if (!hash) {
-        const newHash = await bcrypt.hash(password, 12);
-        await pubClient.hSet(authKey(username), {
-            password_hash: newHash
-        });
-        return res.json({ status: "registered" });
-    }
-
-    const ok = await bcrypt.compare(password, hash);
-    if (!ok) return res.status(401).json({ error: "wrong_password" });
-
-    return res.json({ status: "ok" });
-});
-
 // Setup for DukeChess
 const REDIS_NS = "dc"; // namespace
 
@@ -106,6 +82,37 @@ const SERVER_ID = crypto.randomBytes(6).toString("hex"); // unique id for each s
 function newGameId(game) {
   return `${game}:${Date.now().toString(36)}:${Math.random().toString(36).slice(2, 10)}`; // 36: most compact alphanumeric representation
 }
+
+// POST /api/login
+app.post("/api/login", async (req, res) => {
+    const { username, password, name } = req.body || {};
+
+    if (!username || !password || !name) return res.status(400).json({ error: "missing info" });
+
+    const userData = await pubClient.hGetAll(authKey(username));
+    const hash = userData.password_hash;
+
+    // register
+    if (!hash) {
+        const newHash = await bcrypt.hash(password, 12);
+        await pubClient.hSet(authKey(username), {
+            password_hash: newHash
+        });
+        return res.json({ status: "registered" });
+    }
+
+    const ok = await bcrypt.compare(password, hash);
+    if (!ok) return res.status(401).json({ error: "wrong_password" });
+
+    if (name === "dukechess" || name === "chess") {
+        const existingU2S = await pubClient.get(u2sKey(username));
+        if (existingU2S) {
+            return res.status(403).json({ error: "already logged in" });
+        }
+    }
+
+    return res.json({ status: "ok" });
+});
 
 async function match(name, sid, platform) {
     const queue = qKey(name);
@@ -169,37 +176,28 @@ function setupGame(name) {
 
     gio.on("connection", (socket) => {
         socket.on('init', async function(payload) {
-                    const { username, password, platform } = payload;
-        
-                    // authenticate
-                    if (!username || !password) return res.status(400).json({ error: "missing creds" });
-        
-                    const userData = await pubClient.hGetAll(authKey(username));
-                    const hash = userData.password_hash;
-        
-                    if (!hash || await bcrypt.compare(password, hash)) {
-                        socket.emit("game", {
-                            connection: "false",
-                            message: "Authentication failed."
-                        });
-                    }
-        
-                    const existingU2S = await pubClient.get(u2sKey(username));
-                    if (existingU2S && existingU2S !== socket.id) {
-                        socket.emit("game", {
-                            connection: "false",
-                            message: "You already have a running session!"
-                        });
-                        return;
-                    }
-        
-                    // write mappings
-                    await pubClient.setEx(u2sKey(username), TTL, socket.id);
-                    await pubClient.setEx(s2uKey(socket.id), TTL, username);
-        
-                    //console.log('Platform received from ' + socket.id + ': ' + platform);
-                    await match(name, socket.id, platform);
+            const { username, password, platform } = payload;
+
+            // authenticate
+            if (!username || !password) return res.status(400).json({ error: "missing creds" });
+
+            const userData = await pubClient.hGetAll(authKey(username));
+            const hash = userData.password_hash;
+
+            if (!hash || await bcrypt.compare(password, hash)) {
+                socket.emit("game", {
+                    connection: "false",
+                    message: "Authentication failed."
                 });
+            }
+
+            // write mappings
+            await pubClient.setEx(u2sKey(username), TTL, socket.id);
+            await pubClient.setEx(s2uKey(socket.id), TTL, username);
+
+            //console.log('Platform received from ' + socket.id + ': ' + platform);
+            await match(name, socket.id, platform);
+        });
 
         socket.on("game", async function(msg) {
             const gid = await pubClient.get(s2gKey(socket.id));

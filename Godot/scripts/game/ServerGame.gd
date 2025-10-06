@@ -7,9 +7,7 @@ signal client_disconnected
 signal online_game_started
 signal peer_disconnected
 
-const _IS_DEBUG:bool = false
-
-const WEBSOCKET_URL = "http://" + ("127.0.0.1" if _IS_DEBUG else "175.178.11.87") + "/socket.io/"
+const WEBSOCKET_URL = "http://" + ("127.0.0.1" if Global.IS_DEBUG_SERVER else "175.178.11.87") + "/socket.io/"
 const NAMESPACE = "/dukechess" # NO / AT THE END!!!
 
 var _client
@@ -42,9 +40,6 @@ func _on_socket_connect(_payload: Variant, _name_space, error: bool):
 		
 func _on_socket_event(event_name: String, payload: Variant, _name_space):
 	if (_name_space == NAMESPACE):
-		if (_IS_DEBUG):
-			print(event_name, " ", payload)
-		
 		match event_name:
 			"game":
 				if (payload["connection"] == "false"):

@@ -14,13 +14,12 @@ corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6458r"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7orsj"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(1, 1, 1, 1)
 
 [node name="LoginScreen" type="ColorRect"]
 anchors_preset = 15
@@ -115,13 +114,27 @@ theme_override_constants/margin_left = 50
 theme_override_constants/margin_right = 50
 theme_override_constants/margin_bottom = 200
 
-[node name="MsgLabel" type="RichTextLabel" parent="MarginContainer"]
-custom_minimum_size = Vector2(0, 100)
+[node name="Panel" type="Panel" parent="MarginContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_7orsj")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/Panel"]
+layout_mode = 2
+offset_right = 1820.0
+offset_bottom = 104.0
+
+[node name="MsgLabel" type="RichTextLabel" parent="MarginContainer/Panel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 24
-theme_override_styles/normal = SubResource("StyleBoxFlat_6458r")
 bbcode_enabled = true
-text = "[center]Please login with your username and password.[center]"
+text = "[center]Please login with your username and password."
+
+[node name="TimerLabel" type="RichTextLabel" parent="MarginContainer/Panel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
 
 [node name="LanguageMarginContainer" type="MarginContainer" parent="."]
 offset_right = 40.0
@@ -146,8 +159,6 @@ theme_override_font_sizes/font_size = 40
 icon_alignment = 1
 
 [node name="Timer" type="Timer" parent="."]
-wait_time = 3.0
-one_shot = true
 
 [connection signal="pressed" from="VBoxContainer/LoginButton" to="." method="_on_login_button_pressed"]
 [connection signal="item_selected" from="LanguageMarginContainer/LanguageContainer/OptionButton" to="." method="_on_option_button_item_selected"]

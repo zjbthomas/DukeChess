@@ -8,8 +8,7 @@ var username = ""
 var password = ""
 
 # functions for connecting to Redis
-const _IS_DEBUG = false
-var API_BASE = ("http://127.0.0.1" if _IS_DEBUG else "https://175.178.11.87")
+var API_BASE = ("http://127.0.0.1" if Global.IS_DEBUG_SERVER else "https://175.178.11.87")
 
 func _post(url, body):
 	var headers = ["Content-Type: application/json"]
@@ -40,7 +39,8 @@ func login(username, password_attempt):
 
 	var payload = {
 		"username": username,
-		"password": password
+		"password": password,
+		"name": "dukechess"
 	}
 	var res = await _post("%s/api/login" % API_BASE, payload)
 

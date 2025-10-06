@@ -288,7 +288,8 @@ class Tile extends React.Component {
         return React.createElement("div", null, "Login not available");
       }
       return React.createElement(window.Login, {
-        onLogin: handleLogin
+        onLogin: handleLogin,
+        game: "dukechess"
       });
     }
 
