@@ -39,6 +39,9 @@ const REDIS_GLOBAL_NS = "global";
 
 const authKey = (u) => `${REDIS_GLOBAL_NS}:user:auth:${u}`;
 
+const u2tKey = (u, game) => `${REDIS_GLOBAL_NS}:user:token:${u}:${game}`; // username -> token
+const t2uKey = (t, game) => `${REDIS_GLOBAL_NS}:token:user:${t}:${game}`; // token -> username
+
 // Setup for DukeChess
 const REDIS_NS = "dc"; // namespace
 
@@ -54,7 +57,7 @@ const s2gKey = (sid) => `${REDIS_NS}:socket:game:${sid}`; // sid -> gid
 const s2pKey = (sid) => `${REDIS_NS}:socket:platform:${sid}`; // sid -> platform
 const gOwnerKey = (gid) => `${REDIS_NS}:game:owner:${gid}`; // which node owns the controller
 const gInfoKey = (gid) => `${REDIS_NS}:game:info:${gid}`;   // HSET gid -> {name, p1, p1Platform, p2, p2Platform}
-const TTL = 60 * 60;
+const TTL = 30 * 60; // 30 minutes
 
 function makeEmitter(io, name) {
   return {
@@ -105,13 +108,21 @@ app.post("/api/login", async (req, res) => {
     if (!ok) return res.status(401).json({ error: "wrong_password" });
 
     if (name === "dukechess" || name === "chess") {
-        const existingU2S = await pubClient.get(u2sKey(username));
-        if (existingU2S) {
-            return res.status(403).json({ error: "already logged in" });
+            const existingU2S = await pubClient.get(u2sKey(username));
+            if (existingU2S) {
+                return res.status(403).json({ error: "already logged in" });
+            }
+            return res.json({ status: "ok" });
+        } else {
+            const token = crypto.randomBytes(24).toString("base64url");
+            const old = await pubClient.get(u2tKey(username, name));
+            if (old) await pubClient.del(t2uKey(old, name));   // invalidate previous
+    
+            await pubClient.setEx(u2tKey(username, name), TTL, token);
+            await pubClient.setEx(t2uKey(token, name), TTL, username);
+    
+            return res.json({ status: "ok", token: token });
         }
-    }
-
-    return res.json({ status: "ok" });
 });
 
 async function match(name, sid, platform) {
@@ -189,6 +200,16 @@ function setupGame(name) {
                     connection: "false",
                     message: "Authentication failed."
                 });
+                return;
+            }
+
+            const existingU2S = await pubClient.get(u2sKey(username));
+            if (existingU2S) {
+                socket.emit("game", {
+                    connection: "false",
+                    message: "Already logged in."
+                });
+                return;
             }
 
             // write mappings
