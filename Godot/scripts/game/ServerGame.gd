@@ -308,6 +308,8 @@ func perform_op_for_server(user_op, summon_chess_from_server = null):
 				
 						next_turn()
 						
+						emit_checkmate()
+						
 						return true
 					else:
 						return false

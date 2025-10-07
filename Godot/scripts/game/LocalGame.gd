@@ -353,6 +353,7 @@ func perform_op(user_op, is_from_menu):
 						
 						emit_cover_effects(null)
 						emit_message()
+						emit_checkmate()
 						
 						return true
 					else:
