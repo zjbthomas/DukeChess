@@ -3,7 +3,7 @@ extends Node
 class_name LocalGame
 
 signal add_chess(pos, chess, is_no_effect)
-signal remove_chess(pos)
+signal remove_chess(pos, is_active)
 signal move_chess(src, dest, is_flip_during_move)
 
 signal state_cover_effect(dict)
@@ -333,7 +333,7 @@ func perform_op(user_op, is_from_menu):
 							
 							current_player.add_chess(summon_chess)
 							
-							remove_chess.emit(summon_pos)
+							remove_chess.emit(summon_pos, true)
 							
 							current_state = GAMESTATE.CHOOSEDESTONE
 						ChessModel.ACTION_TYPE.COMMAND:
@@ -402,7 +402,7 @@ func perform_action(board, src_chess:ChessInst, action, dest_arr, target_chess_n
 			if (src_chess.get_available_movements(board, dest_arr[0], action).get(dest_arr[1]) == MovementManager.MOVEMENT_TYPE.STRIKE):
 				board[dest_arr[1]] = null
 				
-				remove_chess.emit(dest_arr[1])
+				remove_chess.emit(dest_arr[1], false)
 				
 				src_chess.is_front = !src_chess.is_front
 				

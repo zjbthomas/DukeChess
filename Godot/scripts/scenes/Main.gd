@@ -155,7 +155,7 @@ func _on_chess_collide(node):
 	
 	SoundEffect.play("kill")
 	
-func _on_remove_chess(pos):
+func _on_remove_chess(pos, is_active):
 	_is_in_animation = true
 	
 	var r = Global.n_to_rc(pos)[0]
@@ -176,7 +176,10 @@ func _on_remove_chess(pos):
 		
 		_is_in_animation = false
 		
-		SoundEffect.play("kill")
+		if (!is_active):
+			SoundEffect.play("kill")
+		else:
+			SoundEffect.play("chess_move") # TODO: could be a different FX
 	)
 	
 func _on_move_chess(src, dst, is_flip_during_move):

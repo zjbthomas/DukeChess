@@ -293,7 +293,7 @@ func perform_op_for_server(user_op, summon_chess_from_server = null):
 							
 							current_player.add_chess(summon_chess)
 							
-							remove_chess.emit(summon_pos)
+							remove_chess.emit(summon_pos, true)
 							
 							current_state = GAMESTATE.CHOOSEDESTONE
 						ChessModel.ACTION_TYPE.COMMAND:

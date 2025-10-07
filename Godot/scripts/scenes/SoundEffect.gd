@@ -29,7 +29,7 @@ func load_streams():
 	
 func play(name):
 	if (!is_muted):
-		if ($SoundEffectPlayer.playing == false):
+		if ($SoundEffectPlayer.playing == false): # TODO: this blocks too much
 			$SoundEffectPlayer.stream = _streams.get(name)
 			$SoundEffectPlayer.play()
 
