@@ -1,6 +1,7 @@
 extends Node
 
 const _STREAM_TYPE = {
+	"checkmate": "res://musics//checkmate.mp3",
 	"chess_move": "res://musics//chess_move.mp3",
 	"countdown": "res://musics//countdown.mp3",
 	"kill": "res://musics//kill.mp3",
@@ -28,9 +29,15 @@ func load_streams():
 	
 func play(name):
 	if (!is_muted):
+		if ($SoundEffectPlayer.playing == false):
+			$SoundEffectPlayer.stream = _streams.get(name)
+			$SoundEffectPlayer.play()
+
+func priority_play(name):
+	if (!is_muted):
 		$SoundEffectPlayer.stream = _streams.get(name)
 		$SoundEffectPlayer.play()
-		
+
 func switch():
 	if (!is_muted):
 		$SoundEffectPlayer.stop()

@@ -195,7 +195,7 @@ function setupGame(name) {
             const userData = await pubClient.hGetAll(authKey(username));
             const hash = userData.password_hash;
 
-            if (!hash || await bcrypt.compare(password, hash)) {
+            if (!hash || !(await bcrypt.compare(password, hash))) {
                 socket.emit("game", {
                     connection: "false",
                     message: "Authentication failed."

@@ -429,4 +429,6 @@ func emit_message():
 
 func emit_after_move_animation():
 	if (current_state == GAMESTATE.ENDSTATE):
-		game_over.emit()
+		game_over.emit(not check_player_loss(true))
+	else:
+		emit_checkmate()

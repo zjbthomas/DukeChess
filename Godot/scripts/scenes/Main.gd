@@ -49,6 +49,9 @@ func _ready():
 	game.connect("hover_control_area_cover_effect", _on_game_hover_control_area_cover_effect)
 	game.connect("show_menu", _on_game_show_menu)
 	game.connect("game_message", _on_game_message)
+	
+	game.connect("checkmate", _on_checkmate)
+	
 	game.connect("game_over", _on_game_over)
 	
 	if (not Global.is_local):
@@ -318,8 +321,13 @@ func _on_game_message(msg):
 	if msg != null:
 		$MainGUI/MessageContainer/Panel/MessageLabel.text = msg
 
-func _on_game_over():
+func _on_checkmate():
+	SoundEffect.priority_play("checkmate")
+
+func _on_game_over(is_win):
 	$MainGUI/GridContainer/StartButton.disabled = false
+	
+	SoundEffect.priority_play("win" if is_win else "lose")
 
 func _init_board():
 	for ir in range(Global.MAXR):

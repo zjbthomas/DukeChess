@@ -12,7 +12,9 @@ signal hover_control_area_cover_effect(dict)
 signal game_message(msg)
 signal show_menu(pos, items)
 
-signal game_over
+signal checkmate
+
+signal game_over(is_win)
 
 enum GAMESTATE {
 	INITIALIZATION,
@@ -688,13 +690,18 @@ func emit_message():
 
 	game_message.emit(msg)
 
+func emit_checkmate():
+	if (len(check_dukes_being_checkmated())) > 0:
+		checkmate.emit()
+
 func emit_after_move_animation():
 	if (current_state == GAMESTATE.ENDSTATE):
 		emit_message()
-		game_over.emit()
+		game_over.emit(not check_player_loss(true))
 	else:
 		emit_cover_effects(null)
 		emit_message()
+		emit_checkmate()
 
 func has_available_movement(player, board):
 	# iterate all possible chess
