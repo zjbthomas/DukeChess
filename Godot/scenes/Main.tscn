@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://cfd8jcleybuec"]
+[gd_scene load_steps=23 format=3 uid="uid://cfd8jcleybuec"]
 
 [ext_resource type="PackedScene" uid="uid://blvbnngqi673u" path="res://scenes/ChessTile.tscn" id="1_h0u3b"]
 [ext_resource type="Script" path="res://scripts/scenes/Main.gd" id="1_h17yc"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://cqwayhgnllvvv" path="res://scenes/Chess.tscn" id="5_pfq4i"]
 [ext_resource type="Script" path="res://scripts/scenes/Camera3D.gd" id="6_bs80g"]
 [ext_resource type="PackedScene" uid="uid://bweec6jbyouee" path="res://scenes/MainGUI.tscn" id="6_g86v1"]
+[ext_resource type="PackedScene" uid="uid://bkmnbbccd02oq" path="res://scenes/SoundControlSidebar.tscn" id="8_gpskb"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_tp6sn"]
 size = Vector3(60, 2, 60)
@@ -156,3 +157,5 @@ size = 8.0
 script = ExtResource("6_bs80g")
 
 [node name="MainGUI" parent="." instance=ExtResource("6_g86v1")]
+
+[node name="SoundControlSidebar" parent="." instance=ExtResource("8_gpskb")]

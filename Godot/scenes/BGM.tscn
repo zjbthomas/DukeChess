@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://bsfwo5us2rcfw"]
+
+[ext_resource type="Script" path="res://scripts/scenes/BGM.gd" id="1_gajko"]
+[ext_resource type="AudioStream" uid="uid://dw8eryt6abmu1" path="res://musics/bgm.mp3" id="2_4v74y"]
+
+[node name="BGM" type="Node"]
+script = ExtResource("1_gajko")
+
+[node name="BGMPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_4v74y")
+volume_db = -7.0

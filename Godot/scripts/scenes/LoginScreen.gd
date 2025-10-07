@@ -8,6 +8,13 @@ var _login_timer = 3
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	# play BGM
+	BGM.play()
+	
+	# load streams
+	# TODO: this should go to LoadScreen, which requires a differnt screen sequence
+	SoundEffect.load_streams()
+	
 	# convert locale to inner ones
 	var system_locale = TranslationServer.get_locale()
 	for locale in Global.LOCALES:
@@ -48,6 +55,7 @@ func _on_login_button_pressed():
 	
 	if username == "" or password == "":
 		$MarginContainer/Panel/VBoxContainer/MsgLabel.text = "[center]" + tr("LOGIN_MSG_INIT")
+		SoundEffect.play("notification_error")
 		return
 	
 	$VBoxContainer/UsernameSplit/UsernameLineEdit.editable = false
@@ -61,6 +69,7 @@ func _on_login_button_pressed():
 			_is_successful_login = true
 			
 			$MarginContainer/Panel/VBoxContainer/MsgLabel.text = "[center]" + Global.user.username + tr("LOGIN_MSG_NEW_USER")
+			SoundEffect.play("notification_ok")
 			
 			$MarginContainer/Panel/VBoxContainer/TimerLabel.text = "[center]" + str(_login_timer)
 			$Timer.start()
@@ -68,6 +77,7 @@ func _on_login_button_pressed():
 			_is_successful_login = false
 			
 			$MarginContainer/Panel/VBoxContainer/MsgLabel.text = "[center]" + tr("LOGIN_MSG_PASSWORD_INCORRECT")
+			SoundEffect.play("notification_error")
 			
 			$VBoxContainer/UsernameSplit/UsernameLineEdit.editable = true
 			$VBoxContainer/PasswordSplit/PasswordLineEdit.editable = true
@@ -76,6 +86,7 @@ func _on_login_button_pressed():
 			_is_successful_login = true
 			
 			$MarginContainer/Panel/VBoxContainer/MsgLabel.text = "[center]" + Global.user.username + tr("LOGIN_MSG_OLD_USER")
+			SoundEffect.play("notification_ok")
 			
 			$MarginContainer/Panel/VBoxContainer/TimerLabel.text = "[center]" + str(_login_timer)
 			$Timer.start()
@@ -83,6 +94,7 @@ func _on_login_button_pressed():
 			_is_successful_login = false
 			
 			$MarginContainer/Panel/VBoxContainer/MsgLabel.text = "[center]" + tr("LOGIN_MSG_SERVER_DOWN")
+			SoundEffect.play("notification_error")
 			
 			$VBoxContainer/UsernameSplit/UsernameLineEdit.editable = true
 			$VBoxContainer/PasswordSplit/PasswordLineEdit.editable = true
@@ -91,6 +103,7 @@ func _on_login_button_pressed():
 func _on_timer_timeout():
 	_login_timer -= 1
 	$MarginContainer/Panel/VBoxContainer/TimerLabel.text = "[center]" + str(_login_timer)
+	SoundEffect.play("countdown")
 	
 	if (_login_timer == 0 and _is_successful_login):
 		$Timer.stop()

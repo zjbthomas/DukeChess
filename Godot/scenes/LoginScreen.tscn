@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://3xfyqnbkvhxj"]
+[gd_scene load_steps=8 format=3 uid="uid://3xfyqnbkvhxj"]
 
 [ext_resource type="Script" path="res://scripts/scenes/LoginScreen.gd" id="1_bpee2"]
 [ext_resource type="PackedScene" uid="uid://bx37xxgvwv7d" path="res://scenes/ModeSelectScreen.tscn" id="2_5soyd"]
 [ext_resource type="Texture2D" uid="uid://cfvj7ybmeoo5g" path="res://images/screens/logo.png" id="2_yk2hp"]
+[ext_resource type="PackedScene" uid="uid://bkmnbbccd02oq" path="res://scenes/SoundControlSidebar.tscn" id="4_hetn8"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x547u"]
 bg_color = Color(1, 1, 1, 1)
@@ -137,6 +138,7 @@ theme_override_font_sizes/normal_font_size = 24
 bbcode_enabled = true
 
 [node name="LanguageMarginContainer" type="MarginContainer" parent="."]
+layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 theme_override_constants/margin_left = 10
@@ -159,6 +161,10 @@ theme_override_font_sizes/font_size = 40
 icon_alignment = 1
 
 [node name="Timer" type="Timer" parent="."]
+
+[node name="SoundControlSidebar" parent="." instance=ExtResource("4_hetn8")]
+layout_mode = 1
+offset_left = -90.0
 
 [connection signal="pressed" from="VBoxContainer/LoginButton" to="." method="_on_login_button_pressed"]
 [connection signal="item_selected" from="LanguageMarginContainer/LanguageContainer/OptionButton" to="." method="_on_option_button_item_selected"]

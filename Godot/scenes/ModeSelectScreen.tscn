@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://bx37xxgvwv7d"]
+[gd_scene load_steps=7 format=3 uid="uid://bx37xxgvwv7d"]
 
 [ext_resource type="Script" path="res://scripts/scenes/ModeSelectScreen.gd" id="1_8llta"]
 [ext_resource type="PackedScene" uid="uid://jrpg2lf2cnoa" path="res://scenes/LoadScreen.tscn" id="2_c8m55"]
+[ext_resource type="PackedScene" uid="uid://bkmnbbccd02oq" path="res://scenes/SoundControlSidebar.tscn" id="3_fvu7i"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lw36n"]
 bg_color = Color(0.501961, 0.501961, 0.501961, 1)
@@ -132,6 +133,10 @@ layout_mode = 2
 size_flags_horizontal = 8
 theme_override_font_sizes/font_size = 40
 icon_alignment = 1
+
+[node name="SoundControlSidebar" parent="." instance=ExtResource("3_fvu7i")]
+layout_mode = 1
+offset_left = -90.0
 
 [connection signal="pressed" from="VBoxContainer/LocalModeButton" to="." method="_on_local_mode_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/AIEasyModeButton" to="." method="_on_ai_easy_mode_button_pressed"]

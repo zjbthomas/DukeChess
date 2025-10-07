@@ -142,12 +142,16 @@ func _on_add_chess(pos, chess:ChessInst, is_no_effect):
 	$MainGUI/AspectRatioContainer/PanelContainer/SummonInfo/Player1RemainLabel.text = _get_remaining_chess_text(game.player_list[0])
 	$MainGUI/AspectRatioContainer/PanelContainer/SummonInfo/Player2RemainLabel.text = _get_remaining_chess_text(game.player_list[1])
 
+	SoundEffect.play("chess_move")
+
 func _on_chess_collide(node):
 	$Particles/DeadParticles.global_position = node.global_position
 	$Particles/DeadParticles.restart()
 	
 	node.queue_free()
-
+	
+	SoundEffect.play("kill")
+	
 func _on_remove_chess(pos):
 	_is_in_animation = true
 	
@@ -168,6 +172,8 @@ func _on_remove_chess(pos):
 		$MainGUI/AspectRatioContainer/PanelContainer/SummonInfo/Player1RemainLabel.text = _get_remaining_chess_text(game.player_list[1])
 		
 		_is_in_animation = false
+		
+		SoundEffect.play("kill")
 	)
 	
 func _on_move_chess(src, dst, is_flip_during_move):
@@ -190,6 +196,7 @@ func _on_move_chess(src, dst, is_flip_during_move):
 	var dst_r = Global.n_to_rc(dst)[0]
 	var dst_c = Global.n_to_rc(dst)[1]
 	var dst_tile = $Board.get_node(_get_tile_name_at_rc(dst_r, dst_c))
+	var dst_chess_is_null: bool = (dst_tile.get_node_or_null(_get_chess_name_at_n(dst)) == null)
 	
 	var tween = get_tree().create_tween()
 	# 1: raise the chess
@@ -223,6 +230,9 @@ func _on_move_chess(src, dst, is_flip_during_move):
 		_is_in_animation = false
 		
 		game.emit_after_move_animation()
+		
+		if (dst_chess_is_null):
+			SoundEffect.play("chess_move")
 	)
 	
 func _get_remaining_chess_text(player):
