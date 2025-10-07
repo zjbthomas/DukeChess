@@ -325,6 +325,7 @@ func _on_game_message(msg):
 		$MainGUI/MessageContainer/Panel/MessageLabel.text = msg
 
 func _on_checkmate():
+	# TODO: checkmate sound is not available when a chess is summoned
 	SoundEffect.priority_play("checkmate")
 
 func _on_game_over(is_win):
