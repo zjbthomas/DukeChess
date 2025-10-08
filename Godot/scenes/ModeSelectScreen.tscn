@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://bx37xxgvwv7d"]
+[gd_scene load_steps=9 format=3 uid="uid://bx37xxgvwv7d"]
 
 [ext_resource type="Script" path="res://scripts/scenes/ModeSelectScreen.gd" id="1_8llta"]
 [ext_resource type="PackedScene" uid="uid://cfd8jcleybuec" path="res://scenes/Main.tscn" id="2_c4uri"]
 [ext_resource type="PackedScene" uid="uid://bkmnbbccd02oq" path="res://scenes/SoundControlSidebar.tscn" id="3_fvu7i"]
 [ext_resource type="PackedScene" uid="uid://3xfyqnbkvhxj" path="res://scenes/LoginScreen.tscn" id="3_od7iv"]
+[ext_resource type="Texture2D" uid="uid://brjxw8kjacy0m" path="res://images/screens/background.png" id="4_2dgg3"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lw36n"]
 bg_color = Color(0.501961, 0.501961, 0.501961, 1)
@@ -51,6 +52,15 @@ color = Color(0, 0, 0, 1)
 script = ExtResource("1_8llta")
 main_scene = ExtResource("2_c4uri")
 login_scene = ExtResource("3_od7iv")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4_2dgg3")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1

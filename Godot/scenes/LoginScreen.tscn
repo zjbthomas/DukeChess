@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://3xfyqnbkvhxj"]
+[gd_scene load_steps=8 format=3 uid="uid://3xfyqnbkvhxj"]
 
 [ext_resource type="Script" path="res://scripts/scenes/LoginScreen.gd" id="1_bpee2"]
+[ext_resource type="Texture2D" uid="uid://brjxw8kjacy0m" path="res://images/screens/background.png" id="2_er472"]
 [ext_resource type="Texture2D" uid="uid://cfvj7ybmeoo5g" path="res://images/screens/logo.png" id="2_yk2hp"]
 [ext_resource type="PackedScene" uid="uid://bkmnbbccd02oq" path="res://scenes/SoundControlSidebar.tscn" id="4_hetn8"]
 
@@ -29,6 +30,15 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 1)
 script = ExtResource("1_bpee2")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_er472")
 
 [node name="ImageContainer" type="AspectRatioContainer" parent="."]
 layout_mode = 1
