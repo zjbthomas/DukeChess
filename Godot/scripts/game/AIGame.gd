@@ -4,8 +4,8 @@ class_name AIGame
 
 signal close_menu
 
-signal disable_start_button
-signal enable_start_button
+signal disable_buttons_in_ai
+signal enable_buttons_in_ai
 
 # for saving history
 const HISTORY_SAVED_DIR = "user://history"
@@ -62,7 +62,7 @@ func perform_op(user_op, is_from_menu):
 		return false
 
 func ai_handle():
-	disable_start_button.emit()
+	disable_buttons_in_ai.emit()
 	
 	_waiting_cnt = WAITING_CNT_MAX
 	
@@ -280,7 +280,7 @@ func next_turn():
 	super()
 	
 	if (current_player == player_list[0]):
-		enable_start_button.emit() # move this here so it will be run when UI is free
+		enable_buttons_in_ai.emit() # move this here so it will be run when UI is free
 
 func store_to_history(actor, state, board, op, prob):
 	history.append({

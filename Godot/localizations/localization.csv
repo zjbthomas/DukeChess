@@ -14,6 +14,7 @@ CHESS_SHOW_FRONT,front,正面
 COLLECTION_CLEAR_ALL,Clear all,清除所有棋子
 COLLECTION_CLOSE,Close,关闭
 LOAD_NOW_LOADING,Loading…,载入中…
+LOGIN_BACK_BUTTON,Back,返回
 LOGIN_BUTTON,Login,登录
 LOGIN_MSG_INIT,Please login with your username and password.,请输入您的用户名和密码。
 LOGIN_MSG_NEW_USER,",thank you for trying this game! Now loading…",，感谢您游玩这款游戏！正在进入游戏…

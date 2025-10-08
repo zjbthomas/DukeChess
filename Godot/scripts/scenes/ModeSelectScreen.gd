@@ -1,6 +1,7 @@
 extends ColorRect
 
-@export var load_scene: PackedScene
+@export var main_scene: PackedScene
+@export var login_scene: PackedScene
 
 func _ready():
 	# convert locale to inner ones
@@ -32,7 +33,7 @@ func _setup_ui_localization():
 func _on_local_mode_button_pressed():
 	Global.is_local = true
 	Global.is_ai = false
-	get_tree().change_scene_to_packed.bind(load_scene).call_deferred()
+	get_tree().change_scene_to_packed.bind(main_scene).call_deferred()
 
 func _on_ai_easy_mode_button_pressed():
 	Global.is_local = true
@@ -40,7 +41,7 @@ func _on_ai_easy_mode_button_pressed():
 	
 	Global.ai_depth = Global.AI_MODE.EASY
 	
-	get_tree().change_scene_to_packed.bind(load_scene).call_deferred()
+	get_tree().change_scene_to_packed.bind(main_scene).call_deferred()
 	
 func _on_ai_hard_mode_button_pressed():
 	Global.is_local = true
@@ -48,12 +49,12 @@ func _on_ai_hard_mode_button_pressed():
 	
 	Global.ai_depth = Global.AI_MODE.HARD
 	
-	get_tree().change_scene_to_packed.bind(load_scene).call_deferred()
+	get_tree().change_scene_to_packed.bind(main_scene).call_deferred()
 
 func _on_server_mode_button_pressed():
 	Global.is_local = false
 	Global.is_ai = false
-	get_tree().change_scene_to_packed.bind(load_scene).call_deferred()
+	get_tree().change_scene_to_packed.bind(login_scene).call_deferred()
 
 func _on_option_button_item_selected(index):
 	TranslationServer.set_locale(Global.LOCALES.keys()[index])

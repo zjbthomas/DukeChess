@@ -1,43 +1,18 @@
 extends ColorRect
 
-@export var mode_select_scene: PackedScene
-
 var _is_successful_login = false
 
 var _login_timer = 3
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	# play BGM
-	BGM.play()
-	
-	# load streams
-	# TODO: this should go to LoadScreen, which requires a differnt screen sequence
-	SoundEffect.load_streams()
-	
-	# convert locale to inner ones
-	var system_locale = TranslationServer.get_locale()
-	for locale in Global.LOCALES:
-		if (locale in system_locale):
-			TranslationServer.set_locale(locale)
-			
-			system_locale = locale
-			
-			break
-			
-	# add localization options
-	for ix in Global.LOCALES.size():
-		$LanguageMarginContainer/LanguageContainer/OptionButton.add_item(Global.LOCALES[Global.LOCALES.keys()[ix]], ix)
-		
-		if (Global.LOCALES.keys()[ix] in system_locale):
-			$LanguageMarginContainer/LanguageContainer/OptionButton.selected = ix
-
 	_setup_ui_localization()
 	
 func _setup_ui_localization():
 	$VBoxContainer/UsernameSplit/UsernameLabel.text = tr("LOGIN_USERNAME")
 	$VBoxContainer/PasswordSplit/PasswordLabel.text = tr("LOGIN_PASSWORD")
 	$VBoxContainer/LoginButton.text = tr("LOGIN_BUTTON")
+	$VBoxContainer/BackButton.text = tr("LOGIN_BACK_BUTTON")
 	$MarginContainer/Panel/VBoxContainer/MsgLabel.text = "[center]" + tr("LOGIN_MSG_INIT")
 
 func _on_option_button_item_selected(index):
@@ -61,6 +36,7 @@ func _on_login_button_pressed():
 	$VBoxContainer/UsernameSplit/UsernameLineEdit.editable = false
 	$VBoxContainer/PasswordSplit/PasswordLineEdit.editable = false
 	$VBoxContainer/LoginButton.disabled = true
+	$VBoxContainer/BackButton.disabled = true
 	
 	var result = await Global.user.login(username, password)
 	
@@ -82,6 +58,7 @@ func _on_login_button_pressed():
 			$VBoxContainer/UsernameSplit/UsernameLineEdit.editable = true
 			$VBoxContainer/PasswordSplit/PasswordLineEdit.editable = true
 			$VBoxContainer/LoginButton.disabled = false
+			$VBoxContainer/BackButton.disabled = false
 		Global.user.LOGIN_STATUS.SUCCESSFUL_LOGIN:
 			_is_successful_login = true
 			
@@ -99,6 +76,7 @@ func _on_login_button_pressed():
 			$VBoxContainer/UsernameSplit/UsernameLineEdit.editable = true
 			$VBoxContainer/PasswordSplit/PasswordLineEdit.editable = true
 			$VBoxContainer/LoginButton.disabled = false
+			$VBoxContainer/BackButton.disabled = false
 
 func _on_timer_timeout():
 	_login_timer -= 1
@@ -108,4 +86,7 @@ func _on_timer_timeout():
 	if (_login_timer == 0 and _is_successful_login):
 		$Timer.stop()
 		
-		get_tree().change_scene_to_packed.bind(mode_select_scene).call_deferred()
+		get_tree().change_scene_to_file.bind("res://scenes/Main.tscn").call_deferred()
+
+func _on_back_button_pressed():
+	get_tree().change_scene_to_file.bind("res://scenes//ModeSelectScreen.tscn").call_deferred()

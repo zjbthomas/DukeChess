@@ -11,7 +11,6 @@ const WEBSOCKET_URL = "http://" + ("127.0.0.1" if Global.IS_DEBUG_SERVER else "1
 const NAMESPACE = "/dukechess" # NO / AT THE END!!!
 
 var _client
-var _is_client_ready = false
 
 func _init(main):
 	_client = SocketIOClient.new(WEBSOCKET_URL)
@@ -25,7 +24,7 @@ func _init(main):
 	main.add_child(_client)
 
 func _on_engine_connect(_sid: String):
-	_is_client_ready = true
+	_client.socketio_connect(NAMESPACE)
 
 func _on_socket_connect(_payload: Variant, _name_space, error: bool):
 	if (_name_space == NAMESPACE):
@@ -80,14 +79,6 @@ func _on_engine_disconnect(code, reason):
 func _exit_tree():
 	# optional: disconnect from socketio server
 	_client.socketio_disconnect()
-
-func websocket_connect():
-	if (_is_client_ready):
-		_client.socketio_connect(NAMESPACE)
-		return true
-	else:
-		game_message.emit(tr("MAIN_MSG_NOT_READY"))
-		return false
 
 func convert_n_from_server(n):
 	var r = Global.n_to_rc(n)[0]

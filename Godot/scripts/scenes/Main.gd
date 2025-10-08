@@ -21,16 +21,10 @@ var _is_in_animation = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	_setup_ui_localization()
-	
 	# init board GUI
 	_init_board()
 	
 	# init MainGUI
-	$MainGUI/GridContainer/StartButton.disabled = false
-	$MainGUI/ControlAreaControls/Player1ControlArea.visible = false
-	$MainGUI/ControlAreaControls/Player2ControlArea.visible = false
-
 	$MainGUI/GridContainer/BackButton.connect("pressed", _on_back_button_pressed)
 	$MainGUI/GridContainer/StartButton.connect("pressed", _on_start_button_pressed)
 
@@ -63,24 +57,9 @@ func _ready():
 	if (Global.is_ai):
 		game.connect("close_menu", func(): get_tree().call_group("menu", "queue_free"))
 		
-		game.connect("disable_start_button", func(): $MainGUI/GridContainer/StartButton.disabled = true)
-		game.connect("enable_start_button", func(): $MainGUI/GridContainer/StartButton.disabled = false)
+		game.connect("disable_buttons_in_ai", _on_disable_buttons_in_ai)
+		game.connect("enable_buttons_in_ai", _on_enable_buttons_in_ai)
 	
-func _setup_ui_localization():
-	var mode
-	if (Global.is_ai):
-		if (Global.ai_depth == Global.AI_MODE.EASY):
-			mode = tr("SELECT_AI_EASY")
-		else:
-			mode = tr("SELECT_AI_HARD")
-	else:
-		if (Global.is_local):
-			mode = tr("SELECT_LOCAL")
-		else:
-			mode = tr("SELECT_ONLINE")
-	
-	$MainGUI/GridContainer/Label.text = tr("MAIN_MODE") + " " + mode
-
 func _on_client_connected():
 	$MainGUI/GridContainer/StartButton.disabled = true
 
@@ -106,13 +85,10 @@ func _on_start_button_pressed():
 		
 		await get_tree().create_timer(0.2).timeout # TODO: in case queue_free not finished
 		
-		if (Global.is_local):
-			game.game_start()
-			
-			$MainGUI/ControlAreaControls/Player1ControlArea.visible = true
-			$MainGUI/ControlAreaControls/Player2ControlArea.visible = true
-		else:
-			game.websocket_connect()
+		game.game_start()
+		
+		$MainGUI/ControlAreaControls/Player1ControlArea.visible = true
+		$MainGUI/ControlAreaControls/Player2ControlArea.visible = true
 
 func _on_back_button_pressed():
 	get_tree().change_scene_to_file.bind(mode_select_scene).call_deferred()
@@ -397,3 +373,11 @@ func _on_control_area_mouse_entered(player_index):
 
 func _on_control_area_mouse_exited():
 	get_tree().call_group("all_hover_control_area_cover_effects", "queue_free")
+
+func _on_disable_buttons_in_ai():
+	$MainGUI/GridContainer/BackButton.disabled = true
+	$MainGUI/GridContainer/StartButton.disabled = true
+	
+func _on_enable_buttons_in_ai():
+	$MainGUI/GridContainer/BackButton.disabled = false
+	$MainGUI/GridContainer/StartButton.disabled = false
