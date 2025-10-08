@@ -13,6 +13,11 @@ const _STREAM_TYPE = {
 
 var is_muted = false
 
+var DEFAULT_DB = 0
+var MIN_DB = -20
+
+var volumn: int = 100
+
 var is_in_priority = false
 
 var _streams = {}
@@ -46,8 +51,21 @@ func priority_play(name):
 		$SoundEffectPlayer.play()
 
 func switch():
-	if (!is_muted):
-		$SoundEffectPlayer.stop()
-		is_in_priority = false # reset this to false as finished is NOT emitted when calling stop()
-		
 	is_muted = !is_muted
+	
+	if (is_muted):
+		$SoundEffectPlayer.stop()
+		is_in_priority = false # reset this to false as finished is NOT emitted when calling stop()	
+	else:
+		update_volumn(volumn)
+		
+func update_volumn(volumn):
+	self.volumn = volumn
+	
+	if (volumn == 0):
+		is_muted = true
+		$SoundEffectPlayer.stop()
+		is_in_priority = false # reset this to false as finished is NOT emitted when calling stop()	
+	else:
+		is_muted = false
+		$SoundEffectPlayer.volume_db = lerp(MIN_DB, DEFAULT_DB, volumn / 100.0)
