@@ -276,8 +276,8 @@ func ai_act():
 					if (current_player != player_list[0]):
 						ai_handle()
 
-func next_turn():
-	super()
+func next_turn(is_end = false):
+	super(is_end)
 	
 	if (current_player == player_list[0]):
 		enable_buttons_in_ai.emit() # move this here so it will be run when UI is free

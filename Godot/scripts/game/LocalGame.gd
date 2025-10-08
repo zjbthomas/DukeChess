@@ -295,6 +295,7 @@ func perform_op(user_op, is_from_menu):
 
 						if (check_player_loss(true) or check_player_loss(false)):
 							current_state = GAMESTATE.ENDSTATE
+							next_turn(true)
 						else:
 							next_turn()
 							
@@ -425,10 +426,11 @@ func perform_action(board, src_chess:ChessInst, action, dest_arr, target_chess_n
 			move_chess.emit(dest_arr[0], dest_arr[1], false)
 			move_chess.emit(current_chess_pos, current_chess_pos, true) # same location flip
 
-func next_turn():
+func next_turn(is_end = false):
 	current_player = player_list[1] if (current_player == player_list[0]) else player_list[0]
 	
-	current_state = GAMESTATE.CHOOSECHESS
+	if (not is_end):
+		current_state = GAMESTATE.CHOOSECHESS
 
 func check_player_loss(is_main_player):
 	for n in range(Global.MAXR * Global.MAXC):

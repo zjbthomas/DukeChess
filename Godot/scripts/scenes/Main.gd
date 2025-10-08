@@ -305,6 +305,7 @@ func _on_checkmate():
 	SoundEffect.priority_play("checkmate")
 
 func _on_game_over(is_win):
+	$MainGUI/GridContainer/BackButton.disabled = false
 	$MainGUI/GridContainer/StartButton.disabled = false
 	
 	SoundEffect.priority_play("win" if is_win else "lose")
