@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://cfd8jcleybuec"]
+[gd_scene load_steps=23 format=3 uid="uid://cfd8jcleybuec"]
 
 [ext_resource type="PackedScene" uid="uid://blvbnngqi673u" path="res://scenes/ChessTile.tscn" id="1_h0u3b"]
 [ext_resource type="Script" path="res://scripts/scenes/Main.gd" id="1_h17yc"]
@@ -9,6 +9,27 @@
 [ext_resource type="Script" path="res://scripts/scenes/Camera3D.gd" id="6_bs80g"]
 [ext_resource type="PackedScene" uid="uid://bweec6jbyouee" path="res://scenes/MainGUI.tscn" id="6_g86v1"]
 [ext_resource type="PackedScene" uid="uid://bkmnbbccd02oq" path="res://scenes/SoundControlSidebar.tscn" id="8_gpskb"]
+
+[sub_resource type="GDScript" id="GDScript_gf5qr"]
+script/source = "extends Marker3D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+"
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d0een"]
+shading_mode = 0
+albedo_texture = ExtResource("5_oa5jm")
+
+[sub_resource type="QuadMesh" id="QuadMesh_usgus"]
+material = SubResource("StandardMaterial3D_d0een")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m2inq"]
 albedo_color = Color(0.0627451, 0.0627451, 0.0627451, 1)
@@ -71,37 +92,26 @@ scale_min = 0.3
 scale_max = 0.3
 color = Color(0.392157, 0.666667, 0.392157, 1)
 
-[sub_resource type="GDScript" id="GDScript_gf5qr"]
-script/source = "extends Marker3D
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
-"
-
-[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_4jo5t"]
-panorama = ExtResource("5_oa5jm")
-
-[sub_resource type="Sky" id="Sky_aky21"]
-sky_material = SubResource("PanoramaSkyMaterial_4jo5t")
-
-[sub_resource type="Environment" id="Environment_hom24"]
-background_mode = 2
-sky = SubResource("Sky_aky21")
-sky_rotation = Vector3(0, 2.06298, 0)
-
 [node name="Main" type="Node"]
 script = ExtResource("1_h17yc")
 mode_select_scene = "res://scenes/ModeSelectScreen.tscn"
 chess_tile_scene = ExtResource("1_h0u3b")
 chess_scene = ExtResource("5_pfq4i")
 menu_scene = ExtResource("4_ptmm8")
+
+[node name="CameraPivot" type="Marker3D" parent="."]
+script = SubResource("GDScript_gf5qr")
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 20, 0)
+projection = 1
+current = true
+size = 8.0
+script = ExtResource("6_bs80g")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CameraPivot/Camera3D"]
+transform = Transform3D(14.2, 0, 0, 0, 8, 0, 0, 0, 1, 0, 0, -50)
+mesh = SubResource("QuadMesh_usgus")
 
 [node name="Board" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.05, -0.5)
@@ -137,17 +147,6 @@ draw_pass_1 = SubResource("QuadMesh_k70n8")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 20, 0)
 light_energy = 2.067
-
-[node name="CameraPivot" type="Marker3D" parent="."]
-script = SubResource("GDScript_gf5qr")
-
-[node name="Camera3D" type="Camera3D" parent="CameraPivot"]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 20, 0)
-environment = SubResource("Environment_hom24")
-projection = 1
-current = true
-size = 8.0
-script = ExtResource("6_bs80g")
 
 [node name="MainGUI" parent="." instance=ExtResource("6_g86v1")]
 
