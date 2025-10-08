@@ -75,6 +75,13 @@ offset_bottom = 422.0
 theme_override_constants/separation = 10
 metadata/_edit_group_ = true
 
+[node name="UsernameLabel" type="Label" parent="GridContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 0, 1)
+theme_override_font_sizes/font_size = 32
+text = "username"
+horizontal_alignment = 1
+
 [node name="Label" type="Label" parent="GridContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32

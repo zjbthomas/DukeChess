@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://ch81gdv1sldj7"]
+
+[ext_resource type="Script" path="res://scripts/scenes/SoundEffect.gd" id="1_6wcqc"]
+
+[node name="SoundEffect" type="Node"]
+script = ExtResource("1_6wcqc")
+
+[node name="SoundEffectPlayer" type="AudioStreamPlayer" parent="."]
+max_polyphony = 2

@@ -3,7 +3,7 @@ extends Node
 class_name LocalGame
 
 signal add_chess(pos, chess, is_no_effect)
-signal remove_chess(pos)
+signal remove_chess(pos, is_active)
 signal move_chess(src, dest, is_flip_during_move)
 
 signal state_cover_effect(dict)
@@ -12,7 +12,9 @@ signal hover_control_area_cover_effect(dict)
 signal game_message(msg)
 signal show_menu(pos, items)
 
-signal game_over
+signal checkmate
+
+signal game_over(is_win)
 
 enum GAMESTATE {
 	INITIALIZATION,
@@ -293,6 +295,7 @@ func perform_op(user_op, is_from_menu):
 
 						if (check_player_loss(true) or check_player_loss(false)):
 							current_state = GAMESTATE.ENDSTATE
+							next_turn(true)
 						else:
 							next_turn()
 							
@@ -331,7 +334,7 @@ func perform_op(user_op, is_from_menu):
 							
 							current_player.add_chess(summon_chess)
 							
-							remove_chess.emit(summon_pos)
+							remove_chess.emit(summon_pos, true)
 							
 							current_state = GAMESTATE.CHOOSEDESTONE
 						ChessModel.ACTION_TYPE.COMMAND:
@@ -351,6 +354,7 @@ func perform_op(user_op, is_from_menu):
 						
 						emit_cover_effects(null)
 						emit_message()
+						emit_checkmate()
 						
 						return true
 					else:
@@ -400,7 +404,7 @@ func perform_action(board, src_chess:ChessInst, action, dest_arr, target_chess_n
 			if (src_chess.get_available_movements(board, dest_arr[0], action).get(dest_arr[1]) == MovementManager.MOVEMENT_TYPE.STRIKE):
 				board[dest_arr[1]] = null
 				
-				remove_chess.emit(dest_arr[1])
+				remove_chess.emit(dest_arr[1], false)
 				
 				src_chess.is_front = !src_chess.is_front
 				
@@ -422,10 +426,11 @@ func perform_action(board, src_chess:ChessInst, action, dest_arr, target_chess_n
 			move_chess.emit(dest_arr[0], dest_arr[1], false)
 			move_chess.emit(current_chess_pos, current_chess_pos, true) # same location flip
 
-func next_turn():
+func next_turn(is_end = false):
 	current_player = player_list[1] if (current_player == player_list[0]) else player_list[0]
 	
-	current_state = GAMESTATE.CHOOSECHESS
+	if (not is_end):
+		current_state = GAMESTATE.CHOOSECHESS
 
 func check_player_loss(is_main_player):
 	for n in range(Global.MAXR * Global.MAXC):
@@ -688,13 +693,18 @@ func emit_message():
 
 	game_message.emit(msg)
 
+func emit_checkmate():
+	if (len(check_dukes_being_checkmated())) > 0:
+		checkmate.emit()
+
 func emit_after_move_animation():
 	if (current_state == GAMESTATE.ENDSTATE):
 		emit_message()
-		game_over.emit()
+		game_over.emit(not check_player_loss(true))
 	else:
 		emit_cover_effects(null)
 		emit_message()
+		emit_checkmate()
 
 func has_available_movement(player, board):
 	# iterate all possible chess

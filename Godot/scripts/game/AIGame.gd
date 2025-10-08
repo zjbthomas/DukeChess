@@ -4,8 +4,8 @@ class_name AIGame
 
 signal close_menu
 
-signal disable_start_button
-signal enable_start_button
+signal disable_buttons_in_ai
+signal enable_buttons_in_ai
 
 # for saving history
 const HISTORY_SAVED_DIR = "user://history"
@@ -62,7 +62,7 @@ func perform_op(user_op, is_from_menu):
 		return false
 
 func ai_handle():
-	disable_start_button.emit()
+	disable_buttons_in_ai.emit()
 	
 	_waiting_cnt = WAITING_CNT_MAX
 	
@@ -88,6 +88,9 @@ func ai_think():
 			# calculate best op
 			var score_and_dict = find_best_op(current_player, board, Global.ai_depth, -INF, INF)
 			best_selection_dict = score_and_dict[1]
+			
+			# DEBUG
+			#print(score_and_dict[0])
 		GAMESTATE.CHOOSEDESTONE:
 			if current_action == ChessModel.ACTION_TYPE.SUMMON:
 				# re-calculate best op as now we know summon_chess
@@ -273,11 +276,11 @@ func ai_act():
 					if (current_player != player_list[0]):
 						ai_handle()
 
-func next_turn():
-	super()
+func next_turn(is_end = false):
+	super(is_end)
 	
 	if (current_player == player_list[0]):
-		enable_start_button.emit() # move this here so it will be run when UI is free
+		enable_buttons_in_ai.emit() # move this here so it will be run when UI is free
 
 func store_to_history(actor, state, board, op, prob):
 	history.append({
@@ -580,7 +583,13 @@ func find_best_op(player, imagined_board, depth, alpha, beta):
 					if (pruned): break
 					
 		if (pruned): break
-
+	
+	# DEBUG
+	#print("depth: %s, score: %s, alpha: %s, beta: %s" % [depth, score, alpha, beta])
+	
+	#if (depth == Global.ai_depth):
+	#	print(possible_selections)
+	
 	# TODO: (need confirmation) this happens when score is always (-)INF)
 	if (score == (-INF if multiplier > 0 else INF)):
 		return [0, {}]
@@ -629,6 +638,10 @@ func find_best_op_for_summon(alpha, beta):
 		if (beta < alpha):
 			break
 		
+	# DEBUG
+	#print("SUMMON score: %s" % [score])
+	#print(possible_selections)
+	
 	# TODO: do we need this?
 	if (score == -INF):
 		return [0, {}]

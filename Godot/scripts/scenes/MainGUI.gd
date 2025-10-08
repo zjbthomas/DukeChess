@@ -8,15 +8,40 @@ const OFFSET = 28
 func _ready():
 	_setup_ui_localization()
 	
+	# set username
+	if (Global.is_local):
+		$GridContainer/UsernameLabel.visible = false
+	else:
+		$GridContainer/UsernameLabel.visible = true
+		$GridContainer/UsernameLabel.text = Global.user.username;
+		
+	$GridContainer/StartButton.visible = Global.is_local
+	$GridContainer/StartButton.disabled = false
+	
 	$CardBack.visible = false
 	
 	# set remaining chess area
 	$AspectRatioContainer/PanelContainer/SummonInfo/Player1Label.visible = Global.is_local
 	$AspectRatioContainer/PanelContainer/SummonInfo/Player2Label.visible = Global.is_local
 	$AspectRatioContainer/PanelContainer/SummonInfo/Player2RemainLabel.visible = Global.is_local
+	
+	$ControlAreaControls/Player1ControlArea.visible = false
+	$ControlAreaControls/Player2ControlArea.visible = false
 
 func _setup_ui_localization():
-	# $GridContainer/Label is set in Main.gd
+	var mode
+	if (Global.is_ai):
+		if (Global.ai_depth == Global.AI_MODE.EASY):
+			mode = tr("SELECT_AI_EASY")
+		else:
+			mode = tr("SELECT_AI_HARD")
+	else:
+		if (Global.is_local):
+			mode = tr("SELECT_LOCAL")
+		else:
+			mode = tr("SELECT_ONLINE")
+	
+	$GridContainer/Label.text = tr("MAIN_MODE") + " " + mode
 	
 	$GridContainer/BackButton.text = tr("MAIN_BUTTON_BACK")
 	$GridContainer/StartButton.text = tr("MAIN_BUTTON_START")

@@ -21,16 +21,10 @@ var _is_in_animation = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	_setup_ui_localization()
-	
 	# init board GUI
 	_init_board()
 	
 	# init MainGUI
-	$MainGUI/GridContainer/StartButton.disabled = false
-	$MainGUI/ControlAreaControls/Player1ControlArea.visible = false
-	$MainGUI/ControlAreaControls/Player2ControlArea.visible = false
-
 	$MainGUI/GridContainer/BackButton.connect("pressed", _on_back_button_pressed)
 	$MainGUI/GridContainer/StartButton.connect("pressed", _on_start_button_pressed)
 
@@ -49,6 +43,9 @@ func _ready():
 	game.connect("hover_control_area_cover_effect", _on_game_hover_control_area_cover_effect)
 	game.connect("show_menu", _on_game_show_menu)
 	game.connect("game_message", _on_game_message)
+	
+	game.connect("checkmate", _on_checkmate)
+	
 	game.connect("game_over", _on_game_over)
 	
 	if (not Global.is_local):
@@ -60,24 +57,9 @@ func _ready():
 	if (Global.is_ai):
 		game.connect("close_menu", func(): get_tree().call_group("menu", "queue_free"))
 		
-		game.connect("disable_start_button", func(): $MainGUI/GridContainer/StartButton.disabled = true)
-		game.connect("enable_start_button", func(): $MainGUI/GridContainer/StartButton.disabled = false)
+		game.connect("disable_buttons_in_ai", _on_disable_buttons_in_ai)
+		game.connect("enable_buttons_in_ai", _on_enable_buttons_in_ai)
 	
-func _setup_ui_localization():
-	var mode
-	if (Global.is_ai):
-		if (Global.ai_depth == Global.AI_MODE.EASY):
-			mode = tr("SELECT_AI_EASY")
-		else:
-			mode = tr("SELECT_AI_HARD")
-	else:
-		if (Global.is_local):
-			mode = tr("SELECT_LOCAL")
-		else:
-			mode = tr("SELECT_ONLINE")
-	
-	$MainGUI/GridContainer/Label.text = tr("MAIN_MODE") + " " + mode
-
 func _on_client_connected():
 	$MainGUI/GridContainer/StartButton.disabled = true
 
@@ -87,6 +69,8 @@ func _on_online_game_started():
 
 func _on_client_disconnected():
 	$MainGUI/GridContainer/StartButton.disabled = false
+	
+	_on_peer_disconnected(); # TODO
 
 func _on_peer_disconnected():
 	# clear everything
@@ -101,13 +85,10 @@ func _on_start_button_pressed():
 		
 		await get_tree().create_timer(0.2).timeout # TODO: in case queue_free not finished
 		
-		if (Global.is_local):
-			game.game_start()
-			
-			$MainGUI/ControlAreaControls/Player1ControlArea.visible = true
-			$MainGUI/ControlAreaControls/Player2ControlArea.visible = true
-		else:
-			game.websocket_connect()
+		game.game_start()
+		
+		$MainGUI/ControlAreaControls/Player1ControlArea.visible = true
+		$MainGUI/ControlAreaControls/Player2ControlArea.visible = true
 
 func _on_back_button_pressed():
 	get_tree().change_scene_to_file.bind(mode_select_scene).call_deferred()
@@ -140,13 +121,17 @@ func _on_add_chess(pos, chess:ChessInst, is_no_effect):
 	$MainGUI/AspectRatioContainer/PanelContainer/SummonInfo/Player1RemainLabel.text = _get_remaining_chess_text(game.player_list[0])
 	$MainGUI/AspectRatioContainer/PanelContainer/SummonInfo/Player2RemainLabel.text = _get_remaining_chess_text(game.player_list[1])
 
+	SoundEffect.play("chess_move")
+
 func _on_chess_collide(node):
 	$Particles/DeadParticles.global_position = node.global_position
 	$Particles/DeadParticles.restart()
 	
 	node.queue_free()
-
-func _on_remove_chess(pos):
+	
+	SoundEffect.play("kill")
+	
+func _on_remove_chess(pos, is_active):
 	_is_in_animation = true
 	
 	var r = Global.n_to_rc(pos)[0]
@@ -166,6 +151,11 @@ func _on_remove_chess(pos):
 		$MainGUI/AspectRatioContainer/PanelContainer/SummonInfo/Player1RemainLabel.text = _get_remaining_chess_text(game.player_list[1])
 		
 		_is_in_animation = false
+		
+		if (!is_active):
+			SoundEffect.play("kill")
+		else:
+			SoundEffect.play("chess_move") # TODO: could be a different FX
 	)
 	
 func _on_move_chess(src, dst, is_flip_during_move):
@@ -188,6 +178,7 @@ func _on_move_chess(src, dst, is_flip_during_move):
 	var dst_r = Global.n_to_rc(dst)[0]
 	var dst_c = Global.n_to_rc(dst)[1]
 	var dst_tile = $Board.get_node(_get_tile_name_at_rc(dst_r, dst_c))
+	var dst_chess_is_null: bool = (dst_tile.get_node_or_null(_get_chess_name_at_n(dst)) == null)
 	
 	var tween = get_tree().create_tween()
 	# 1: raise the chess
@@ -221,6 +212,9 @@ func _on_move_chess(src, dst, is_flip_during_move):
 		_is_in_animation = false
 		
 		game.emit_after_move_animation()
+		
+		if (dst_chess_is_null):
+			SoundEffect.play("chess_move")
 	)
 	
 func _get_remaining_chess_text(player):
@@ -306,8 +300,15 @@ func _on_game_message(msg):
 	if msg != null:
 		$MainGUI/MessageContainer/Panel/MessageLabel.text = msg
 
-func _on_game_over():
+func _on_checkmate():
+	# TODO: checkmate sound is not available when a chess is summoned
+	SoundEffect.priority_play("checkmate")
+
+func _on_game_over(is_win):
+	$MainGUI/GridContainer/BackButton.disabled = false
 	$MainGUI/GridContainer/StartButton.disabled = false
+	
+	SoundEffect.priority_play("win" if is_win else "lose")
 
 func _init_board():
 	for ir in range(Global.MAXR):
@@ -373,3 +374,11 @@ func _on_control_area_mouse_entered(player_index):
 
 func _on_control_area_mouse_exited():
 	get_tree().call_group("all_hover_control_area_cover_effects", "queue_free")
+
+func _on_disable_buttons_in_ai():
+	$MainGUI/GridContainer/BackButton.disabled = true
+	$MainGUI/GridContainer/StartButton.disabled = true
+	
+func _on_enable_buttons_in_ai():
+	$MainGUI/GridContainer/BackButton.disabled = false
+	$MainGUI/GridContainer/StartButton.disabled = false

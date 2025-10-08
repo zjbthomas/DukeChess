@@ -21,6 +21,9 @@ var _is_in_animation = false
 func _ready():
 	_setup_ui_localization()
 	
+	# setup UI
+	$VBoxContainer/HBoxContainer/VBoxContainer/OpenButton.visible = Global.is_local and (not Global.is_ai) and OS.has_feature("windows")
+	
 	# add chess to AllChess container
 	for chess in Global.chess_loader.chess_name_list:
 		var node = chess_in_show_scene.instantiate()
@@ -55,6 +58,7 @@ func _ready():
 
 func _setup_ui_localization():
 	$VBoxContainer/HBoxContainer/VBoxContainer/ClearButton.text = tr("COLLECTION_CLEAR_ALL")
+	$VBoxContainer/HBoxContainer/VBoxContainer/OpenButton.text = tr("COLLECTION_OPEN_FOLDER")
 	$VBoxContainer/OKButton.text = tr("COLLECTION_CLOSE")
 
 func _on_chess_pressed(node):
@@ -187,3 +191,8 @@ func _get_node_used_chess(chess_name, is_locked):
 
 func _on_clear_button_pressed():
 	get_tree().call_group("free_used_chess", "emit_signal", "pressed")
+
+
+func _on_open_button_pressed():
+	if OS.has_feature("windows"):
+		OS.shell_open(ProjectSettings.globalize_path(Global.chess_loader.USERCHESSDIR))

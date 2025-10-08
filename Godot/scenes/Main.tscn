@@ -1,22 +1,35 @@
-[gd_scene load_steps=22 format=3 uid="uid://cfd8jcleybuec"]
+[gd_scene load_steps=23 format=3 uid="uid://cfd8jcleybuec"]
 
 [ext_resource type="PackedScene" uid="uid://blvbnngqi673u" path="res://scenes/ChessTile.tscn" id="1_h0u3b"]
 [ext_resource type="Script" path="res://scripts/scenes/Main.gd" id="1_h17yc"]
 [ext_resource type="PackedScene" uid="uid://c8y6pj2u8hsgr" path="res://scenes/Menu.tscn" id="4_ptmm8"]
 [ext_resource type="Texture2D" uid="uid://dlfm5njoa1def" path="res://images/textures/Flare00.PNG" id="5_cpke4"]
+[ext_resource type="Texture2D" uid="uid://brjxw8kjacy0m" path="res://images/screens/background.png" id="5_oa5jm"]
 [ext_resource type="PackedScene" uid="uid://cqwayhgnllvvv" path="res://scenes/Chess.tscn" id="5_pfq4i"]
 [ext_resource type="Script" path="res://scripts/scenes/Camera3D.gd" id="6_bs80g"]
 [ext_resource type="PackedScene" uid="uid://bweec6jbyouee" path="res://scenes/MainGUI.tscn" id="6_g86v1"]
+[ext_resource type="PackedScene" uid="uid://bkmnbbccd02oq" path="res://scenes/SoundControlSidebar.tscn" id="8_gpskb"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_tp6sn"]
-size = Vector3(60, 2, 60)
+[sub_resource type="GDScript" id="GDScript_gf5qr"]
+script/source = "extends Marker3D
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_symdh"]
-albedo_color = Color(0, 0, 0, 1)
 
-[sub_resource type="BoxMesh" id="BoxMesh_alcxu"]
-material = SubResource("StandardMaterial3D_symdh")
-size = Vector3(60, 2, 60)
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+"
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d0een"]
+shading_mode = 0
+albedo_texture = ExtResource("5_oa5jm")
+
+[sub_resource type="QuadMesh" id="QuadMesh_usgus"]
+material = SubResource("StandardMaterial3D_d0een")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m2inq"]
 albedo_color = Color(0.0627451, 0.0627451, 0.0627451, 1)
@@ -79,20 +92,6 @@ scale_min = 0.3
 scale_max = 0.3
 color = Color(0.392157, 0.666667, 0.392157, 1)
 
-[sub_resource type="GDScript" id="GDScript_gf5qr"]
-script/source = "extends Marker3D
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
-"
-
 [node name="Main" type="Node"]
 script = ExtResource("1_h17yc")
 mode_select_scene = "res://scenes/ModeSelectScreen.tscn"
@@ -100,15 +99,19 @@ chess_tile_scene = ExtResource("1_h0u3b")
 chess_scene = ExtResource("5_pfq4i")
 menu_scene = ExtResource("4_ptmm8")
 
-[node name="Ground" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00970078, -1, 0.054203)
+[node name="CameraPivot" type="Marker3D" parent="."]
+script = SubResource("GDScript_gf5qr")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
-shape = SubResource("BoxShape3D_tp6sn")
+[node name="Camera3D" type="Camera3D" parent="CameraPivot"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 20, 0)
+projection = 1
+current = true
+size = 8.0
+script = ExtResource("6_bs80g")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
-mesh = SubResource("BoxMesh_alcxu")
-skeleton = NodePath("../..")
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CameraPivot/Camera3D"]
+transform = Transform3D(14.2, 0, 0, 0, 8, 0, 0, 0, 1, 0, 0, -50)
+mesh = SubResource("QuadMesh_usgus")
 
 [node name="Board" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.05, -0.5)
@@ -145,14 +148,7 @@ draw_pass_1 = SubResource("QuadMesh_k70n8")
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 20, 0)
 light_energy = 2.067
 
-[node name="CameraPivot" type="Marker3D" parent="."]
-script = SubResource("GDScript_gf5qr")
-
-[node name="Camera3D" type="Camera3D" parent="CameraPivot"]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 20, 0)
-projection = 1
-current = true
-size = 8.0
-script = ExtResource("6_bs80g")
-
 [node name="MainGUI" parent="." instance=ExtResource("6_g86v1")]
+
+[node name="SoundControlSidebar" parent="." instance=ExtResource("8_gpskb")]
+offset_left = -90.0
