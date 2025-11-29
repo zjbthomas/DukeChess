@@ -18,19 +18,6 @@ func _process(delta):
 func _load_game_resources():
 	$VBoxContainer/ProgressBar.value = 0
 
-	# load chess info
-	Global.chess_loader = ChessLoader.new()
-	Global.chess_loader.connect("error_message", _on_chess_loader_error_message)
-	
-	Global.chess_loader.load_chess()
-	
-	$VBoxContainer/ProgressBar.value = 30
-	
-	# load chess texture
-	Global.chess_loader.load_chess_textures()
-	
-	$VBoxContainer/ProgressBar.value = 60
-	
 	# load streams
 	SoundEffect.load_streams()
 	
