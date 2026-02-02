@@ -3,6 +3,10 @@
 
 #include "MainPlayerController.h"
 
+#include "Kismet/GameplayStatics.h"
+
+#include "BoardActor.h"
+
 void AMainPlayerController::BeginPlay()
 {
     Super::BeginPlay();

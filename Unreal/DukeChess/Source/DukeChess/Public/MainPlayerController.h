@@ -2,13 +2,11 @@
 
 #pragma once
 
-#include "BoardActor.h"
-
-#include "Kismet/GameplayStatics.h"
-
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "MainPlayerController.generated.h"
+
+class ABoardActor;
 
 /**
  * 

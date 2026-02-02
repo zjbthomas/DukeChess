@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include "GlobalGameInstance.h"
-#include "ChessTileActor.h"
-
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "BoardActor.generated.h"
+
+class AChessTileActor;
 
 UCLASS()
 class DUKECHESS_API ABoardActor : public AActor

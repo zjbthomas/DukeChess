@@ -3,6 +3,9 @@
 
 #include "BoardActor.h"
 
+#include "GlobalGameInstance.h"
+#include "ChessTileActor.h"
+
 // Sets default values
 ABoardActor::ABoardActor()
 {
