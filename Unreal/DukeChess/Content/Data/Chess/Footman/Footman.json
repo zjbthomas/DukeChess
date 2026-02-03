@@ -1,0 +1,59 @@
+{
+    "name": "Footman",
+    "version": 1,
+    "localization": [
+        {
+            "zh": "侍卫"
+        }
+    ],
+    "front-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Move",
+                    "destination": "U"
+                },
+                {
+                    "type": "Move",
+                    "destination": "D"
+                },
+                {
+                    "type": "Move",
+                    "destination": "R"
+                },
+                {
+                    "type": "Move",
+                    "destination": "L"
+                }
+            ]
+        }
+    ],
+    "back-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Move",
+                    "destination": "UR"
+                },
+                {
+                    "type": "Move",
+                    "destination": "UL"
+                },
+                {
+                    "type": "Move",
+                    "destination": "UU"
+                },
+                {
+                    "type": "Move",
+                    "destination": "DR"
+                },
+                {
+                    "type": "Move",
+                    "destination": "DL"
+                }
+            ]
+        }
+    ]
+}

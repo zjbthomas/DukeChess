@@ -1,0 +1,71 @@
+{
+    "name": "Bowman",
+    "version": 1,
+    "localization": [
+        {
+            "zh": "弓箭手"
+        }
+    ],
+    "front-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Move",
+                    "destination": "U"
+                },
+                {
+                    "type": "Move",
+                    "destination": "R"
+                },
+                {
+                    "type": "Move",
+                    "destination": "L"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "DD"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "RR"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "LL"
+                }
+            ]
+        }
+    ],
+    "back-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Move",
+                    "destination": "U"
+                },
+                {
+                    "type": "Move",
+                    "destination": "DR"
+                },
+                {
+                    "type": "Move",
+                    "destination": "DL"
+                },
+                {
+                    "type": "Strike",
+                    "destination": "UU"
+                },
+                {
+                    "type": "Strike",
+                    "destination": "UR"
+                },
+                {
+                    "type": "Strike",
+                    "destination": "UL"
+                }
+            ]
+        }
+    ]
+}

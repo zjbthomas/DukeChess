@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "ChessLoader.h"
+
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "GlobalGameInstance.generated.h"
@@ -20,4 +22,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Board")
 	int32 MAXC = 6;
+
+	// Chess
+	TUniquePtr<ChessLoader> ChessLoaderInstance;
+
+	LoadChessResult LoadChess();
+
+	// Mode
+	UPROPERTY(BlueprintReadWrite, Category = "Mode")
+	bool bLocal = false;
+	UPROPERTY(BlueprintReadWrite, Category = "Mode")
+	bool bAI = false;
 };

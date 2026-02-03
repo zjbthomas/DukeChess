@@ -1,0 +1,67 @@
+{
+    "name": "Knight",
+    "version": 1,
+    "localization": [
+        {
+            "zh": "骑士"
+        }
+    ],
+    "front-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Move",
+                    "destination": "R"
+                },
+                {
+                    "type": "Move",
+                    "destination": "L"
+                },
+                {
+                    "type": "Move",
+                    "destination": "D"
+                },
+                {
+                    "type": "Move",
+                    "destination": "DD"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "UUR"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "UUL"
+                }
+            ]
+        }
+    ],
+    "back-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Move",
+                    "destination": "DR"
+                },
+                {
+                    "type": "Move",
+                    "destination": "DL"
+                },
+                {
+                    "type": "Move",
+                    "destination": "DDRR"
+                },
+                {
+                    "type": "Move",
+                    "destination": "DDLL"
+                },
+                {
+                    "type": "Slide",
+                    "destination": "U"
+                }
+            ]
+        }
+    ]
+}

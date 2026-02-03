@@ -10,6 +10,6 @@ public class DukeChessEditorTarget : TargetRules
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V5;
 
-		ExtraModuleNames.AddRange( new string[] { "DukeChess" } );
+        ExtraModuleNames.AddRange( new string[] { "DukeChess" } );
 	}
 }

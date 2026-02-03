@@ -1,0 +1,59 @@
+{
+    "name": "Pikeman",
+    "version": 1,
+    "localization": [
+        {
+            "zh": "长枪兵"
+        }
+    ],
+    "front-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Move",
+                    "destination": "UR"
+                },
+                {
+                    "type": "Move",
+                    "destination": "UL"
+                },
+                {
+                    "type": "Move",
+                    "destination": "UURR"
+                },
+                {
+                    "type": "Move",
+                    "destination": "UULL"
+                }
+            ]
+        }
+    ],
+    "back-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Strike",
+                    "destination": "UUR"
+                },
+                {
+                    "type": "Strike",
+                    "destination": "UUL"
+                },
+                {
+                    "type": "Move",
+                    "destination": "U"
+                },
+                {
+                    "type": "Move",
+                    "destination": "D"
+                },
+                {
+                    "type": "Move",
+                    "destination": "DD"
+                }
+            ]
+        }
+    ]
+}

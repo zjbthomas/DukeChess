@@ -1,0 +1,96 @@
+{
+    "name": "Marshall",
+    "version": 1,
+    "localization": [
+        {
+            "zh": "元帅"
+        }
+    ],
+    "front-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Slide",
+                    "destination": "R"
+                },
+                {
+                    "type": "Slide",
+                    "destination": "L"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "UURR"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "UULL"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "DD"
+                }
+            ]
+        }
+    ],
+    "back-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Move",
+                    "destination": "U"
+                },
+                {
+                    "type": "Move",
+                    "destination": "UR"
+                },
+                {
+                    "type": "Move",
+                    "destination": "UL"
+                },
+                {
+                    "type": "Move",
+                    "destination": "R"
+                },
+                {
+                    "type": "Move",
+                    "destination": "RR"
+                },
+                {
+                    "type": "Move",
+                    "destination": "L"
+                },
+                {
+                    "type": "Move",
+                    "destination": "LL"
+                },
+                {
+                    "type": "Move",
+                    "destination": "DR"
+                },
+                {
+                    "type": "Move",
+                    "destination": "DL"
+                }
+            ]
+        },
+        {
+            "action": "Command",
+            "targets": [
+                {
+                    "type": "Command",
+                    "destination": "U"
+                },
+                {
+                    "type": "Command",
+                    "destination": "R"
+                },
+                {
+                    "type": "Command",
+                    "destination": "L"
+                }
+            ]
+        }
+    ]
+}

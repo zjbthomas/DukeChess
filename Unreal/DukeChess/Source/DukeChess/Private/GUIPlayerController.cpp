@@ -18,6 +18,14 @@ void AGUIPlayerController::BeginPlay()
 	bShowMouseCursor = true;
 	SetInputMode(FInputModeUIOnly{});
 
+	// Load GlobalGameInstance
+	Global = Cast<UGlobalGameInstance>(GetGameInstance());
+	if (!Global) {
+		UE_LOG(LogTemp, Error, TEXT("GlobalGameInstance cast failed!"));
+		return;
+	}
+
+	// Check if loading needed
 	AGUIGameModeBase* GM = GetWorld()->GetAuthGameMode<AGUIGameModeBase>();
 	if (!GM) return;
 
@@ -27,7 +35,10 @@ void AGUIPlayerController::BeginPlay()
 	case EUILevelKind::ModeLoad:
 		ModeLoadGameResources();
 
-		UGameplayStatics::OpenLevel(this, FName(TEXT("MainMap")));
+		if (bModeLoadOK) {
+			UGameplayStatics::OpenLevel(this, FName(TEXT("MainMap")));
+		}
+		
 		break;
 	default:
 		break;
@@ -40,13 +51,16 @@ void AGUIPlayerController::RegisterLoadingUserWidget(ULoadingUserWidget* InWidge
 }
 
 void AGUIPlayerController::ModeLoadGameResources() {
-	UGlobalGameInstance* Global = Cast<UGlobalGameInstance>(GetGameInstance());
-	if (!Global) {
-		UE_LOG(LogTemp, Error, TEXT("GlobalGameInstance cast failed!"));
+	LoadChessResult R = Global->LoadChess();
+
+	bModeLoadOK = R.bOK;
+
+	if (!R.bOK) {
+		LoadingUserWidget->SetMessage(R.ErrorMsg);
 		return;
 	}
 
-	LoadingUserWidget->SetProgress(100);
+	LoadingUserWidget->SetProgress(50);
 
 	UE_LOG(LogTemp, Warning, TEXT("ModeLoadGameResources!"));
 }

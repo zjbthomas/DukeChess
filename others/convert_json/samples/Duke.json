@@ -1,0 +1,81 @@
+{
+    "name": "Duke",
+    "version": 1,
+    "localization": [
+        {
+            "zh": "公爵"
+        }
+    ],
+    "front-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Slide",
+                    "destination": "L"
+                },
+                {
+                    "type": "Slide",
+                    "destination": "R"
+                }
+            ]
+        },
+        {
+            "action": "Summon",
+            "targets": [
+                {
+                    "type": "Summon",
+                    "destination": "U"
+                },
+                {
+                    "type": "Summon",
+                    "destination": "D"
+                },
+                {
+                    "type": "Summon",
+                    "destination": "L"
+                },
+                {
+                    "type": "Summon",
+                    "destination": "R"
+                }
+            ]
+        }
+    ],
+    "back-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Slide",
+                    "destination": "U"
+                },
+                {
+                    "type": "Slide",
+                    "destination": "D"
+                }
+            ]
+        },
+        {
+            "action": "Summon",
+            "targets": [
+                {
+                    "type": "Summon",
+                    "destination": "U"
+                },
+                {
+                    "type": "Summon",
+                    "destination": "D"
+                },
+                {
+                    "type": "Summon",
+                    "destination": "L"
+                },
+                {
+                    "type": "Summon",
+                    "destination": "R"
+                }
+            ]
+        }
+    ]
+}

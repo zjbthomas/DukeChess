@@ -5,6 +5,15 @@
 
 #include "GUIPlayerController.h"
 
+void ULoadingUserWidget::SetMessage(FString Message)
+{
+
+	if (TextLoadingMsg)
+	{
+		TextLoadingMsg->SetText(FText::FromString(Message));
+	}
+}
+
 void ULoadingUserWidget::SetProgress(int32 Percentage)
 {
 

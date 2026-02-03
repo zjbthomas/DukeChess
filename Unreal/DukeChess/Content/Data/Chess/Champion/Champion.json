@@ -1,0 +1,87 @@
+{
+    "name": "Champion",
+    "version": 1,
+    "localization": [
+        {
+            "zh": "勇士"
+        }
+    ],
+    "front-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Move",
+                    "destination": "U"
+                },
+                {
+                    "type": "Move",
+                    "destination": "D"
+                },
+                {
+                    "type": "Move",
+                    "destination": "R"
+                },
+                {
+                    "type": "Move",
+                    "destination": "L"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "UU"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "DD"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "RR"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "LL"
+                }
+            ]
+        }
+    ],
+    "back-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Strike",
+                    "destination": "U"
+                },
+                {
+                    "type": "Strike",
+                    "destination": "D"
+                },
+                {
+                    "type": "Strike",
+                    "destination": "R"
+                },
+                {
+                    "type": "Strike",
+                    "destination": "L"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "UU"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "DD"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "RR"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "LL"
+                }
+            ]
+        }
+    ]
+}

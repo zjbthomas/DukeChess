@@ -18,9 +18,15 @@ class DUKECHESS_API ULoadingUserWidget : public UUserWidget
 
 public:
 	UFUNCTION(BlueprintCallable)
+	void SetMessage(FString Message);
+
+	UFUNCTION(BlueprintCallable)
 	void SetProgress(int32 Percentage);
 
 protected:
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* TextLoadingMsg;
+
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* TextLoading;
 

@@ -1,0 +1,55 @@
+{
+    "name": "LongBowman",
+    "version": 1,
+    "localization": [
+        {
+            "zh": "长弓手"
+        }
+    ],
+    "front-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Move",
+                    "destination": "U"
+                },
+                {
+                    "type": "Move",
+                    "destination": "D"
+                },
+                {
+                    "type": "Move",
+                    "destination": "R"
+                },
+                {
+                    "type": "Move",
+                    "destination": "L"
+                }
+            ]
+        }
+    ],
+    "back-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Strike",
+                    "destination": "UU"
+                },
+                {
+                    "type": "Strike",
+                    "destination": "UUU"
+                },
+                {
+                    "type": "Move",
+                    "destination": "DR"
+                },
+                {
+                    "type": "Move",
+                    "destination": "DL"
+                }
+            ]
+        }
+    ]
+}

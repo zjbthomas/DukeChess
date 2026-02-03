@@ -7,6 +7,7 @@
 #include "GUIPlayerController.generated.h"
 
 class ULoadingUserWidget;
+class UGlobalGameInstance;
 
 /**
  * 
@@ -26,6 +27,10 @@ public:
 private:
 	UPROPERTY()
 	ULoadingUserWidget* LoadingUserWidget = nullptr;
+
+	UGlobalGameInstance* Global;
+
+	bool bModeLoadOK = true;
 
 	void ModeLoadGameResources();
 };

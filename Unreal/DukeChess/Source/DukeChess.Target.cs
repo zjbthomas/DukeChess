@@ -11,5 +11,7 @@ public class DukeChessTarget : TargetRules
 		DefaultBuildSettings = BuildSettingsVersion.V5;
 
 		ExtraModuleNames.AddRange( new string[] { "DukeChess" } );
-	}
+
+        AdditionalCompilerArguments = "/utf-8";
+    }
 }

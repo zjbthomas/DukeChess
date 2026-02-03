@@ -1,0 +1,63 @@
+{
+    "name": "Ranger",
+    "version": 1,
+    "localization": [
+        {
+            "zh": "游侠"
+        }
+    ],
+    "front-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Slide",
+                    "destination": "U"
+                },
+                {
+                    "type": "Slide",
+                    "destination": "D"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "UUR"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "UUL"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "RRU"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "LLU"
+                }
+            ]
+        }
+    ],
+    "back-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Slide",
+                    "destination": "UR"
+                },
+                {
+                    "type": "Slide",
+                    "destination": "UL"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "DDR"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "DDL"
+                }
+            ]
+        }
+    ]
+}

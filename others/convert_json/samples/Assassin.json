@@ -1,0 +1,47 @@
+{
+    "name": "Assassin",
+    "version": 1,
+    "localization": [
+        {
+            "zh": "刺客"
+        }
+    ],
+    "front-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "JumpSlide",
+                    "destination": "UU"
+                },
+                {
+                    "type": "JumpSlide",
+                    "destination": "DDRR"
+                },
+                {
+                    "type": "JumpSlide",
+                    "destination": "DDLL"
+                }
+            ]
+        }
+    ],
+    "back-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "JumpSlide",
+                    "destination": "UURR"
+                },
+                {
+                    "type": "JumpSlide",
+                    "destination": "UULL"
+                },
+                {
+                    "type": "JumpSlide",
+                    "destination": "DD"
+                }
+            ]
+        }
+    ]
+}

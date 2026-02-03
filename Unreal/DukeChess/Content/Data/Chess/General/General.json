@@ -1,0 +1,100 @@
+{
+    "name": "General",
+    "version": 1,
+    "localization": [
+        {
+            "zh": "将军"
+        }
+    ],
+    "front-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Move",
+                    "destination": "U"
+                },
+                {
+                    "type": "Move",
+                    "destination": "D"
+                },
+                {
+                    "type": "Move",
+                    "destination": "RR"
+                },
+                {
+                    "type": "Move",
+                    "destination": "LL"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "UUR"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "UUL"
+                }
+            ]
+        }
+    ],
+    "back-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Move",
+                    "destination": "U"
+                },
+                {
+                    "type": "Move",
+                    "destination": "R"
+                },
+                {
+                    "type": "Move",
+                    "destination": "RR"
+                },
+                {
+                    "type": "Move",
+                    "destination": "L"
+                },
+                {
+                    "type": "Move",
+                    "destination": "LL"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "UUR"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "UUL"
+                }
+            ]
+        },
+        {
+            "action": "Command",
+            "targets": [
+                {
+                    "type": "Command",
+                    "destination": "R"
+                },
+                {
+                    "type": "Command",
+                    "destination": "L"
+                },
+                {
+                    "type": "Command",
+                    "destination": "D"
+                },
+                {
+                    "type": "Command",
+                    "destination": "DR"
+                },
+                {
+                    "type": "Command",
+                    "destination": "DL"
+                }
+            ]
+        }
+    ]
+}

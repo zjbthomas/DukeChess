@@ -1,0 +1,67 @@
+{
+    "name": "Dragoon",
+    "version": 1,
+    "localization": [
+        {
+            "zh": "龙骑兵"
+        }
+    ],
+    "front-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Move",
+                    "destination": "R"
+                },
+                {
+                    "type": "Move",
+                    "destination": "L"
+                },
+                {
+                    "type": "Strike",
+                    "destination": "UU"
+                },
+                {
+                    "type": "Strike",
+                    "destination": "UURR"
+                },
+                {
+                    "type": "Strike",
+                    "destination": "UULL"
+                }
+            ]
+        }
+    ],
+    "back-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Move",
+                    "destination": "U"
+                },
+                {
+                    "type": "Move",
+                    "destination": "UU"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "UUR"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "UUL"
+                },
+                {
+                    "type": "Slide",
+                    "destination": "DR"
+                },
+                {
+                    "type": "Slide",
+                    "destination": "DL"
+                }
+            ]
+        }
+    ]
+}

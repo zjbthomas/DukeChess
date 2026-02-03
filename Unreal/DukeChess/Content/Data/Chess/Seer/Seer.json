@@ -1,0 +1,87 @@
+{
+    "name": "Seer",
+    "version": 1,
+    "localization": [
+        {
+            "zh": "先知"
+        }
+    ],
+    "front-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Move",
+                    "destination": "UR"
+                },
+                {
+                    "type": "Move",
+                    "destination": "UL"
+                },
+                {
+                    "type": "Move",
+                    "destination": "DR"
+                },
+                {
+                    "type": "Move",
+                    "destination": "DL"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "UU"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "DD"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "RR"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "LL"
+                }
+            ]
+        }
+    ],
+    "back-movements": [
+        {
+            "action": "Move",
+            "targets": [
+                {
+                    "type": "Move",
+                    "destination": "U"
+                },
+                {
+                    "type": "Move",
+                    "destination": "D"
+                },
+                {
+                    "type": "Move",
+                    "destination": "R"
+                },
+                {
+                    "type": "Move",
+                    "destination": "L"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "UURR"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "UULL"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "DDRR"
+                },
+                {
+                    "type": "Jump",
+                    "destination": "DDLL"
+                }
+            ]
+        }
+    ]
+}
