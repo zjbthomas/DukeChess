@@ -12,35 +12,21 @@
             "targets": [
                 {
                     "type": "Move",
-                    "destination": "U"
-                },
-                {
-                    "type": "Move",
-                    "destination": "D"
-                },
-                {
-                    "type": "Move",
-                    "destination": "R"
-                },
-                {
-                    "type": "Move",
-                    "destination": "L"
+                    "destination": [
+                        "U",
+                        "D",
+                        "R",
+                        "L"
+                    ]
                 },
                 {
                     "type": "Jump",
-                    "destination": "UU"
-                },
-                {
-                    "type": "Jump",
-                    "destination": "DD"
-                },
-                {
-                    "type": "Jump",
-                    "destination": "RR"
-                },
-                {
-                    "type": "Jump",
-                    "destination": "LL"
+                    "destination": [
+                        "UU",
+                        "DD",
+                        "RR",
+                        "LL"
+                    ]
                 }
             ]
         }
@@ -51,35 +37,21 @@
             "targets": [
                 {
                     "type": "Strike",
-                    "destination": "U"
-                },
-                {
-                    "type": "Strike",
-                    "destination": "D"
-                },
-                {
-                    "type": "Strike",
-                    "destination": "R"
-                },
-                {
-                    "type": "Strike",
-                    "destination": "L"
+                    "destination": [
+                        "U",
+                        "D",
+                        "R",
+                        "L"
+                    ]
                 },
                 {
                     "type": "Jump",
-                    "destination": "UU"
-                },
-                {
-                    "type": "Jump",
-                    "destination": "DD"
-                },
-                {
-                    "type": "Jump",
-                    "destination": "RR"
-                },
-                {
-                    "type": "Jump",
-                    "destination": "LL"
+                    "destination": [
+                        "UU",
+                        "DD",
+                        "RR",
+                        "LL"
+                    ]
                 }
             ]
         }

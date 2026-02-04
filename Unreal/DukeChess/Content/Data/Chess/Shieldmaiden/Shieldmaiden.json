@@ -12,23 +12,13 @@
             "targets": [
                 {
                     "type": "Move",
-                    "destination": "U"
-                },
-                {
-                    "type": "Move",
-                    "destination": "UL"
-                },
-                {
-                    "type": "Move",
-                    "destination": "L"
-                },
-                {
-                    "type": "Move",
-                    "destination": "DL"
-                },
-                {
-                    "type": "Move",
-                    "destination": "DD"
+                    "destination": [
+                        "U",
+                        "UL",
+                        "L",
+                        "DL",
+                        "DD"
+                    ]
                 }
             ]
         }
@@ -39,23 +29,13 @@
             "targets": [
                 {
                     "type": "Move",
-                    "destination": "U"
-                },
-                {
-                    "type": "Move",
-                    "destination": "UR"
-                },
-                {
-                    "type": "Move",
-                    "destination": "R"
-                },
-                {
-                    "type": "Move",
-                    "destination": "DR"
-                },
-                {
-                    "type": "Move",
-                    "destination": "DD"
+                    "destination": [
+                        "U",
+                        "UR",
+                        "R",
+                        "DR",
+                        "DD"
+                    ]
                 }
             ]
         }

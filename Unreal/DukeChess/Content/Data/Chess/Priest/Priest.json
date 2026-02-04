@@ -12,19 +12,12 @@
             "targets": [
                 {
                     "type": "Slide",
-                    "destination": "UR"
-                },
-                {
-                    "type": "Slide",
-                    "destination": "UL"
-                },
-                {
-                    "type": "Slide",
-                    "destination": "DR"
-                },
-                {
-                    "type": "Slide",
-                    "destination": "DL"
+                    "destination": [
+                        "UR",
+                        "UL",
+                        "DR",
+                        "DL"
+                    ]
                 }
             ]
         }
@@ -35,35 +28,21 @@
             "targets": [
                 {
                     "type": "Move",
-                    "destination": "UR"
-                },
-                {
-                    "type": "Move",
-                    "destination": "UL"
-                },
-                {
-                    "type": "Move",
-                    "destination": "DR"
-                },
-                {
-                    "type": "Move",
-                    "destination": "DL"
+                    "destination": [
+                        "UR",
+                        "UL",
+                        "DR",
+                        "DL"
+                    ]
                 },
                 {
                     "type": "Jump",
-                    "destination": "UURR"
-                },
-                {
-                    "type": "Jump",
-                    "destination": "UULL"
-                },
-                {
-                    "type": "Jump",
-                    "destination": "DDRR"
-                },
-                {
-                    "type": "Jump",
-                    "destination": "DDLL"
+                    "destination": [
+                        "UURR",
+                        "UULL",
+                        "DDRR",
+                        "DDLL"
+                    ]
                 }
             ]
         }

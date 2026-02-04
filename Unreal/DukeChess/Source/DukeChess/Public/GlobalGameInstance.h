@@ -33,4 +33,28 @@ public:
 	bool bLocal = false;
 	UPROPERTY(BlueprintReadWrite, Category = "Mode")
 	bool bAI = false;
+
+	static FIntPoint DestToOffsetsForChess(FString Dest) {
+		int32 x = 0;
+		int32 y = 0;
+
+		for (TCHAR C : Dest) {
+			switch (C) {
+			case 'U':
+				y -= 1;
+				break;
+			case 'D':
+				y += 1;
+				break;
+			case 'L':
+				x -= 1;
+				break;
+			case 'R':
+				x += 1;
+				break;
+			}
+		}
+
+		return FIntPoint{ x, y };
+	}
 };

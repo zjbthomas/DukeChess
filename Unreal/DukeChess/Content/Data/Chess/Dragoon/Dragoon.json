@@ -12,23 +12,18 @@
             "targets": [
                 {
                     "type": "Move",
-                    "destination": "R"
-                },
-                {
-                    "type": "Move",
-                    "destination": "L"
-                },
-                {
-                    "type": "Strike",
-                    "destination": "UU"
+                    "destination": [
+                        "R",
+                        "L"
+                    ]
                 },
                 {
                     "type": "Strike",
-                    "destination": "UURR"
-                },
-                {
-                    "type": "Strike",
-                    "destination": "UULL"
+                    "destination": [
+                        "UU",
+                        "UURR",
+                        "UULL"
+                    ]
                 }
             ]
         }
@@ -39,27 +34,24 @@
             "targets": [
                 {
                     "type": "Move",
-                    "destination": "U"
-                },
-                {
-                    "type": "Move",
-                    "destination": "UU"
-                },
-                {
-                    "type": "Jump",
-                    "destination": "UUR"
+                    "destination": [
+                        "U",
+                        "UU"
+                    ]
                 },
                 {
                     "type": "Jump",
-                    "destination": "UUL"
+                    "destination": [
+                        "UUR",
+                        "UUL"
+                    ]
                 },
                 {
                     "type": "Slide",
-                    "destination": "DR"
-                },
-                {
-                    "type": "Slide",
-                    "destination": "DL"
+                    "destination": [
+                        "DR",
+                        "DL"
+                    ]
                 }
             ]
         }

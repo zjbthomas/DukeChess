@@ -4,13 +4,13 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import xml.etree.ElementTree as ET
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 # -----------------------------
 # CONFIG (edit these two paths)
 # -----------------------------
-INPUT_DIR = Path(r"E:\eDocs\Personal\DukeChess\Godot\chess")     # e.g., ./chess/Assassin/Assassin.xml
-OUTPUT_DIR = Path(r"E:\eDocs\Personal\chess-json")   # e.g., ./output/Assassin/Assassin.json
+INPUT_DIR = Path(r"E:\eDocs\Personal\DukeChess\Godot\chess")
+OUTPUT_DIR = Path(r"E:\eDocs\Personal\chess-json")
 
 
 def _text(elem: Optional[ET.Element]) -> Optional[str]:
@@ -34,11 +34,9 @@ def _coerce_int_if_possible(v: Optional[str]) -> Any:
 
 def parse_localization(root: ET.Element) -> List[Dict[str, str]]:
     """
-    From:
-      <localization><zh>刺客</zh>...</localization>
-    To:
-      [{"zh": "刺客", ...}]
-    Always returns a LIST (matches sample).
+    <localization><zh>...</zh>...</localization>
+      -> [{"zh": "...", ...}]
+    Always returns a list.
     """
     out: List[Dict[str, str]] = []
     for loc in root.findall("./localization"):
@@ -53,39 +51,63 @@ def parse_localization(root: ET.Element) -> List[Dict[str, str]]:
     return out
 
 
-def parse_targets(targets_elem: Optional[ET.Element]) -> List[Dict[str, Any]]:
+def _group_targets_by_type(targets_elem: Optional[ET.Element]) -> List[Dict[str, Any]]:
     """
-    From:
+    XML:
       <targets>
-        <target><destination>UU</destination><type>JumpSlide</type></target>
-        ...
+        <target><destination>...</destination><type>Move</type></target>
+        <target><destination>...</destination><type>Move</type></target>
+        <target><destination>...</destination><type>Strike</type></target>
       </targets>
-    To:
-      [{"type": "...", "destination": "..."}, ...]
-    Key order: type then destination (as requested).
+
+    JSON (grouped by type, preserving first-seen order of types):
+      [
+        {"type": "Move", "destination": ["...", "..."]},
+        {"type": "Strike", "destination": ["..."]}
+      ]
+
+    Also enforces key order: type first, then destination.
     """
     if targets_elem is None:
         return []
 
-    out: List[Dict[str, Any]] = []
-    for tgt in targets_elem.findall("./target"):
-        typ = _text(tgt.find("./type"))
-        dest = _text(tgt.find("./destination"))
+    # Keep order of "type" groups by first appearance
+    order: List[str] = []
+    grouped: Dict[str, List[str]] = {}
 
-        # Enforce insertion order: type first, then destination
-        obj: Dict[str, Any] = {}
-        obj["type"] = typ
-        obj["destination"] = dest
-        out.append(obj)
+    for tgt in targets_elem.findall("./target"):
+        typ = _text(tgt.find("./type")) or ""
+        dest = _text(tgt.find("./destination")) or ""
+
+        if typ not in grouped:
+            grouped[typ] = []
+            order.append(typ)
+        grouped[typ].append(dest)
+
+    out: List[Dict[str, Any]] = []
+    for typ in order:
+        out.append({
+            "type": typ,
+            "destination": grouped[typ],
+        })
     return out
 
 
 def parse_movements(side_elem: Optional[ET.Element]) -> List[Dict[str, Any]]:
     """
-    From:
-      <front><movements><movement>...</movement></movements></front>
-    To:
-      [{"action": "...", "targets": [...]}, ...]
+    <front|back>
+      <movements>
+        <movement>
+          <action>Move</action>
+          <targets>...</targets>
+        </movement>
+      </movements>
+    </front|back>
+
+    -> [
+         {"action": "...", "targets": [ {type,destination[...]}, ... ]},
+         ...
+       ]
     """
     if side_elem is None:
         return []
@@ -93,7 +115,7 @@ def parse_movements(side_elem: Optional[ET.Element]) -> List[Dict[str, Any]]:
     out: List[Dict[str, Any]] = []
     for mv in side_elem.findall("./movements/movement"):
         action = _text(mv.find("./action"))
-        targets = parse_targets(mv.find("./targets"))
+        targets = _group_targets_by_type(mv.find("./targets"))
 
         mv_obj: Dict[str, Any] = {}
         mv_obj["action"] = action
@@ -101,6 +123,21 @@ def parse_movements(side_elem: Optional[ET.Element]) -> List[Dict[str, Any]]:
         out.append(mv_obj)
 
     return out
+
+
+def parse_center(root: ET.Element) -> Dict[str, Any]:
+    """
+    Sample 1 expects:
+      <back><center>D</center></back>
+    -> "center": {"back": "D"}
+
+    Only include if the node exists and has non-empty text.
+    """
+    center_obj: Dict[str, Any] = {}
+    back_center = _text(root.find("./back/center"))
+    if back_center is not None:
+        center_obj["back"] = back_center
+    return center_obj
 
 
 def convert_one(xml_path: Path, input_root: Path, output_root: Path) -> Path:
@@ -113,20 +150,25 @@ def convert_one(xml_path: Path, input_root: Path, output_root: Path) -> Path:
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     tree = ET.parse(xml_path)
-    root = tree.getroot()
+    root = tree.getroot()  # <chess ...>
 
     data: Dict[str, Any] = {}
 
-    # Root attributes => top-level keys (no "chess", no "@attributes")
+    # Root attributes -> top-level keys
     data["name"] = root.attrib.get("name")
     data["version"] = _coerce_int_if_possible(root.attrib.get("version"))
 
-    # localization => list of dicts
+    # localization -> list of dicts
     loc = parse_localization(root)
     if loc:
         data["localization"] = loc
 
-    # front/back flattened => front-movements / back-movements
+    # optional center (currently only back/center shown in sample)
+    center = parse_center(root)
+    if center:
+        data["center"] = center
+
+    # movements
     data["front-movements"] = parse_movements(root.find("./front"))
     data["back-movements"] = parse_movements(root.find("./back"))
 

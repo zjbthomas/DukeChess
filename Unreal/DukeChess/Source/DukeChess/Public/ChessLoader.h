@@ -6,6 +6,8 @@
 
 class UGlobalGameInstance;
 
+class ChessModel;
+
 struct LoadChessResult {
 	bool bOK = true;
 
@@ -37,7 +39,7 @@ public:
 
 	TArray<FString> ChessNameArray;
 	TMap<FString, int32> ChessMaxAmountMap;
-	// TODO: ChessModelMap
+	TMap<FString, TSharedPtr<ChessModel>> ChessModelMap;
 	// TODO: ChessTextureMap
 
 	LoadChessResult LoadChess();

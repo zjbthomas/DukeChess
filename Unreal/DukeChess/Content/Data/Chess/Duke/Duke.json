@@ -12,11 +12,10 @@
             "targets": [
                 {
                     "type": "Slide",
-                    "destination": "L"
-                },
-                {
-                    "type": "Slide",
-                    "destination": "R"
+                    "destination": [
+                        "L",
+                        "R"
+                    ]
                 }
             ]
         },
@@ -25,19 +24,12 @@
             "targets": [
                 {
                     "type": "Summon",
-                    "destination": "U"
-                },
-                {
-                    "type": "Summon",
-                    "destination": "D"
-                },
-                {
-                    "type": "Summon",
-                    "destination": "L"
-                },
-                {
-                    "type": "Summon",
-                    "destination": "R"
+                    "destination": [
+                        "U",
+                        "D",
+                        "L",
+                        "R"
+                    ]
                 }
             ]
         }
@@ -48,11 +40,10 @@
             "targets": [
                 {
                     "type": "Slide",
-                    "destination": "U"
-                },
-                {
-                    "type": "Slide",
-                    "destination": "D"
+                    "destination": [
+                        "U",
+                        "D"
+                    ]
                 }
             ]
         },
@@ -61,19 +52,12 @@
             "targets": [
                 {
                     "type": "Summon",
-                    "destination": "U"
-                },
-                {
-                    "type": "Summon",
-                    "destination": "D"
-                },
-                {
-                    "type": "Summon",
-                    "destination": "L"
-                },
-                {
-                    "type": "Summon",
-                    "destination": "R"
+                    "destination": [
+                        "U",
+                        "D",
+                        "L",
+                        "R"
+                    ]
                 }
             ]
         }

@@ -6,25 +6,21 @@
             "zh": "长弓手"
         }
     ],
+    "center": {
+        "back": "D"
+    },
     "front-movements": [
         {
             "action": "Move",
             "targets": [
                 {
                     "type": "Move",
-                    "destination": "U"
-                },
-                {
-                    "type": "Move",
-                    "destination": "D"
-                },
-                {
-                    "type": "Move",
-                    "destination": "R"
-                },
-                {
-                    "type": "Move",
-                    "destination": "L"
+                    "destination": [
+                        "U",
+                        "D",
+                        "R",
+                        "L"
+                    ]
                 }
             ]
         }
@@ -35,19 +31,17 @@
             "targets": [
                 {
                     "type": "Strike",
-                    "destination": "UU"
-                },
-                {
-                    "type": "Strike",
-                    "destination": "UUU"
-                },
-                {
-                    "type": "Move",
-                    "destination": "DR"
+                    "destination": [
+                        "UU",
+                        "UUU"
+                    ]
                 },
                 {
                     "type": "Move",
-                    "destination": "DL"
+                    "destination": [
+                        "DR",
+                        "DL"
+                    ]
                 }
             ]
         }

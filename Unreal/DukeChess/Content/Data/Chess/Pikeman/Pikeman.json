@@ -12,19 +12,12 @@
             "targets": [
                 {
                     "type": "Move",
-                    "destination": "UR"
-                },
-                {
-                    "type": "Move",
-                    "destination": "UL"
-                },
-                {
-                    "type": "Move",
-                    "destination": "UURR"
-                },
-                {
-                    "type": "Move",
-                    "destination": "UULL"
+                    "destination": [
+                        "UR",
+                        "UL",
+                        "UURR",
+                        "UULL"
+                    ]
                 }
             ]
         }
@@ -35,23 +28,18 @@
             "targets": [
                 {
                     "type": "Strike",
-                    "destination": "UUR"
-                },
-                {
-                    "type": "Strike",
-                    "destination": "UUL"
-                },
-                {
-                    "type": "Move",
-                    "destination": "U"
+                    "destination": [
+                        "UUR",
+                        "UUL"
+                    ]
                 },
                 {
                     "type": "Move",
-                    "destination": "D"
-                },
-                {
-                    "type": "Move",
-                    "destination": "DD"
+                    "destination": [
+                        "U",
+                        "D",
+                        "DD"
+                    ]
                 }
             ]
         }

@@ -1,23 +1,21 @@
 {
-    "name": "Footman",
+    "name": "LongBowman",
     "version": 1,
     "localization": [
         {
-            "zh": "侍卫"
+            "zh": "长弓手"
         }
     ],
+    "center": {
+        "back": "D"
+    },
     "front-movements": [
         {
             "action": "Move",
             "targets": [
                 {
                     "type": "Move",
-                    "destination": [
-                        "U",
-                        "D",
-                        "R",
-                        "L"
-                    ]
+                    "destination": ["U", "D", "L", "R"]
                 }
             ]
         }
@@ -27,14 +25,12 @@
             "action": "Move",
             "targets": [
                 {
+                    "type": "Strike",
+                    "destination": ["UU", "UUU"]
+                },
+                {
                     "type": "Move",
-                    "destination": [
-                        "UR",
-                        "UL",
-                        "UU",
-                        "DR",
-                        "DL"
-                    ]
+                    "destination": ["DR", "DL"]
                 }
             ]
         }

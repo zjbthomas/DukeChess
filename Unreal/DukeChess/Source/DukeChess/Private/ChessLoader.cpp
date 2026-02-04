@@ -11,6 +11,8 @@
 
 #include "GlobalGameInstance.h"
 
+#include "ChessModel.h"
+
 ChessLoader::ChessLoader(UGlobalGameInstance* InGlobal)
 {
 	// Load GlobalGameInstance
@@ -194,6 +196,9 @@ bool ChessLoader::LoadChessFromContent(LoadChessResult& R) {
 			return false;
 		}
 
+		TUniquePtr<ChessModel> Chess = MakeUnique<ChessModel>();
+
+		// Name
 		FString Name;
 		if (!Root->TryGetStringField(TEXT("name"), Name))
 		{
@@ -202,7 +207,39 @@ bool ChessLoader::LoadChessFromContent(LoadChessResult& R) {
 			return false;
 		}
 
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *Name);
+		// Length of name should not be too long
+		if (Name.Len() > 12) { // TODO: magic number
+			R.bOK = false;
+			R.ErrorMsg = FString::Printf(TEXT("'Name' in %s too long"), *Filename);
+			return false;
+		}
+
+		Chess->Name = Name;
+
+		// Version
+		int32 Version;
+		if (!Root->TryGetNumberField(TEXT("version"), Version)) Version = 1;
+
+		Chess->Version = Version;
+
+		// TODO: Locale
+
+		// Center offsets
+		const TSharedPtr<FJsonObject>* Centers;
+		if (Root->TryGetObjectField(TEXT("center"), Centers) && Centers)
+		{
+			FString FrontCenterDest;
+			if ((*Centers)->TryGetStringField(TEXT("front"), FrontCenterDest)) {
+				Chess->FrontCenterOffset = UGlobalGameInstance::DestToOffsetsForChess(FrontCenterDest);
+			}
+
+			FString BackCenterDest;
+			if ((*Centers)->TryGetStringField(TEXT("back"), BackCenterDest)) {
+				Chess->BackCenterOffset = UGlobalGameInstance::DestToOffsetsForChess(BackCenterDest);
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("%s %d %d"), *Chess->Name, Chess->BackCenterOffset.X, Chess->BackCenterOffset.Y);
+		}
 	}
 
 	return true;

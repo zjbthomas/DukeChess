@@ -12,23 +12,18 @@
             "targets": [
                 {
                     "type": "Slide",
-                    "destination": "R"
-                },
-                {
-                    "type": "Slide",
-                    "destination": "L"
-                },
-                {
-                    "type": "Jump",
-                    "destination": "UURR"
+                    "destination": [
+                        "R",
+                        "L"
+                    ]
                 },
                 {
                     "type": "Jump",
-                    "destination": "UULL"
-                },
-                {
-                    "type": "Jump",
-                    "destination": "DD"
+                    "destination": [
+                        "UURR",
+                        "UULL",
+                        "DD"
+                    ]
                 }
             ]
         }
@@ -39,39 +34,17 @@
             "targets": [
                 {
                     "type": "Move",
-                    "destination": "U"
-                },
-                {
-                    "type": "Move",
-                    "destination": "UR"
-                },
-                {
-                    "type": "Move",
-                    "destination": "UL"
-                },
-                {
-                    "type": "Move",
-                    "destination": "R"
-                },
-                {
-                    "type": "Move",
-                    "destination": "RR"
-                },
-                {
-                    "type": "Move",
-                    "destination": "L"
-                },
-                {
-                    "type": "Move",
-                    "destination": "LL"
-                },
-                {
-                    "type": "Move",
-                    "destination": "DR"
-                },
-                {
-                    "type": "Move",
-                    "destination": "DL"
+                    "destination": [
+                        "U",
+                        "UR",
+                        "UL",
+                        "R",
+                        "RR",
+                        "L",
+                        "LL",
+                        "DR",
+                        "DL"
+                    ]
                 }
             ]
         },
@@ -80,15 +53,11 @@
             "targets": [
                 {
                     "type": "Command",
-                    "destination": "U"
-                },
-                {
-                    "type": "Command",
-                    "destination": "R"
-                },
-                {
-                    "type": "Command",
-                    "destination": "L"
+                    "destination": [
+                        "U",
+                        "R",
+                        "L"
+                    ]
                 }
             ]
         }

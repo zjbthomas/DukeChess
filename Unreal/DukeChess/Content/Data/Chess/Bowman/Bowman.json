@@ -12,27 +12,19 @@
             "targets": [
                 {
                     "type": "Move",
-                    "destination": "U"
-                },
-                {
-                    "type": "Move",
-                    "destination": "R"
-                },
-                {
-                    "type": "Move",
-                    "destination": "L"
+                    "destination": [
+                        "U",
+                        "R",
+                        "L"
+                    ]
                 },
                 {
                     "type": "Jump",
-                    "destination": "DD"
-                },
-                {
-                    "type": "Jump",
-                    "destination": "RR"
-                },
-                {
-                    "type": "Jump",
-                    "destination": "LL"
+                    "destination": [
+                        "DD",
+                        "RR",
+                        "LL"
+                    ]
                 }
             ]
         }
@@ -43,27 +35,19 @@
             "targets": [
                 {
                     "type": "Move",
-                    "destination": "U"
-                },
-                {
-                    "type": "Move",
-                    "destination": "DR"
-                },
-                {
-                    "type": "Move",
-                    "destination": "DL"
+                    "destination": [
+                        "U",
+                        "DR",
+                        "DL"
+                    ]
                 },
                 {
                     "type": "Strike",
-                    "destination": "UU"
-                },
-                {
-                    "type": "Strike",
-                    "destination": "UR"
-                },
-                {
-                    "type": "Strike",
-                    "destination": "UL"
+                    "destination": [
+                        "UU",
+                        "UR",
+                        "UL"
+                    ]
                 }
             ]
         }

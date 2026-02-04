@@ -12,15 +12,7 @@
             "targets": [
                 {
                     "type": "JumpSlide",
-                    "destination": "UU"
-                },
-                {
-                    "type": "JumpSlide",
-                    "destination": "DDRR"
-                },
-                {
-                    "type": "JumpSlide",
-                    "destination": "DDLL"
+                    "destination": ["UU", "DDRR", "DDLL"]
                 }
             ]
         }
@@ -31,15 +23,7 @@
             "targets": [
                 {
                     "type": "JumpSlide",
-                    "destination": "UURR"
-                },
-                {
-                    "type": "JumpSlide",
-                    "destination": "UULL"
-                },
-                {
-                    "type": "JumpSlide",
-                    "destination": "DD"
+                    "destination": ["UURR", "UULL", "DD"]
                 }
             ]
         }
