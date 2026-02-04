@@ -39,5 +39,33 @@
                 }
             ]
         }
+    ],
+    "front-auras": [
+        {
+            "targets": [
+                {
+                    "type": "Defense",
+                    "destination": [
+                        "UR",
+                        "R",
+                        "DR"
+                    ]
+                }
+            ]
+        }
+    ],
+    "back-auras": [
+        {
+            "targets": [
+                {
+                    "type": "Defense",
+                    "destination": [
+                        "UL",
+                        "L",
+                        "DL"
+                    ]
+                }
+            ]
+        }
     ]
 }

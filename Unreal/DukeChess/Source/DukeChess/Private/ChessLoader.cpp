@@ -11,8 +11,6 @@
 
 #include "GlobalGameInstance.h"
 
-#include "ChessModel.h"
-
 ChessLoader::ChessLoader(UGlobalGameInstance* InGlobal)
 {
 	// Load GlobalGameInstance
@@ -196,7 +194,7 @@ bool ChessLoader::LoadChessFromContent(LoadChessResult& R) {
 			return false;
 		}
 
-		TUniquePtr<ChessModel> Chess = MakeUnique<ChessModel>();
+		TSharedPtr<ChessModel> Chess = MakeShared<ChessModel>();
 
 		// Name
 		FString Name;
@@ -237,9 +235,25 @@ bool ChessLoader::LoadChessFromContent(LoadChessResult& R) {
 			if ((*Centers)->TryGetStringField(TEXT("back"), BackCenterDest)) {
 				Chess->BackCenterOffset = UGlobalGameInstance::DestToOffsetsForChess(BackCenterDest);
 			}
-
-			UE_LOG(LogTemp, Warning, TEXT("%s %d %d"), *Chess->Name, Chess->BackCenterOffset.X, Chess->BackCenterOffset.Y);
 		}
+
+		// Front movements
+		if (!ParseMovements(Root, TEXT("front-movements"), Chess->FrontMap, R, Filename)) return false;
+
+		// Back movements
+		if (!ParseMovements(Root, TEXT("back-movements"), Chess->BackMap, R, Filename)) return false;
+
+		// Front auras
+		if (!ParseAura(Root, TEXT("front-auras"), Chess->FrontAuraMap, R, Filename)) return false;
+
+		// Back auras
+		if (!ParseAura(Root, TEXT("back-auras"), Chess->BackAuraMap, R, Filename)) return false;
+
+		// TODO: Load image
+
+		// Add chess to list
+		ChessNameArray.Add(Name);
+		ChessModelMap.Add(Name, Chess);
 	}
 
 	return true;
@@ -367,4 +381,222 @@ bool ChessLoader::LoadChessFromSaved(LoadChessResult& R) {
 							return
 
 							chess_max_amount_dict[chess_name] = amount*/
+}
+
+bool ChessLoader::ParseMovements(TSharedPtr<FJsonObject>& Root, FString Key, TMap<EActionType, TMap<FString, EMovementType>>& InMap, LoadChessResult& R, const FString& Filename) {
+	const TArray<TSharedPtr<FJsonValue>>* Movements;
+	if (Root->TryGetArrayField(Key, Movements) && Movements) {
+		for (const TSharedPtr<FJsonValue>& V : *Movements)
+		{
+			// Check if V is Object
+			if (!V.IsValid() || V->Type != EJson::Object)
+			{
+				R.bOK = false;
+				R.ErrorMsg = FString::Printf(TEXT("Invalid '%s' field in %s"), *Key, *Filename);
+				return false;
+			}
+
+			// Check if V is valid Object
+			TSharedPtr<FJsonObject> Obj = V->AsObject();
+			if (!Obj.IsValid())
+			{
+				R.bOK = false;
+				R.ErrorMsg = FString::Printf(TEXT("Invalid '%s' field in %s"), *Key, *Filename);
+				return false;
+			}
+
+			ParseMovementsResult PMR;
+			if (!ParseSingleMovement(Obj, R, Filename, PMR)) return false;
+
+			InMap.Add(PMR.ActionType, PMR.TargetMap);
+		}
+	}
+	else {
+		R.bOK = false;
+		R.ErrorMsg = FString::Printf(TEXT("Missing '%s' field in %s"), *Key, *Filename);
+		return false;
+	}
+
+	return true;
+}
+
+bool ChessLoader::ParseSingleMovement(TSharedPtr<FJsonObject>& Parent, LoadChessResult& R, const FString& Filename, ParseMovementsResult& PMR) {
+	TMap<FString, EMovementType> TargetMap;
+
+	const TArray<TSharedPtr<FJsonValue>>* Targets;
+	if (Parent->TryGetArrayField(TEXT("targets"), Targets) && Targets) {
+		for (const TSharedPtr<FJsonValue>& VT : *Targets)
+		{
+			// Check if V is Object
+			if (!VT.IsValid() || VT->Type != EJson::Object)
+			{
+				R.bOK = false;
+				R.ErrorMsg = FString::Printf(TEXT("Invalid field in 'targets' in %s"), *Filename);
+				return false;
+			}
+
+			// Check if V is valid Object
+			TSharedPtr<FJsonObject> Obj = VT->AsObject();
+			if (!Obj.IsValid())
+			{
+				R.bOK = false;
+				R.ErrorMsg = FString::Printf(TEXT("Invalid field in 'targets' in %s"), *Filename);
+				return false;
+			}
+
+			FString Type;
+			if (!Obj->TryGetStringField(TEXT("type"), Type))
+			{
+				R.bOK = false;
+				R.ErrorMsg = FString::Printf(TEXT("Missing field 'type' in %s"), *Filename);
+				return false;
+			}
+
+			const TArray<TSharedPtr<FJsonValue>>* Destinations;
+			if (Obj->TryGetArrayField(TEXT("destination"), Destinations))
+			{
+				for (const TSharedPtr<FJsonValue>& VD : *Destinations)
+				{
+					FString Dest = VD->AsString();
+
+					// TODO: validate type and destination
+
+					EMovementType MovementType;
+					if (!MovementManager::TryParseMovementType(Type, MovementType)) {
+						R.bOK = false;
+						R.ErrorMsg = FString::Printf(TEXT("Invalid movement type %s in %s"), *Type, *Filename);
+						return false;
+					}
+
+					TargetMap.Add(Dest, MovementType);
+				}
+			}
+			else {
+				R.bOK = false;
+				R.ErrorMsg = FString::Printf(TEXT("Missing field 'destination' in %s"), *Filename);
+				return false;
+			}
+		}
+	}
+	else {
+		R.bOK = false;
+		R.ErrorMsg = FString::Printf(TEXT("Missing field 'targets' in %s"), *Filename);
+		return false;
+	}
+
+	FString Action;
+	if (!Parent->TryGetStringField(TEXT("action"), Action))
+	{
+		R.bOK = false;
+		R.ErrorMsg = FString::Printf(TEXT("Missing field 'action' in %s"), *Filename);
+		return false;
+	}
+	
+	// TODO: validate action
+
+	EActionType ActionType;
+	if (!ChessModel::TryParseActionType(Action, ActionType)) {
+		R.bOK = false;
+		R.ErrorMsg = FString::Printf(TEXT("Invalid action type %s in %s"), *Action, *Filename);
+		return false;
+	}
+
+	PMR.ActionType = ActionType;
+	PMR.TargetMap = TargetMap;
+
+	return true;
+}
+
+bool ChessLoader::ParseAura(TSharedPtr<FJsonObject>& Root, FString Key, TMap<EAuraType, TArray<FString>>& InMap, LoadChessResult& R, const FString& Filename) {
+	const TArray<TSharedPtr<FJsonValue>>* Auras;
+	if (Root->TryGetArrayField(Key, Auras) && Auras) {
+		for (const TSharedPtr<FJsonValue>& V : *Auras)
+		{
+			// Check if V is Object
+			if (!V.IsValid() || V->Type != EJson::Object)
+			{
+				R.bOK = false;
+				R.ErrorMsg = FString::Printf(TEXT("Invalid '%s' field in %s"), *Key, *Filename);
+				return false;
+			}
+
+			// Check if V is valid Object
+			TSharedPtr<FJsonObject> AuraObj = V->AsObject();
+			if (!AuraObj.IsValid())
+			{
+				R.bOK = false;
+				R.ErrorMsg = FString::Printf(TEXT("Invalid '%s' field in %s"), *Key, *Filename);
+				return false;
+			}
+
+			// Targets
+			const TArray<TSharedPtr<FJsonValue>>* Targets;
+			if (AuraObj->TryGetArrayField(TEXT("targets"), Targets) && Targets) {
+				for (const TSharedPtr<FJsonValue>& VT : *Targets)
+				{
+					// Check if V is Object
+					if (!VT.IsValid() || VT->Type != EJson::Object)
+					{
+						R.bOK = false;
+						R.ErrorMsg = FString::Printf(TEXT("Invalid field in 'targets' in %s"), *Filename);
+						return false;
+					}
+
+					// Check if V is valid Object
+					TSharedPtr<FJsonObject> TargetObj = VT->AsObject();
+					if (!TargetObj.IsValid())
+					{
+						R.bOK = false;
+						R.ErrorMsg = FString::Printf(TEXT("Invalid field in 'targets' in %s"), *Filename);
+						return false;
+					}
+
+					FString Type;
+					if (!TargetObj->TryGetStringField(TEXT("type"), Type))
+					{
+						R.bOK = false;
+						R.ErrorMsg = FString::Printf(TEXT("Missing field 'type' in %s"), *Filename);
+						return false;
+					}
+
+					const TArray<TSharedPtr<FJsonValue>>* Destinations;
+					if (TargetObj->TryGetArrayField(TEXT("destination"), Destinations))
+					{
+						for (const TSharedPtr<FJsonValue>& VD : *Destinations)
+						{
+							FString Dest = VD->AsString();
+
+							// TODO: validate type and destination
+
+							EAuraType AuraType;
+							if (!MovementManager::TryParseAuraType(Type, AuraType)) {
+								R.bOK = false;
+								R.ErrorMsg = FString::Printf(TEXT("Invalid aura type %s in %s"), *Type, *Filename);
+								return false;
+							}
+
+							if (InMap.Contains(AuraType)) {
+								InMap[AuraType].Add(Dest);
+							}
+							else {
+								InMap.Add(AuraType, { Dest });
+							}
+						}
+					}
+					else {
+						R.bOK = false;
+						R.ErrorMsg = FString::Printf(TEXT("Missing field 'destination' in %s"), *Filename);
+						return false;
+					}
+				}
+			}
+			else {
+				R.bOK = false;
+				R.ErrorMsg = FString::Printf(TEXT("Missing field 'targets' in %s"), *Filename);
+				return false;
+			}
+		}
+	} // May be no aura, so no else
+
+	return true;
 }

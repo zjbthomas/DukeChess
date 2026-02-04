@@ -4,9 +4,10 @@
 
 #include "CoreMinimal.h"
 
-class UGlobalGameInstance;
+#include "ChessModel.h"
+#include "MovementManager.h"
 
-class ChessModel;
+class UGlobalGameInstance;
 
 struct LoadChessResult {
 	bool bOK = true;
@@ -18,6 +19,11 @@ struct ManifestEntry
 {
 	FString JSONRelPath;
 	FString PNGRelPath;
+};
+
+struct ParseMovementsResult {
+	EActionType ActionType;
+	TMap<FString, EMovementType> TargetMap;
 };
 
 /**
@@ -52,5 +58,10 @@ private:
 	bool CopyFile(const FString& PakFilePath, const FString& DestFilePath);
 
 	TArray<ManifestEntry> ReadManifestEntries(LoadChessResult& R);
+
+	bool ParseMovements(TSharedPtr<FJsonObject>& Root, FString Key, TMap<EActionType, TMap<FString, EMovementType>>& InMap, LoadChessResult& R, const FString& Filename);
+	bool ParseSingleMovement(TSharedPtr<FJsonObject>& Parent, LoadChessResult& R, const FString& Filename, ParseMovementsResult& PMR);
+
+	bool ParseAura(TSharedPtr<FJsonObject>& Root, FString Key, TMap<EAuraType, TArray<FString>>& InMap, LoadChessResult& R, const FString& Filename);
 
 };

@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import xml.etree.ElementTree as ET
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 # -----------------------------
 # CONFIG (edit these two paths)
@@ -33,11 +33,6 @@ def _coerce_int_if_possible(v: Optional[str]) -> Any:
 
 
 def parse_localization(root: ET.Element) -> List[Dict[str, str]]:
-    """
-    <localization><zh>...</zh>...</localization>
-      -> [{"zh": "...", ...}]
-    Always returns a list.
-    """
     out: List[Dict[str, str]] = []
     for loc in root.findall("./localization"):
         obj: Dict[str, str] = {}
@@ -53,25 +48,15 @@ def parse_localization(root: ET.Element) -> List[Dict[str, str]]:
 
 def _group_targets_by_type(targets_elem: Optional[ET.Element]) -> List[Dict[str, Any]]:
     """
-    XML:
-      <targets>
-        <target><destination>...</destination><type>Move</type></target>
-        <target><destination>...</destination><type>Move</type></target>
-        <target><destination>...</destination><type>Strike</type></target>
-      </targets>
+    Group <target> by <type>, collecting destinations into lists.
 
-    JSON (grouped by type, preserving first-seen order of types):
-      [
-        {"type": "Move", "destination": ["...", "..."]},
-        {"type": "Strike", "destination": ["..."]}
-      ]
-
-    Also enforces key order: type first, then destination.
+    Output example:
+      [{"type": "Move", "destination": ["U","D"]},
+       {"type": "Strike", "destination": ["UU"]}]
     """
     if targets_elem is None:
         return []
 
-    # Keep order of "type" groups by first appearance
     order: List[str] = []
     grouped: Dict[str, List[str]] = {}
 
@@ -94,21 +79,6 @@ def _group_targets_by_type(targets_elem: Optional[ET.Element]) -> List[Dict[str,
 
 
 def parse_movements(side_elem: Optional[ET.Element]) -> List[Dict[str, Any]]:
-    """
-    <front|back>
-      <movements>
-        <movement>
-          <action>Move</action>
-          <targets>...</targets>
-        </movement>
-      </movements>
-    </front|back>
-
-    -> [
-         {"action": "...", "targets": [ {type,destination[...]}, ... ]},
-         ...
-       ]
-    """
     if side_elem is None:
         return []
 
@@ -125,26 +95,48 @@ def parse_movements(side_elem: Optional[ET.Element]) -> List[Dict[str, Any]]:
     return out
 
 
-def parse_center(root: ET.Element) -> Dict[str, Any]:
+def parse_auras(side_elem: Optional[ET.Element]) -> List[Dict[str, Any]]:
     """
-    Sample 1 expects:
-      <back><center>D</center></back>
-    -> "center": {"back": "D"}
+    From:
+      <front|back>
+        <auras>
+          <aura>
+            <targets>...</targets>
+          </aura>
+        </auras>
+      </front|back>
 
-    Only include if the node exists and has non-empty text.
+    To:
+      [
+        {"targets": [ {type,destination[...]}, ... ]},
+        ...
+      ]
     """
+    if side_elem is None:
+        return []
+
+    out: List[Dict[str, Any]] = []
+    for aura in side_elem.findall("./auras/aura"):
+        targets = _group_targets_by_type(aura.find("./targets"))
+        aura_obj: Dict[str, Any] = {}
+        aura_obj["targets"] = targets
+        out.append(aura_obj)
+
+    return out
+
+
+def parse_center(root: ET.Element) -> Dict[str, Any]:
     center_obj: Dict[str, Any] = {}
     back_center = _text(root.find("./back/center"))
     if back_center is not None:
         center_obj["back"] = back_center
+    front_center = _text(root.find("./front/center"))
+    if front_center is not None:
+        center_obj["front"] = front_center
     return center_obj
 
 
 def convert_one(xml_path: Path, input_root: Path, output_root: Path) -> Path:
-    """
-    Convert one XML file, preserving directory structure:
-      output_root / (xml_path relative to input_root) with .json extension
-    """
     rel = xml_path.relative_to(input_root)
     out_path = (output_root / rel).with_suffix(".json")
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -153,24 +145,30 @@ def convert_one(xml_path: Path, input_root: Path, output_root: Path) -> Path:
     root = tree.getroot()  # <chess ...>
 
     data: Dict[str, Any] = {}
-
-    # Root attributes -> top-level keys
     data["name"] = root.attrib.get("name")
     data["version"] = _coerce_int_if_possible(root.attrib.get("version"))
 
-    # localization -> list of dicts
     loc = parse_localization(root)
     if loc:
         data["localization"] = loc
 
-    # optional center (currently only back/center shown in sample)
     center = parse_center(root)
     if center:
         data["center"] = center
 
-    # movements
-    data["front-movements"] = parse_movements(root.find("./front"))
-    data["back-movements"] = parse_movements(root.find("./back"))
+    front = root.find("./front")
+    back = root.find("./back")
+
+    data["front-movements"] = parse_movements(front)
+    data["back-movements"] = parse_movements(back)
+
+    # NEW: auras
+    front_auras = parse_auras(front)
+    back_auras = parse_auras(back)
+    if front_auras:
+        data["front-auras"] = front_auras
+    if back_auras:
+        data["back-auras"] = back_auras
 
     with out_path.open("w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
