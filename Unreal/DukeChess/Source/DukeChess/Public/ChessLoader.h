@@ -53,6 +53,8 @@ public:
 private:
 	bool LoadChessFromContent(LoadChessResult& R);
 	bool LoadChessFromSaved(LoadChessResult& R);
+	bool LoadChessFromJSON(const FString& Filename, const FString& ForceName, const FString& ImagePath, LoadChessResult& R);
+	bool LoadChessMaxAmount(const FString& Filename, LoadChessResult& R);
 
 	bool CopyToSaved(LoadChessResult& R);
 	bool CopyFile(const FString& PakFilePath, const FString& DestFilePath);
@@ -63,5 +65,7 @@ private:
 	bool ParseSingleMovement(TSharedPtr<FJsonObject>& Parent, LoadChessResult& R, const FString& Filename, ParseMovementsResult& PMR);
 
 	bool ParseAura(TSharedPtr<FJsonObject>& Root, FString Key, TMap<EAuraType, TArray<FString>>& InMap, LoadChessResult& R, const FString& Filename);
+
+	UTexture2D* LoadTexture2DFromFile(const FString& FilePath);
 
 };

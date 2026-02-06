@@ -3,11 +3,21 @@
 
 #include "ChessLoader.h"
 
-// For JSON
+#include "Engine/Texture2D.h"
+
+#include "Modules/ModuleManager.h"
+
+#include "Misc/Paths.h"
 #include "Misc/FileHelper.h"
+
+// For JSON
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "Dom/JsonObject.h"
+
+// For image
+#include "IImageWrapperModule.h"
+#include "IImageWrapper.h"
 
 #include "GlobalGameInstance.h"
 
@@ -170,217 +180,191 @@ bool ChessLoader::LoadChessFromContent(LoadChessResult& R) {
 	{
 		if (E.JSONRelPath.Equals(CHESSAMOUNTJSONONLINE, ESearchCase::IgnoreCase) || E.JSONRelPath.Equals(CHESSAMOUNTJSON, ESearchCase::IgnoreCase))
 		{
-			// TODO: handle chess_amount
 			continue;
 		}
 
 		FString Filename = CONTENTCHESSPATH / E.JSONRelPath;
 
-		FString JsonText;
-		if (!FFileHelper::LoadFileToString(JsonText, *Filename))
-		{
-			R.bOK = false;
-			R.ErrorMsg = FString::Printf(TEXT("Failed to read json: %s"),*Filename);
-			return false;
-		}
+		FString ImagePath = (!E.PNGRelPath.IsEmpty()) ? CONTENTCHESSPATH / E.PNGRelPath : TEXT("");
 
-		TSharedPtr<FJsonObject> Root;
-
-		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonText);
-		if (!FJsonSerializer::Deserialize(Reader, Root) || !Root.IsValid())
-		{
-			R.bOK = false;
-			R.ErrorMsg = FString::Printf(TEXT("Invalid json format: %s"), *Filename);
-			return false;
-		}
-
-		TSharedPtr<ChessModel> Chess = MakeShared<ChessModel>();
-
-		// Name
-		FString Name;
-		if (!Root->TryGetStringField(TEXT("name"), Name))
-		{
-			R.bOK = false;
-			R.ErrorMsg = FString::Printf(TEXT("Missing field 'name' in %s"), *Filename);
-			return false;
-		}
-
-		// Length of name should not be too long
-		if (Name.Len() > 12) { // TODO: magic number
-			R.bOK = false;
-			R.ErrorMsg = FString::Printf(TEXT("'Name' in %s too long"), *Filename);
-			return false;
-		}
-
-		Chess->Name = Name;
-
-		// Version
-		int32 Version;
-		if (!Root->TryGetNumberField(TEXT("version"), Version)) Version = 1;
-
-		Chess->Version = Version;
-
-		// TODO: Locale
-
-		// Center offsets
-		const TSharedPtr<FJsonObject>* Centers;
-		if (Root->TryGetObjectField(TEXT("center"), Centers) && Centers)
-		{
-			FString FrontCenterDest;
-			if ((*Centers)->TryGetStringField(TEXT("front"), FrontCenterDest)) {
-				Chess->FrontCenterOffset = UGlobalGameInstance::DestToOffsetsForChess(FrontCenterDest);
-			}
-
-			FString BackCenterDest;
-			if ((*Centers)->TryGetStringField(TEXT("back"), BackCenterDest)) {
-				Chess->BackCenterOffset = UGlobalGameInstance::DestToOffsetsForChess(BackCenterDest);
-			}
-		}
-
-		// Front movements
-		if (!ParseMovements(Root, TEXT("front-movements"), Chess->FrontMap, R, Filename)) return false;
-
-		// Back movements
-		if (!ParseMovements(Root, TEXT("back-movements"), Chess->BackMap, R, Filename)) return false;
-
-		// Front auras
-		if (!ParseAura(Root, TEXT("front-auras"), Chess->FrontAuraMap, R, Filename)) return false;
-
-		// Back auras
-		if (!ParseAura(Root, TEXT("back-auras"), Chess->BackAuraMap, R, Filename)) return false;
-
-		// TODO: Load image
-
-		// Add chess to list
-		ChessNameArray.Add(Name);
-		ChessModelMap.Add(Name, Chess);
+		if (!LoadChessFromJSON(Filename, TEXT(""), ImagePath, R)) return false;
 	}
+
+	// Set default chess num from JSON
+	FString Filename = CONTENTCHESSPATH / ((Global->bLocal && !Global->bAI)? CHESSAMOUNTJSON : CHESSAMOUNTJSONONLINE);
+
+	if (!LoadChessMaxAmount(Filename, R)) return false;
 
 	return true;
 }
 
 bool ChessLoader::LoadChessFromSaved(LoadChessResult& R) {
+	// Find all subfolders
+	TArray<FString> SubDirs;
+	IFileManager::Get().FindFiles(SubDirs, *(SAVEDCHESSPATH / TEXT("*")), /*Files=*/false, /*Directories=*/true);
+
+	for (const FString& DirName : SubDirs)
+	{
+		const FString JsonPath = FPaths::Combine(SAVEDCHESSPATH, DirName, DirName + TEXT(".json"));
+		if (!IFileManager::Get().FileExists(*JsonPath))
+		{
+			R.bOK = false;
+			R.ErrorMsg = FString::Printf(TEXT("%s not exists"), *JsonPath);
+			return false;
+		}
+
+		FString ImagePath = FPaths::Combine(SAVEDCHESSPATH, DirName, DirName + TEXT(".png"));
+		if (!IFileManager::Get().FileExists(*ImagePath))
+		{
+			ImagePath = TEXT("");
+		}
+
+		if (!LoadChessFromJSON(JsonPath, TEXT(""), ImagePath, R)) return false;
+	}
+
+	// Set default chess num from JSON
+	FString Filename = SAVEDCHESSPATH / CHESSAMOUNTJSON;
+
+	if (!LoadChessMaxAmount(Filename, R)) return false;
 
 	return true;
+}
 
-	/*var used_dir = USERCHESSDIR if (Global.is_local and not Global.is_ai) else RESCHESSDIR
-		var chess_amount_file = CHESSAMOUNTJSON if (Global.is_local and not Global.is_ai) else CHESSAMOUNTJSONONLINE
+bool ChessLoader::LoadChessFromJSON(const FString& Filename, const FString& ForceName, const FString& ImagePath, LoadChessResult& R) {
+	FString JsonText;
+	if (!FFileHelper::LoadFileToString(JsonText, *Filename))
+	{
+		R.bOK = false;
+		R.ErrorMsg = FString::Printf(TEXT("Failed to read json: %s"), *Filename);
+		return false;
+	}
 
-		var chess_dir = DirAccess.open(used_dir)
+	TSharedPtr<FJsonObject> Root;
 
-		for chess_name in chess_dir.get_directories() :
-			# load XML
-			var xml_path = used_dir + "/" + chess_name + "/" + chess_name + ".xml" # XML has the same name as the folder
-			if not FileAccess.file_exists(xml_path) :
-				error_message.emit(tr("CHESS_LOADER_ERROR_XML_NOT_EXISTS") % [xml_path])
-				return
+	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonText);
+	if (!FJsonSerializer::Deserialize(Reader, Root) || !Root.IsValid())
+	{
+		R.bOK = false;
+		R.ErrorMsg = FString::Printf(TEXT("Invalid json format: %s"), *Filename);
+		return false;
+	}
 
-				var xml_root = XML.parse_file(xml_path).root
+	TSharedPtr<ChessModel> Chess = MakeShared<ChessModel>();
 
-				# check name and version
-				var name = xml_root.attributes["name"]
-				if (name != chess_name) :
-					error_message.emit(tr("CHESS_LOADER_ERROR_DISMATCH_NAME") % [xml_path])
-					return
+	// Name
+	FString Name;
+	if (!Root->TryGetStringField(TEXT("name"), Name))
+	{
+		R.bOK = false;
+		R.ErrorMsg = FString::Printf(TEXT("Missing field 'name' in %s"), *Filename);
+		return false;
+	}
 
-					# TODO : length of name should not be too long
-					if (name.length() > 12) :
-						error_message.emit(tr("CHESS_LOADER_ERROR_LONG_NAME") % [name])
-						return
+	// Force name check
+	if (!ForceName.IsEmpty() && !Name.Equals(ForceName)) {
+		R.bOK = false;
+		R.ErrorMsg = FString::Printf(TEXT("Field 'name' in %s not equals to %s"), *Filename, *ForceName);
+		return false;
+	}
 
-						var version = int(xml_root.attributes["version"])
+	// Length of name should not be too long
+	if (Name.Len() > 12) { // TODO: magic number
+		R.bOK = false;
+		R.ErrorMsg = FString::Printf(TEXT("'Name' in %s too long"), *Filename);
+		return false;
+	}
 
-						var chess = ChessModel.new()
+	Chess->Name = Name;
 
-						chess.name = name
-						chess.version = version
+	// Version
+	int32 Version;
+	if (!Root->TryGetNumberField(TEXT("version"), Version)) Version = 1;
 
-						# locale names
-						for locale in Global.LOCALES:
-	# default locale name
-		chess.tr_name_dict[locale] = chess.name
+	Chess->Version = Version;
 
-		if (xml_root.get("localization") != null) :
-			if (xml_root.localization.get(locale) != null) :
-				chess.tr_name_dict[locale] = xml_root.localization.get(locale).content
+	// TODO: Locale
 
-				# center offsets
-				if (xml_root.front.get('center') != null) :
-					var front_center_offset_x = Global.dest_to_offsets_for_chess(xml_root.front.center.content)[0]
-					var front_center_offset_y = Global.dest_to_offsets_for_chess(xml_root.front.center.content)[1]
+	// Center offsets
+	const TSharedPtr<FJsonObject>* Centers;
+	if (Root->TryGetObjectField(TEXT("center"), Centers) && Centers)
+	{
+		FString FrontCenterDest;
+		if ((*Centers)->TryGetStringField(TEXT("front"), FrontCenterDest)) {
+			Chess->FrontCenterOffset = UGlobalGameInstance::DestToOffsetsForChess(FrontCenterDest);
+		}
 
-					chess.front_center_offset_x = front_center_offset_x
-					chess.front_center_offset_y = front_center_offset_y
+		FString BackCenterDest;
+		if ((*Centers)->TryGetStringField(TEXT("back"), BackCenterDest)) {
+			Chess->BackCenterOffset = UGlobalGameInstance::DestToOffsetsForChess(BackCenterDest);
+		}
+	}
 
-					if (xml_root.back.get('center') != null) :
-						var back_center_offset_x = Global.dest_to_offsets_for_chess(xml_root.back.center.content)[0]
-						var back_center_offset_y = Global.dest_to_offsets_for_chess(xml_root.back.center.content)[1]
+	// Front movements
+	if (!ParseMovements(Root, TEXT("front-movements"), Chess->FrontMap, R, Filename)) return false;
 
-						chess.back_center_offset_x = back_center_offset_x
-						chess.back_center_offset_y = back_center_offset_y
+	// Back movements
+	if (!ParseMovements(Root, TEXT("back-movements"), Chess->BackMap, R, Filename)) return false;
 
-						# front actions and movements
-						for xml_movement in xml_root.front.movements.children:
-	var ret = _parse_xml_root(xml_path, xml_movement)
-		if (ret == null) :
-			return
+	// Front auras
+	if (!ParseAura(Root, TEXT("front-auras"), Chess->FrontAuraMap, R, Filename)) return false;
 
-			chess.front_dict[ret[0]] = ret[1]
+	// Back auras
+	if (!ParseAura(Root, TEXT("back-auras"), Chess->BackAuraMap, R, Filename)) return false;
 
-			# back actions and movements
-			for xml_movement in xml_root.back.movements.children:
-	var ret = _parse_xml_root(xml_path, xml_movement)
-		if (ret == null) :
-			return
+	// Load image
+	Chess->Texture = (!ImagePath.IsEmpty()) ? LoadTexture2DFromFile(ImagePath) : nullptr;
 
-			chess.back_dict[ret[0]] = ret[1]
+	// Add chess to list
+	ChessNameArray.Add(Name);
+	ChessModelMap.Add(Name, Chess);
 
-			# front auras
-			if xml_root.front.get("auras") and xml_root.front.auras.get("aura") :
-				chess.front_aura_dict = _parse_xml_auras(xml_path, xml_root.front.auras.aura)
+	return true;
+}
 
-				# back auras
-				if xml_root.back.get("auras") and xml_root.back.auras.get("aura") :
-					chess.back_aura_dict = _parse_xml_auras(xml_path, xml_root.back.auras.aura)
+bool ChessLoader::LoadChessMaxAmount(const FString& Filename, LoadChessResult& R) {
+	FString JsonText;
+	if (!FFileHelper::LoadFileToString(JsonText, *Filename))
+	{
+		R.bOK = false;
+		R.ErrorMsg = FString::Printf(TEXT("Failed to read json: %s"), *Filename);
+		return false;
+	}
 
-					# load image
-					var image_path = used_dir + "/" + chess_name + "/" + chess_name + ".png" # TODO: only PNG is allowed; it has the same name as the folder
-					if (Global.is_local and not Global.is_ai) :
-						if (FileAccess.file_exists(image_path)) :
-							chess.image = ImageTexture.create_from_image(Image.load_from_file(image_path))
-						else :
-							chess.image = load(image_path)
+	TSharedPtr<FJsonObject> Root;
 
-							# add chess to list
-							chess_name_list.append(chess_name)
-							chessmodel_dict[chess_name] = chess
+	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonText);
+	if (!FJsonSerializer::Deserialize(Reader, Root) || !Root.IsValid())
+	{
+		R.bOK = false;
+		R.ErrorMsg = FString::Printf(TEXT("Invalid json format: %s"), *Filename);
+		return false;
+	}
 
-							# set default chess num from JSON
-							var json_as_text = FileAccess.get_file_as_string(used_dir + "/" + chess_amount_file)
-							var json_as_dict = JSON.parse_string(json_as_text)
-							if not json_as_dict:
-	error_message.emit(tr("CHESS_LOADER_ERROR_PARSE_JSON") % [used_dir + "/" + chess_amount_file])
-		return
+	for (const FString Name : ChessNameArray) {
+		int32 Amount;
+		if (!Root->TryGetNumberField(Name, Amount)) Amount = 0;
 
-		for chess_name in chess_name_list :
-	var amount_str = json_as_dict.get(chess_name)
+		// Some special rules
+		if (Name.Equals(TEXT("Duke"), ESearchCase::IgnoreCase)) {
+			if (Amount != 1) {
+				R.bOK = false;
+				R.ErrorMsg = FString::Printf(TEXT("Amount for Duke is not 1 in %s"), *Filename);
+				return false;
+			}
+		}
 
-		var amount = 0
-		if amount_str :
-			amount = int(amount_str)
+		if (Name.Equals(TEXT("Footman"), ESearchCase::IgnoreCase)) {
+			if (Amount < 2) {
+				R.bOK = false;
+				R.ErrorMsg = FString::Printf(TEXT("Amount for Footman is smaller than 2 in %s"), *Filename);
+				return false;
+			}
+		}
 
-			# some special rules
-			if (chess_name == "Duke") :
-				if (amount != 1) :
-					error_message.emit(tr("CHESS_LOADER_ERROR_DUKE_AMOUNT") % [amount, used_dir + "/" + chess_amount_file])
-					return
+		ChessMaxAmountMap.Add(Name, Amount);
+	}
 
-					if (chess_name == "Footman") :
-						if (amount < 2) :
-							error_message.emit(tr("CHESS_LOADER_ERROR_FOOTMAN_AMOUNT") % [amount, used_dir + "/" + chess_amount_file])
-							return
-
-							chess_max_amount_dict[chess_name] = amount*/
+	return true;
 }
 
 bool ChessLoader::ParseMovements(TSharedPtr<FJsonObject>& Root, FString Key, TMap<EActionType, TMap<FString, EMovementType>>& InMap, LoadChessResult& R, const FString& Filename) {
@@ -599,4 +583,66 @@ bool ChessLoader::ParseAura(TSharedPtr<FJsonObject>& Root, FString Key, TMap<EAu
 	} // May be no aura, so no else
 
 	return true;
+}
+
+static EImageFormat DetectImageFormat(const FString& FilePath)
+{
+	const FString Ext = FPaths::GetExtension(FilePath).ToLower();
+	if (Ext == TEXT("png")) return EImageFormat::PNG;
+	if (Ext == TEXT("jpg") || Ext == TEXT("jpeg")) return EImageFormat::JPEG;
+	if (Ext == TEXT("bmp")) return EImageFormat::BMP;
+	if (Ext == TEXT("tga")) return EImageFormat::TGA;
+	return EImageFormat::Invalid;
+}
+
+UTexture2D* ChessLoader::LoadTexture2DFromFile(const FString& FilePath)
+{
+	TArray<uint8> CompressedData;
+	if (!FFileHelper::LoadFileToArray(CompressedData, *FilePath) || CompressedData.Num() == 0)
+	{
+		return nullptr;
+	}
+
+	const EImageFormat Format = DetectImageFormat(FilePath);
+	if (Format == EImageFormat::Invalid)
+	{
+		return nullptr;
+	}
+
+	IImageWrapperModule& ImageWrapperModule =
+		FModuleManager::LoadModuleChecked<IImageWrapperModule>(TEXT("ImageWrapper"));
+
+	TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(Format);
+	if (!ImageWrapper.IsValid() || !ImageWrapper->SetCompressed(CompressedData.GetData(), CompressedData.Num()))
+	{
+		return nullptr;
+	}
+
+	// Decode to BGRA8 (UE-friendly)
+	TArray<uint8> RawBGRA;
+	if (!ImageWrapper->GetRaw(ERGBFormat::BGRA, 8, RawBGRA))
+	{
+		return nullptr;
+	}
+
+	const int32 Width = ImageWrapper->GetWidth();
+	const int32 Height = ImageWrapper->GetHeight();
+
+	UTexture2D* Tex = UTexture2D::CreateTransient(Width, Height, PF_B8G8R8A8);
+	if (!Tex)
+	{
+		return nullptr;
+	}
+
+	Tex->SRGB = true;               // typical for color images
+	Tex->MipGenSettings = TMGS_NoMipmaps; // optional: no mipmaps for UI
+	Tex->NeverStream = true;        // optional: keep in memory
+
+	// Copy pixels into the texture
+	void* TextureData = Tex->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+	FMemory::Memcpy(TextureData, RawBGRA.GetData(), RawBGRA.Num());
+	Tex->GetPlatformData()->Mips[0].BulkData.Unlock();
+
+	Tex->UpdateResource();
+	return Tex;
 }

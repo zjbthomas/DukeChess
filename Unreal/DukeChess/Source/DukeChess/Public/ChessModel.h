@@ -6,6 +6,8 @@
 
 #include "MovementManager.h"
 
+class UTexture2D;
+
 enum class EActionType : uint8
 {
 	MOVE,
@@ -44,6 +46,8 @@ public:
 
 	TMap<EAuraType, TArray<FString>> FrontAuraMap;
 	TMap<EAuraType, TArray<FString>> BackAuraMap;
+
+	UTexture2D* Texture = nullptr;
 
 	bool bFront = true;
 };
