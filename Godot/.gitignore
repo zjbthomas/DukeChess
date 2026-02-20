@@ -1,4 +1,10 @@
 # Godot 4+ specific ignores
 .godot/
 
-deploy/
+# Ignore everything inside /deploy
+/deploy/*
+# But keep Docker-related
+!/deploy/docker-build.bat
+!/deploy/docker-run.bat
+!/deploy/Docker/
+!/deploy/Docker/**
