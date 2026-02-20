@@ -23,6 +23,13 @@ You can get the full rules from [here](https://www.catalystgamelabs.com/download
 
 **This game is available [here](https://dexaint.itch.io/dukechess) to play.**
 
+### Docker version
+
+- Pull the [image](https://hub.docker.com/repository/docker/zjbthomas/dukechess-godot-web/general): `docker pull zjbthomas/dukechess-godot-web`
+- Run the container: `docker run --rm -p 80:80 zjbthomas/dukechess-godot-web`
+- Visit [`http://127.0.0.1:80/`](http://127.0.0.1:80/)
+> ⚠️ Microsoft Edge users: Due to security policies, `localhost` may not work correctly. Please use [`http://127.0.0.1:80/`](http://127.0.0.1:80/) instead.
+
 ## How to deploy web app version 1?
 
 ### Run it locally
@@ -35,7 +42,7 @@ You can get the full rules from [here](https://www.catalystgamelabs.com/download
   - Path to ["Chess.xml"](./web-app/dukechess/resources/Chess.xml) in ["dukechess/js-backend/chess/ChessFactory.js"](./web-app/dukechess/js-backend/chess/ChessFactory.js);
   - Path to ["Player.properties"](./web-app/dukechess/resources/Player.properties) in ["dukechess/js-backend/flow/Player.js"](./web-app/dukechess/js-backend/flow/Player.js)
 - Run `node index.js` at the root directory.
-- Visit `http://host:port/path` (the default is ["http://localhost:80/"](http://localhost:80/)) on two or more pages and enjoy!
+- Visit `http://host:port/path` (the default is [`http://localhost:80/`](http://localhost:80/)) on two or more pages and enjoy!
 
 ### Build it yourself
 
