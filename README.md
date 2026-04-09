@@ -7,7 +7,7 @@ This is a demo of my favourite boardgame [The Duke](https://boardgamegeek.com/bo
 
 - Web app version 1:
   - [Front-end](./web-app/React/): [React](https://reactjs.org/)
-  - [Back-end](./web-app/): [Node.js](https://nodejs.org/en/) with [Socket.IO](https://socket.io/) and [Redis](https://redis.io/)
+  - [Back-end](./web-app/): [Node.js](https://nodejs.org/en/) with [Socket.IO](https://socket.io/), [Redis](https://redis.io/), and [PostgreSQL](https://www.postgresql.org/)
 
 - Web app version 2 (deprecated):
   - [Front-end](./deprecated/jQuery/): jQuery

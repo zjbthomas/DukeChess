@@ -88,6 +88,11 @@ function newGameId(game) {
   return `${game}:${Date.now().toString(36)}:${Math.random().toString(36).slice(2, 10)}`; // 36: most compact alphanumeric representation
 }
 
+// insert MemoryDungeon
+const { apiMemoryDungeon } = require("./server_memorydungeon");
+const mdApi = apiMemoryDungeon({ redis: pubClient, u2tKey, t2uKey, TTL });
+app.use(mdApi.base, mdApi.router);
+
 // POST /api/login
 app.post("/api/login", async (req, res) => {
     const { username, password, name } = req.body || {};
