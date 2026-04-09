@@ -25,6 +25,8 @@ app.use("/dukechess", express.static(__dirname + "/dukechess"));
 app.use("/chess", express.static(__dirname + "/chess"));
 app.use("/global", express.static(__dirname + "/global"));
 
+const db = require("./db/db");
+
 // Redis
 const REDIS_URL = process.env.REDIS_URL || "redis://127.0.0.1:6379";
 const pubClient = createClient({ url: REDIS_URL });
@@ -90,24 +92,34 @@ function newGameId(game) {
 app.post("/api/login", async (req, res) => {
     const { username, password, name } = req.body || {};
 
-    if (!username || !password || !name) return res.status(400).json({ error: "missing info" });
-
-    const userData = await pubClient.hGetAll(authKey(username));
-    const hash = userData.password_hash;
-
-    // register
-    if (!hash) {
-        const newHash = await bcrypt.hash(password, 12);
-        await pubClient.hSet(authKey(username), {
-            password_hash: newHash
-        });
-        return res.json({ status: "registered" });
+    if (!username || !password || !name) {
+        return res.status(400).json({ error: "missing info" });
     }
 
-    const ok = await bcrypt.compare(password, hash);
-    if (!ok) return res.status(401).json({ error: "wrong_password" });
+    try {
+        const userResult = await db.query(
+            "SELECT id, username, password_hash FROM users WHERE username = $1",
+            [username]
+        );
 
-    if (name === "dukechess" || name === "chess") {
+        const user = userResult.rows[0];
+
+        // register
+        if (!user) {
+            const newHash = await bcrypt.hash(password, 12);
+
+            await db.query(
+                "INSERT INTO users (username, password_hash) VALUES ($1, $2)",
+                [username, newHash]
+            );
+
+            return res.json({ status: "registered" });
+        }
+
+        const ok = await bcrypt.compare(password, user.password_hash);
+        if (!ok) return res.status(401).json({ error: "wrong_password" });
+
+        if (name === "dukechess" || name === "chess") {
             const existingU2S = await pubClient.get(u2sKey(username));
             if (existingU2S) {
                 return res.status(403).json({ error: "already logged in" });
@@ -116,13 +128,17 @@ app.post("/api/login", async (req, res) => {
         } else {
             const token = crypto.randomBytes(24).toString("base64url");
             const old = await pubClient.get(u2tKey(username, name));
-            if (old) await pubClient.del(t2uKey(old, name));   // invalidate previous
-    
+            if (old) await pubClient.del(t2uKey(old, name));
+
             await pubClient.setEx(u2tKey(username, name), TTL, token);
             await pubClient.setEx(t2uKey(token, name), TTL, username);
-    
-            return res.json({ status: "ok", token: token });
+
+            return res.json({ status: "ok", token });
         }
+    } catch (err) {
+        console.error("login error:", err);
+        return res.status(500).json({ error: "server_error" });
+    }
 });
 
 async function match(name, sid, platform) {
@@ -192,8 +208,13 @@ function setupGame(name) {
             // authenticate
             if (!username || !password) return res.status(400).json({ error: "missing creds" });
 
-            const userData = await pubClient.hGetAll(authKey(username));
-            const hash = userData.password_hash;
+            const userResult = await db.query(
+                "SELECT password_hash FROM users WHERE username = $1",
+                [username]
+            );
+
+            const user = userResult.rows[0];
+            const hash = user?.password_hash;
 
             if (!hash || !(await bcrypt.compare(password, hash))) {
                 socket.emit("game", {
@@ -246,7 +267,7 @@ function setupGame(name) {
                 await pubClient.del(s2pKey(socket.id));
                 await pubClient.lRem(qKey(name), 0, socket.id);
             }
-            
+
             // remove user mappings
             const username = await pubClient.get(s2uKey(socket.id));
 
